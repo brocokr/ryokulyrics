@@ -1,0 +1,1151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>녹황색사회 가사 노트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Dela+Gothic+One&family=Gothic+A1:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+/* Layout: 앨범 카드 격자 → 트랙 목록 → 가사 한 단. 가사 화면은 원문·발음·해석이 한 줄씩 짝을 이룬다 */
+:root {
+  --bg: #f3f6ee;
+  --surface: #ffffff;
+  --ink: #17301f;
+  --muted: #5d6f61;
+  --line: #d6e0d0;
+  --leaf: #2f7a3e;
+  --yolk: #e8a910;
+  --on-yolk: #1f1a08;
+  --mask: #dbe4d5;
+  --warn-bg: #fff3d1;
+  --warn-ink: #5c4300;
+  --font-display: "Dela Gothic One", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-jp: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  --font-head: "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-body: "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", "Hiragino Sans", sans-serif;
+  --font-mix: "Noto Sans JP", "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101a13; --surface: #17241b; --ink: #e6efe3; --muted: #9db0a1; --line: #2b3d30;
+    --leaf: #7cc58a; --yolk: #f2c247; --mask: #2b3d30; --warn-bg: #3a2f0f; --warn-ink: #f4d58a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101a13; --surface: #17241b; --ink: #e6efe3; --muted: #9db0a1; --line: #2b3d30;
+  --leaf: #7cc58a; --yolk: #f2c247; --mask: #2b3d30; --warn-bg: #3a2f0f; --warn-ink: #f4d58a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 56px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; }
+.narrow { max-width: 760px; margin-inline: auto; }
+a { color: var(--leaf); }
+:focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
+code { font-family: var(--font-mono); font-size: .88em; background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 0 4px; overflow-wrap: anywhere; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+body:not([data-view="home"]) .home-only { display: none; }
+
+/* header */
+.top { padding-block: 36px 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; gap: 28px; }
+.top:not(:has(.hero)) { grid-template-columns: minmax(0, 1fr); }
+.top-text { display: grid; gap: 14px; }
+/* 제작자 인스타그램 링크 */
+.maker-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.maker-k { font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--muted); }
+.maker { display: inline-flex; align-items: center; gap: 8px; padding: 5px 14px 5px 6px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 700; }
+.maker:hover { border-color: var(--leaf); color: var(--leaf); }
+.maker img { display: block; width: 22px; height: 22px; border-radius: 6px; }
+.maker svg { display: block; width: 22px; height: 22px; padding: 2px; flex: none; fill: var(--leaf); }
+/* 밴드 사진: 원래 비율 그대로. 파일이 없으면 자리째 빠진다 */
+.hero { margin: 0; }
+.hero img { display: block; width: 100%; height: auto; aspect-ratio: 2400 / 1642; object-fit: cover; border-radius: 14px; border: 1px solid var(--line); background: var(--mask); }
+.hero figcaption { margin-top: 8px; display: grid; gap: 6px; }
+.hero .cap { font-size: 12px; color: var(--muted); }
+/* 멤버 링크: 사진 속 위치와 같은 순서로 4칸(모바일은 2칸씩) */
+.members { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.members a { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 6px 8px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-decoration: none; }
+.members a:hover { border-color: var(--leaf); color: var(--leaf); }
+.members img { display: block; width: 18px; height: 18px; border-radius: 5px; flex: none; }
+.members span { display: grid; min-width: 0; line-height: 1.3; }
+.members b { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.members small { font-size: 11px; color: var(--muted); }
+@media (max-width: 520px) { .members { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* 공식 링크: 칸 수에 맞춰 줄을 채우고, 좁으면 다음 줄로 내려간다 */
+.official { display: flex; flex-wrap: wrap; gap: 6px; }
+.official a { flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-decoration: none; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.official a:hover { border-color: var(--leaf); color: var(--leaf); }
+.official img, .official svg { display: block; width: 16px; height: 16px; border-radius: 4px; flex: none; }
+@media (max-width: 760px) {
+  .top { grid-template-columns: minmax(0, 1fr); gap: 18px; padding-top: 20px; }
+  .hero { order: -1; }
+}
+.kicker { font-size: 12px; letter-spacing: .12em; color: var(--muted); font-weight: 700; }
+h1 { font-family: var(--font-head); font-weight: 400; font-size: clamp(34px, 7vw, 56px); line-height: 1.05; margin: 0; text-wrap: balance; }
+h1 .jp { font-family: var(--font-display); display: block; font-size: .42em; letter-spacing: .02em; margin-top: 10px; }
+h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
+.lede { max-width: 62ch; color: var(--muted); margin: 0; }
+
+/* search bar */
+.bar {
+  position: sticky; top: 0; z-index: 5;
+  background: var(--bg); padding-block: 12px; border-bottom: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center;
+}
+.search { flex: 1 1 240px; min-width: 0; }
+.search input {
+  width: 100%; font: inherit; padding: 7px 14px; border-radius: 999px;
+  border: 1.5px solid var(--line); background: var(--surface); color: var(--ink);
+}
+.search input:focus { border-color: var(--leaf); outline: none; }
+.stat { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; margin-left: auto; }
+.stat b { color: var(--ink); }
+
+.alert { margin-top: 16px; background: var(--warn-bg); color: var(--warn-ink); border-radius: 12px; padding: 12px 16px; font-size: 14px; }
+.alert ul { margin: 6px 0 0; padding-left: 18px; }
+.alert code { background: transparent; border-color: currentColor; }
+
+/* album grid */
+.group { margin-top: 32px; }
+.group h2 { font-family: var(--font-head); font-weight: 400; font-size: 26px; line-height: 1.15; margin: 0; }
+.group .sub { font-size: 13px; color: var(--muted); margin: 4px 0 14px; }
+/* 한 줄 장수는 GROUPS의 cols(정규 3, 서브 4). 모바일은 아래 미디어 쿼리에서 2장씩 */
+.albums { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 14px; }
+.album { display: flex; flex-direction: column; min-width: 0; overflow: hidden; text-decoration: none; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.album:hover { border-color: var(--leaf); }
+.album-body { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px 16px; }
+
+/* 앨범 커버: 이미지가 없거나 깨지면 회색 칸만 남는다 */
+.cover { display: block; aspect-ratio: 1; background: var(--mask); overflow: hidden; }
+.cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cover.none img { display: none; }
+.album .cover { border-bottom: 1px solid var(--line); }
+.album-head .cover { border-radius: 10px; border: 1px solid var(--line); }
+.cover.mini { width: 26px; flex: none; border-radius: 5px; }
+.cover.mini.none { display: none; }
+.album-top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ord { font-weight: 800; color: var(--leaf); }
+.album-title { font-family: var(--font-display); font-size: 21px; line-height: 1.25; margin-top: 6px; overflow-wrap: anywhere; }
+.album-ko { font-size: 13px; color: var(--muted); }
+.album-foot { margin-top: auto; padding-top: 12px; }
+.meter { display: flex; height: 6px; border-radius: 999px; background: var(--mask); overflow: hidden; }
+.meter i { display: block; height: 100%; }
+.m-fill { background: var(--leaf); }
+.m-second { margin-top: 4px; }
+.m-ko { background: var(--yolk); }
+.meter-text { margin-top: 6px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin: 0 4px 0 2px; }
+.dot.leaf { background: var(--leaf); }
+.dot.yolk { background: var(--yolk); }
+.nw { white-space: nowrap; }
+
+/* album page */
+.back { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; font-size: 14px; font-weight: 700; text-decoration: none; }
+.back:hover { text-decoration: underline; }
+.album-head { display: grid; grid-template-columns: 168px minmax(0, 1fr); align-items: end; column-gap: 20px; padding-block: 14px 4px; }
+.album-name { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 6vw, 44px); line-height: 1.15; margin: 8px 0 2px; overflow-wrap: anywhere; }
+.tracks { list-style: none; margin: 18px 0 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.tracks li + li { border-top: 1px dashed var(--line); }
+.track { display: grid; grid-template-columns: 2em minmax(0, 1fr) auto; gap: 0 10px; align-items: center; padding: 12px 16px; text-decoration: none; color: inherit; }
+.track:hover { background: var(--bg); }
+.tno { font-size: 13px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tjp { font-family: var(--font-jp); font-weight: 700; font-size: 16px; overflow-wrap: anywhere; }
+.tread { font-family: var(--font-jp); font-size: 12px; color: var(--muted); margin-left: 4px; }
+.tko { font-size: 12px; color: var(--muted); margin-left: 8px; }
+.tnote { display: block; font-size: 12px; color: var(--muted); }
+.badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.badge { font-size: 11px; font-weight: 800; line-height: 1.6; border-radius: 6px; padding: 0 7px; border: 1.5px solid var(--line); color: var(--muted); white-space: nowrap; }
+.badge.has { border-color: var(--leaf); color: var(--leaf); }
+.file-hint { font-size: 13px; color: var(--muted); margin-top: 14px; }
+
+/* song page */
+.song-head { padding-block: 14px 0; }
+.song-title { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 6vw, 42px); line-height: 1.2; margin: 8px 0 2px; overflow-wrap: anywhere; }
+.song-title .read { font-family: var(--font-jp); font-size: .42em; color: var(--muted); margin-left: 8px; }
+.song-ko { color: var(--muted); }
+/* 곡 화면 위 유튜브: 웹 주소로 열면 사이트 안에서 재생. 파일로 직접 열면 유튜브가 막아서(오류 153) 새 탭으로 여는 카드를 보여 준다 */
+.yt-player { margin-top: 14px; aspect-ratio: 16 / 9; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--mask); }
+.yt-player iframe { display: block; width: 100%; height: 100%; border: 0; }
+.yt { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); text-decoration: none; }
+.yt:hover { border-color: var(--leaf); }
+.yt-thumb { position: relative; flex: none; width: 168px; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: var(--mask); }
+.yt-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.yt-thumb svg { position: absolute; inset: 0; margin: auto; width: 40px; height: 40px; filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .5)); }
+.yt-text { display: grid; gap: 2px; min-width: 0; }
+.yt-text b { font-size: 14px; }
+.yt-text small { font-size: 12px; color: var(--muted); }
+.yt.plain { padding: 10px 12px; }
+.yt.plain > svg { flex: none; width: 24px; height: 24px; }
+@media (max-width: 520px) { .yt-thumb { width: 116px; } }
+.controls {
+  position: sticky; top: 0; z-index: 5; margin-top: 16px;
+  background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+}
+.seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface); }
+.seg button { font: inherit; font-size: 13px; font-weight: 700; border: 0; background: none; color: var(--muted); padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; }
+.check input { accent-color: var(--leaf); margin: 0; }
+.hint { flex-basis: 100%; margin: 0; font-size: 12px; color: var(--muted); }
+.info, .warn { margin: 14px 0 0; font-size: 13px; border-radius: 10px; padding: 8px 12px; }
+.info { background: var(--surface); border: 1px solid var(--line); color: var(--muted); }
+.warn { background: var(--warn-bg); color: var(--warn-ink); }
+
+.lyrics { margin-top: 22px; }
+.stanza + .stanza { margin-top: 26px; }
+.row { display: grid; grid-template-columns: 1.5em minmax(0, 1fr); align-items: baseline; column-gap: 10px; padding: 5px 6px; margin-inline: -6px; border-radius: 8px; }
+.row + .row { margin-top: 6px; }
+.ln { font-size: 11px; font-weight: 700; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; user-select: none; }
+.row-body { min-width: 0; }
+.jp, .pr, .hg, .ko { width: fit-content; max-width: 100%; overflow-wrap: anywhere; }
+.jp { font-family: var(--font-jp); font-size: 19px; font-weight: 500; line-height: 1.9; }
+/* 발음: 로마자 장음(ō, ā)이 한 글자로 들어 있는 시스템 글꼴을 먼저 쓰고, 한글 발음은 Gothic A1로 넘어간다 */
+.pr { font-family: "Segoe UI", "Helvetica Neue", Arial, "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.hg { font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+.ko { font-size: 15px; color: var(--leaf); line-height: 1.6; margin-top: 1px; }
+rt { font-size: .5em; font-weight: 400; color: var(--muted); }
+.no-pr .pr, .no-hg .hg, .no-furi rt { display: none; }
+.mode-ko .row:not(.shown) :is(.study, .study-btn), .mode-jp .row:not(.shown) :is(.study, .study-btn) { display: none; }
+.mode-ko .row, .mode-jp .row { cursor: pointer; }
+.mode-ko .row:not(.shown) .ko,
+.mode-jp .row:not(.shown) .jp,
+.mode-jp .row:not(.shown) .pr,
+.mode-jp .row:not(.shown) .hg { color: transparent; background: var(--mask); border-radius: 6px; user-select: none; }
+.mode-jp .row:not(.shown) rt { color: transparent; }
+.row.flash { background: color-mix(in srgb, var(--yolk) 28%, transparent); }
+
+/* 단어·문법: 가사 줄 아래 버튼을 누르면 펼쳐지는 카드 */
+.study-btn {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 6px;
+  font: inherit; font-size: 12px; font-weight: 700; color: var(--leaf);
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; padding: 2px 10px 2px 11px; cursor: pointer;
+}
+.study-btn:hover { border-color: var(--leaf); }
+.study-btn .n { color: var(--muted); font-variant-numeric: tabular-nums; }
+.study-btn::after { content: ""; width: 6px; height: 6px; margin: -3px 0 0 2px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); }
+.row.open .study-btn::after { margin-top: 3px; transform: rotate(-135deg); }
+.ghost-btn { font: inherit; font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+.ghost-btn:hover { border-color: var(--leaf); color: var(--leaf); }
+.row:not(.open) .study { display: none; }
+.study { margin: 8px 0 4px; padding: 8px 12px; display: grid; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--yolk); border-radius: 4px 10px 10px 4px; }
+.item { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; font-size: 14px; line-height: 1.7; }
+.term { font-family: var(--font-jp); font-weight: 700; font-size: 15px; line-height: 2; }
+.mean { color: var(--muted); }
+.tag { align-self: center; font-size: 10px; font-weight: 800; line-height: 1.5; color: var(--leaf); border: 1.5px solid var(--leaf); border-radius: 5px; padding: 0 5px; }
+.study { font-family: var(--font-mix); }
+
+/* 자세한 설명이 있는 단어: 누르면 아래로 펼쳐진다 */
+.item-d > summary { list-style: none; cursor: pointer; }
+.item-d > summary::-webkit-details-marker { display: none; }
+.item-d > summary::after { content: ""; align-self: center; width: 6px; height: 6px; margin: -3px 0 0 -2px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); transform: rotate(45deg); }
+.item-d[open] > summary::after { margin-top: 3px; transform: rotate(-135deg); }
+.item-d > summary:hover .term { color: var(--leaf); }
+.detail { margin: 2px 0 12px 2px; padding: 4px 0 2px 14px; border-left: 2px solid var(--line); font-size: 14px; line-height: 1.9; overflow-wrap: anywhere; }
+.detail p { margin: 0 0 4px; }
+.detail .d-sub { margin-top: 10px; }
+.detail .d-sub:first-child { margin-top: 0; }
+.d-sub .d-mark { color: var(--leaf); font-weight: 800; margin-right: 4px; }
+.d-sub b { font-weight: 700; margin-right: 6px; }
+.d-sub span { color: var(--muted); }
+.d-arrow { padding-left: 1em; color: var(--leaf); font-weight: 700; }
+.d-link { margin: 8px 0; padding-left: 12px; border-left: 2px solid var(--line); }
+.d-link-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.detail ul { margin: 0 0 6px; padding-left: 18px; }
+.detail table { border-collapse: collapse; margin: 4px 0 8px; font-size: 13.5px; line-height: 1.8; }
+.detail th, .detail td { border: 1px solid var(--line); padding: 2px 10px; text-align: left; vertical-align: bottom; }
+.detail th { background: var(--bg); color: var(--muted); font-size: 12px; font-weight: 700; }
+
+.memo { margin-top: 30px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+.memo h2 { font-size: 12px; font-weight: 800; letter-spacing: .1em; color: var(--muted); margin: 0 0 6px; }
+.memo-body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.empty-card { margin-top: 22px; background: var(--surface); border: 1.5px dashed var(--line); border-radius: 14px; padding: 18px 20px; }
+.empty-card p { margin: 0 0 8px; }
+.empty-card p:last-child { margin: 0; }
+.empty-title { font-weight: 800; font-size: 16px; }
+.pager { margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+/* 한 곡만 내보낸 파일: 다른 곡으로 가는 길은 없다 */
+[data-single] .pager { display: none; }
+[data-single] .back { pointer-events: none; color: var(--muted); }
+.pager a { display: flex; flex-direction: column; gap: 2px; min-width: 0; text-decoration: none; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.pager a:hover { border-color: var(--leaf); }
+.pager .next { grid-column: 2; text-align: right; }
+.pager small { font-size: 12px; color: var(--muted); }
+.pager span { font-family: var(--font-jp); font-weight: 700; overflow-wrap: anywhere; }
+
+/* search results */
+.count, .none { margin: 18px 0 0; font-size: 13px; color: var(--muted); }
+.results { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 10px; }
+.results a { display: block; text-decoration: none; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
+.results a:hover { border-color: var(--leaf); }
+.where { display: block; font-size: 12px; color: var(--muted); }
+.snip { display: block; margin-top: 4px; font-family: var(--font-jp); font-size: 14px; }
+mark { background: var(--yolk); color: var(--on-yolk); border-radius: 3px; padding: 0 2px; }
+
+/* help */
+.help { margin-top: 36px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.help summary { padding: 14px 18px; font-weight: 800; cursor: pointer; }
+.help-body { padding: 0 18px 18px; font-size: 14px; }
+.help-body ol, .help-body ul { padding-left: 20px; margin: 0 0 12px; }
+.help-body li + li { margin-top: 4px; }
+.help pre { margin: 0 0 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.55; }
+.caution { margin: 0; background: var(--warn-bg); color: var(--warn-ink); border-radius: 10px; padding: 10px 12px; }
+footer { margin-top: 24px; font-size: 12px; color: var(--muted); }
+
+@media (max-width: 520px) {
+  .stat { margin-left: 0; }
+  .jp { font-size: 17px; }
+  .albums { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .album-body { padding: 10px 12px 12px; }
+  .album-title { font-size: 17px; }
+  .album-head { grid-template-columns: 104px minmax(0, 1fr); column-gap: 14px; }
+}
+</style>
+</head>
+<body data-view="home">
+<div class="wrap">
+  <div id="app"></div>
+
+  <details class="help home-only">
+    <summary>가사 넣는 법</summary>
+    <div class="help-body">
+      <ol>
+        <li><code>가사</code> 폴더에서 앨범 파일(예: <code>정규1집.js</code>)을 VS Code나 메모장으로 엽니다.</li>
+        <li>곡마다 <code>### 번호 제목</code> 줄 아래에 <code>[원문]</code> <code>[발음]</code> <code>[한글발음]</code> <code>[해석]</code> <code>[공부]</code> <code>[메모]</code> 칸이 있습니다. 칸 이름 바로 아래에 붙여 넣습니다.</li>
+        <li>저장한 뒤 이 페이지를 새로고침하면 바로 보입니다.</li>
+      </ol>
+<pre>### 01 Re
+
+[원문]
+(일본어 가사 1번째 줄)
+(일본어 가사 2번째 줄)
+
+(일본어 가사 3번째 줄)   ← 빈 줄을 넣으면 절이 나뉩니다
+
+[발음]
+(1번째 줄 로마자 발음)
+(2번째 줄 로마자 발음)
+(3번째 줄 로마자 발음)
+
+[한글발음]
+(1번째 줄 한글 발음)
+(2번째 줄 한글 발음)
+(3번째 줄 한글 발음)
+
+[해석]
+(1번째 줄 해석)
+(2번째 줄 해석)
+(3번째 줄 해석)
+
+[공부]
+1
+{単語|たんご} - 단어
+～ている - ~하고 있다
+
+3
+{文法|ぶんぽう} - 문법
+
+[메모]
+(곡 전체에 대한 메모)</pre>
+      <ul>
+        <li><b>원문·발음·한글발음·해석은 줄 순서대로 짝지어집니다.</b> 원문 3번째 줄 ↔ 해석 3번째 줄. 빈 줄은 세지 않으니 줄 순서만 맞추면 됩니다.</li>
+        <li>안 쓰는 칸은 비워 두면 화면에 안 나옵니다. 발음 없이 원문·해석만 넣어도 됩니다.</li>
+        <li>후리가나: <code>{漢字|かんじ}</code>처럼 쓰면 한자 위에 읽는 법이 붙습니다.</li>
+        <li><b>[공부]</b>에는 줄 번호만 한 줄에 쓰고, 그 아래에 <code>단어 - 뜻</code>을 한 줄씩 적습니다. 그 가사 줄 아래 ‘단어·문법’ 버튼을 누르면 펼쳐집니다. 줄 번호는 가사 왼쪽의 작은 숫자입니다.</li>
+        <li>같은 가사가 되풀이되는 줄은 <b>[공부]</b>에 처음 한 번만 적으면 나머지 줄에도 똑같이 보입니다.</li>
+        <li>다른 곳의 설명을 그대로 보여 주려면 설명 줄에 <code>&gt;&gt; Re 13 ～のに</code>처럼 곡 이름, 줄 번호, 항목을 적습니다. 곡 이름을 빼면 같은 곡이고, 끝에 <code>①</code>을 붙이면 그 소제목만 가져옵니다.</li>
+        <li><code>～</code>로 시작하거나 <code>=</code>가 들어간 항목에는 ‘문법’ 표시가 붙습니다.</li>
+        <li>자세한 설명은 단어 줄 바로 아래에 <b>스페이스 두 칸</b>을 띄우고 적습니다. 단어를 누르면 펼쳐집니다. 설명 안에서 <code>①</code>로 시작하면 소제목, <code>- </code>는 목록, <code>→</code>는 결과 줄, <code> | </code>로 나누면 표(첫 줄이 제목 칸)가 됩니다.</li>
+        <li><code>//</code>로 시작하는 줄은 화면에 안 나오는 메모입니다.</li>
+        <li>같은 곡이 두 앨범에 실린 경우(예: 始まりの歌)는 한쪽에만 넣어도 양쪽에서 보입니다.</li>
+      </ul>
+      <p class="caution">지우면 안 되는 것: 파일 맨 위의 <code>가사("정규1집", &#96;</code>, 맨 아래의 <code>&#96;);</code>, 곡마다 있는 <code>###</code> 줄. 가사 안에 <code>&#96;</code>(백틱) 문자를 넣으면 안 됩니다.</p>
+    </div>
+  </details>
+
+  <footer class="home-only">곡 목록: 나무위키 「녹황색사회/디스코그래피」 통상판 기준(2026.10.18 판). 가사는 이 컴퓨터의 <code>가사</code> 폴더에만 있습니다.</footer>
+</div>
+
+<script>
+"use strict";
+
+// 앨범·곡 목록. tracks의 한 줄은 [일본어 제목, 한국어 제목, 읽는 법]이고 뒤의 둘은 없어도 된다.
+// file은 가사 폴더의 파일 이름이자, 그 파일 맨 위 가사("…") 안의 이름이다.
+const ALBUMS = /*ALBUMS*/[
+  {"key": "full1", "file": "정규1집", "group": "full", "label": "정규 1집", "title": "緑黄色社会", "ko": "녹황색사회", "date": "2018.03.14", "tracks": [
+    ["Re"], ["始まりの歌", "시작의 노래"], ["大人ごっこ", "어른 흉내"], ["キラキラ", "반짝반짝"], ["Alice"],
+    ["君が望む世界", "네가 바라는 세계"], ["恋って", "사랑이란"], ["regret"], ["真夜中ドライブ", "한밤중 드라이브"], ["またね", "또 봐"]
+  ]},
+  {"key": "full2", "file": "정규2집", "group": "full", "label": "정규 2집", "title": "SINGALONG", "date": "2020.04.22", "note": "CD 2020.09.30", "inst": {"1": "인트로"}, "tracks": [
+    ["SINGALONG"], ["Sabotage"], ["Mela!"], ["想い人", "사랑하는 사람"], ["inori"], ["Shout Baby"], ["スカーレット", "스칼렛"],
+    ["一歩", "한걸음"], ["愛のかたち", "사랑의 형태"], ["幸せ", "행복"], ["Brand New World"], ["あのころ見た光", "그 시절 보았던 빛"], ["冬の朝", "겨울 아침"]
+  ]},
+  {"key": "full3", "file": "정규3집", "group": "full", "label": "정규 3집", "title": "Actor", "date": "2022.01.26", "inst": {"1": "인트로"}, "tracks": [
+    ["Actor"], ["キャラクター", "캐릭터"], ["merry-go-round"], ["これからのこと、それからのこと", "앞으로의 일, 그로부터의 일"],
+    ["安心してね", "안심해"], ["LITMUS"], ["ずっとずっとずっと", "계속계속계속"], ["揺れる", "흔들려"], ["たとえたとえ", "만약에만약에"],
+    ["アラモードにワルツ", "아라모드의 왈츠"], ["結証", "결증"], ["S.T.U.D"], ["Landscape"], ["スクリーンと横顔", "스크린과 옆모습"]
+  ]},
+  {"key": "full4", "file": "정규4집", "group": "full", "label": "정규 4집", "title": "pink blue", "date": "2023.05.17", "tracks": [
+    ["ピンクブルー", "핑크 블루"], ["Starry Drama"], ["ジブンセイフク", "자기 정복"], ["あうん"], ["ミチヲユケ", "길을 나아가"],
+    ["うそつき", "거짓말쟁이"], ["陽はまた昇るから", "해는 다시 떠오르니까"], ["湿気っている", "눅눅해졌어"], ["Don!!"], ["White Rabbit"],
+    ["さもなくば誰がやる", "아니면 누가 하겠어"], ["Slow dance"]
+  ]},
+  {"key": "full5", "file": "정규5집", "group": "full", "label": "정규 5집", "title": "Channel U", "date": "2025.02.19", "inst": {"5": "트랜지션", "14": "트랜지션"}, "tracks": [
+    ["PLAYER 1"], ["恥ずかしいか青春は", "부끄러운가 청춘은"], ["ナイスアイディア！", "나이스 아이디어"], ["Monkey Dance"], ["∩", "Intersection"],
+    ["マジックアワー", "매직아워"], ["僕らはいきものだから", "우리들은 살아있으니까"], ["Channel Me"], ["馬鹿の一つ覚え", "바보의 외고집"],
+    ["Each Ring"], ["サマータイムシンデレラ", "서머타임 신데렐라"], ["言えない", "말할 수 없어"], ["コーヒーとましゅまろ", "커피와 마시멜로"],
+    ["U"], ["Party!!"], ["花になって", "꽃이 되어줘"], ["オーロラを探しに", "오로라를 찾으러"]
+  ]},
+  {"key": "full6", "file": "정규6집", "group": "full", "label": "정규 6집", "title": "あたまご", "ko": "아타마고", "date": "2026.09.09", "tracks": [
+    ["誰かの国", "누군가의 나라"], ["TABOO"], ["My Answer"], ["illusion"], ["うたまご", "우타마고"], ["章", "시루시", "しるし"],
+    ["分かりにくい", "이해하기 어려워"], ["アルゴリズム", "알고리즘"], ["レジスダンス", "레지스단스"], ["風に乗る", "바람을 타다"],
+    ["つづく", "이어져"], ["晴々", "맑음"]
+  ]},
+  {"key": "mini1", "file": "미니1집", "group": "sub", "label": "미니 1집", "title": "Nice To Meet You??", "date": "2017.01.11", "tracks": [
+    ["またね", "또 봐"], ["アウトサイダー", "아웃사이더"], ["regret"], ["Bitter"], ["丘と小さなパラダイム", "언덕과 작은 패러다임"]
+  ]},
+  {"key": "mini2", "file": "미니2집", "group": "sub", "label": "미니 2집", "title": "ADORE", "date": "2017.08.02", "tracks": [
+    ["始まりの歌", "시작의 노래"], ["want"], ["キラキラ", "반짝반짝"], ["恋って", "사랑이란"], ["それなりの生活", "나름대로의 생활"]
+  ]},
+  {"key": "mini3", "file": "미니3집", "group": "sub", "label": "미니 3집", "title": "溢れた水の行方", "ko": "넘친 물의 행방", "date": "2018.11.07", "tracks": [
+    ["あのころ見た光", "그 시절 보았던 빛"], ["視線", "시선"], ["Never Come Back"], ["サボテン", "선인장"], ["Bitter"], ["リトルシンガー", "리틀 싱어"]
+  ]},
+  {"key": "ep1", "file": "EP", "group": "sub", "label": "EP", "title": "幸せ -EP-", "ko": "행복 -EP-", "date": "2019.05.29", "tracks": [
+    ["幸せ", "행복"], ["逆転", "역전"], ["ひとりごと", "혼자"], ["にちようび", "일요일"]
+  ]},
+  {"key": "single1", "file": "싱글1집", "group": "single", "label": "싱글 1집", "title": "sabotage", "date": "2019.11.06", "inst": {"3": "인스트"}, "tracks": [
+    ["sabotage"], ["Alright!!"], ["sabotage (Instrumental)"]
+  ]},
+  {"key": "single2", "file": "싱글2집", "group": "single", "label": "싱글 2집", "title": "Shout Baby", "date": "2020.02.19", "inst": {"3": "인스트"}, "tracks": [
+    ["Shout Baby"], ["空に歌えば", "하늘에 노래하면"], ["Shout Baby (Instrumental)"]
+  ]},
+  {"key": "single3", "file": "싱글3집", "group": "single", "label": "싱글 3집", "title": "結証", "ko": "결증", "date": "2021.02.03", "inst": {"4": "인스트", "5": "인스트", "6": "인스트"}, "tracks": [
+    ["結証", "결증"], ["LADYBUG"], ["Copy"], ["結証 (Instrumental)"], ["LADYBUG (Instrumental)"], ["Copy (Instrumental)"]
+  ]},
+  {"key": "single4", "file": "싱글4집", "group": "single", "label": "싱글 4집", "title": "LITMUS", "date": "2021.08.25", "inst": {"4": "인스트", "5": "인스트", "6": "인스트"}, "tracks": [
+    ["LITMUS"], ["アーユーレディー", "Are You Ready"], ["これからのこと、それからのこと", "앞으로의 일, 그로부터의 일"],
+    ["LITMUS (Instrumental)"], ["アーユーレディー (Instrumental)"], ["これからのこと、それからのこと (Instrumental)"]
+  ]},
+  {"key": "single5", "file": "싱글5집", "group": "single", "label": "싱글 5집", "title": "陽はまた昇るから", "ko": "해는 다시 떠오르니까", "date": "2022.04.20", "inst": {"3": "인스트", "4": "인스트"}, "tracks": [
+    ["陽はまた昇るから", "해는 다시 떠오르니까"], ["時のいたずら", "시간의 장난"], ["陽はまた昇るから -instrumental-"], ["時のいたずら -instrumental-"]
+  ]},
+  {"key": "single6", "file": "싱글6집", "group": "single", "label": "싱글 6집", "title": "ミチヲユケ", "ko": "길을 나아가", "date": "2022.11.09", "inst": {"3": "인스트", "4": "인스트"}, "tracks": [
+    ["ミチヲユケ", "길을 나아가"], ["Don!!"], ["ミチヲユケ -Instrumental-"], ["Don!! -Instrumental-"]
+  ]},
+  {"key": "single7", "file": "싱글7집", "group": "single", "label": "싱글 7집", "title": "サマータイムシンデレラ", "ko": "Summer Time Cinderella", "date": "2023.09.06", "inst": {"3": "인스트", "4": "인스트"}, "tracks": [
+    ["サマータイムシンデレラ", "Summer Time Cinderella"], ["マジックアワー", "Magic Hour"], ["サマータイムシンデレラ -Instrumental-"], ["マジックアワー -Instrumental-"]
+  ]},
+  {"key": "single8", "file": "싱글8집", "group": "single", "label": "싱글 8집", "title": "花になって", "ko": "꽃이 되어줘", "date": "2023.12.06", "inst": {"3": "인스트", "4": "인스트"}, "tracks": [
+    ["花になって", "꽃이 되어줘"], ["夢と悪魔とファンタジー", "꿈과 악마와 판타지"], ["花になって -Instrumental-"], ["夢と悪魔とファンタジー -Instrumental-"]
+  ]},
+  {"key": "single9", "file": "싱글9집", "group": "single", "label": "싱글 9집", "title": "Party!!", "date": "2024.03.06", "inst": {"3": "인스트", "4": "인스트"}, "tracks": [
+    ["Party!!"], ["Tap Tap Dance"], ["Party!! -Instrumental-"], ["Tap Tap Dance -Instrumental-"]
+  ]},
+  {"key": "single10", "file": "싱글10집", "group": "single", "label": "싱글 10집", "title": "My Answer", "date": "2025.11.12", "inst": {"3": "인스트", "4": "인스트"}, "tracks": [
+    ["My Answer"], ["さもなくば誰がやる", "아니면 누가 하겠어"], ["My Answer -Instrumental-"], ["さもなくば誰がやる -Instrumental-"]
+  ]},
+  {"key": "single11", "file": "싱글11집", "group": "single", "label": "싱글 11집", "title": "風に乗る", "ko": "바람을 타고", "date": "2026.03.18", "inst": {"3": "인스트", "4": "인스트"}, "tracks": [
+    ["風に乗る", "바람을 타고"], ["étoile", "별"], ["風に乗る -Instrumental-"], ["étoile -Instrumental-"]
+  ]}
+]/*END*/;
+
+const GROUPS = [
+  { id: "full", name: "정규 앨범", sub: "정규 1집부터 6집까지", cols: 3 },
+  { id: "sub", name: "서브 앨범", sub: "미니 앨범 1~3집과 EP", cols: 4 },
+  { id: "single", name: "싱글", sub: "싱글 1~11집 · 통상판 수록곡", cols: 4 },
+];
+
+// 제목의 로마자. 앨범 제목과 곡 제목이 같이 쓴다. 영어로 된 제목은 적지 않는다.
+// 일본어는 조사를 앞 단어에 붙여 쓰고(Darekano Kuni), 긴 소리는 소리 나는 글자로 풀어 쓴다(Kesshou, Chiisana).
+// 외래어는 원래 철자로 적고(Algorithm), 그 뒤의 조사는 띄어 쓴다(Screen to Yokogao).
+const TITLE_EN = {
+  "緑黄色社会": "Ryokuoushoku Shakai", "始まりの歌": "Hajimarino Uta", "大人ごっこ": "Otona Gokko", "キラキラ": "Kirakira",
+  "君が望む世界": "Kimiga Nozomu Sekai", "恋って": "Koitte", "真夜中ドライブ": "Mayonaka Drive", "またね": "Matane",
+  "想い人": "Omoibito", "スカーレット": "Scarlet", "一歩": "Ippo", "愛のかたち": "Aino Katachi", "幸せ": "Shiawase",
+  "あのころ見た光": "Anokoro Mita Hikari", "冬の朝": "Fuyuno Asa",
+  "キャラクター": "Character", "これからのこと、それからのこと": "Korekarano Koto, Sorekarano Koto", "安心してね": "Anshin Shitene",
+  "ずっとずっとずっと": "Zutto Zutto Zutto", "揺れる": "Yureru", "たとえたとえ": "Tatoe Tatoe", "アラモードにワルツ": "À la mode ni Waltz",
+  "結証": "Kesshou", "スクリーンと横顔": "Screen to Yokogao",
+  "ピンクブルー": "Pink Blue", "ジブンセイフク": "Jibun Seifuku", "あうん": "Aun", "ミチヲユケ": "Michi wo Yuke", "うそつき": "Usotsuki",
+  "陽はまた昇るから": "Hiwa Mata Noborukara", "湿気っている": "Shikette Iru", "さもなくば誰がやる": "Samonakuba Darega Yaru",
+  "恥ずかしいか青春は": "Hazukashiika Seishunwa", "ナイスアイディア！": "Nice Idea!", "マジックアワー": "Magic Hour",
+  "僕らはいきものだから": "Bokurawa Ikimono Dakara", "馬鹿の一つ覚え": "Bakano Hitotsu Oboe", "サマータイムシンデレラ": "Summer Time Cinderella",
+  "言えない": "Ienai", "コーヒーとましゅまろ": "Coffee to Marshmallow", "花になって": "Hanani Natte", "オーロラを探しに": "Aurora wo Sagashini · Looking for northern lights",
+  "あたまご": "Atamago", "誰かの国": "Darekano Kuni", "うたまご": "Utamago", "章": "Shirushi", "分かりにくい": "Wakarinikui",
+  "アルゴリズム": "Algorithm", "レジスダンス": "ResisDance", "風に乗る": "Kazeni Noru", "つづく": "Tsuzuku", "晴々": "Harebare",
+  "アウトサイダー": "Outsider", "丘と小さなパラダイム": "Okato Chiisana Paradigm", "それなりの生活": "Sorenarino Seikatsu",
+  "溢れた水の行方": "Afureta Mizuno Yukue", "視線": "Shisen", "サボテン": "Saboten", "リトルシンガー": "Little Singer",
+  "逆転": "Gyakuten", "ひとりごと": "Hitorigoto", "にちようび": "Nichiyoubi",
+  "空に歌えば": "Sorani Utaeba", "アーユーレディー": "Are You Ready", "時のいたずら": "Tokino Itazura", "夢と悪魔とファンタジー": "Yumeto Akumato Fantasy",
+};
+// "風に乗る -Instrumental-"나 "幸せ -EP-"처럼 뒤에 붙은 말은 그대로 두고 앞부분만 찾는다.
+function titleEn(s) {
+  const m = s.match(/^(.*?)(\s+(?:-[^-]+-|\([^)]*\)))$/);
+  const en = TITLE_EN[m ? m[1] : s];
+  return en ? en + (m ? m[2] : "") : "";
+}
+
+const ALL = [];
+for (const al of ALBUMS) {
+  // 한국어 제목 자리에 이미 같은 영어가 있으면(Magic Hour) 되풀이하지 않는다
+  al.en = titleEn(al.title) === al.ko ? "" : titleEn(al.title);
+  al.tracks = al.tracks.map(([jp, ko = "", read = ""], i) => {
+    // inst: 가사가 없는 곡의 {트랙 번호: 종류}(예: 인트로, 트랜지션). 진행률에서 빠지고, 빈 곡 안내 대신 "가사 없음"을 보여 준다.
+    const t = { jp, ko, read, en: titleEn(jp) === ko ? "" : titleEn(jp), no: i + 1, album: al, id: `${al.key}-${i + 1}`, inst: (al.inst || {})[i + 1] || "" };
+    ALL.push(t);
+    return t;
+  });
+}
+const byKey = Object.fromEntries(ALBUMS.map(al => [al.key, al]));
+const norm = s => s.normalize("NFKC").toLowerCase().replace(/\s+/g, "");
+for (const t of ALL) t.twins = ALL.filter(o => o !== t && norm(o.jp) === norm(t.jp));
+
+/* ---------- 가사 파일 읽기 ---------- */
+
+const LYRICS = {};    // 파일 이름 → { 트랙 번호: { 원문, 발음, 해석, 메모 } }
+const fileState = {}; // 파일 이름 → "ok" | "missing" | "broken"
+const fileErrLine = {};
+
+// 가사 파일들이 부르는 함수. ### 줄의 번호로 곡을 나누고, [원문] 같은 칸 이름 아래 줄을 모은다.
+window.가사 = function (name, text) {
+  const songs = {};
+  let cur = null, sec = null;
+  for (const raw of String(text).split(/\r?\n/)) {
+    const line = raw.replace(/\s+$/, "");
+    const head = line.match(/^\s*###\s*(\d+)/);
+    if (head) {
+      cur = songs[Number(head[1])] = { 원문: [], 발음: [], 한글발음: [], 해석: [], 공부: [], 메모: [] };
+      sec = null;
+      continue;
+    }
+    if (!cur || /^\s*\/\//.test(line)) continue;
+    const s = line.match(/^\s*\[(원문|발음|한글발음|해석|공부|메모)\]\s*$/);
+    if (s) sec = s[1];
+    else if (sec) cur[sec].push(line);
+  }
+  LYRICS[name] = songs;
+};
+
+function loadLyrics() {
+  // 한 곡만 내보낸 파일: 가사가 페이지 안에 들어 있어 가사 폴더를 읽지 않는다
+  if (window.EMBED_LYRICS) {
+    for (const [name, text] of Object.entries(window.EMBED_LYRICS)) 가사(name, text);
+    for (const al of ALBUMS) fileState[al.file] = "ok";
+    return Promise.resolve();
+  }
+  addEventListener("error", e => {
+    try {
+      const m = /\/([^/]+)\.js$/.exec(decodeURIComponent(e.filename || ""));
+      if (m && e.lineno) fileErrLine[m[1]] = e.lineno;
+    } catch {}
+  });
+  return Promise.all(ALBUMS.map(al => new Promise(resolve => {
+    const s = document.createElement("script");
+    s.src = `가사/${al.file}.js`;
+    s.onload = () => { fileState[al.file] = LYRICS[al.file] ? "ok" : "broken"; resolve(); };
+    s.onerror = () => { fileState[al.file] = "missing"; resolve(); };
+    document.head.append(s);
+  })));
+}
+
+const has = lines => !!lines && lines.some(l => l.trim());
+const own = t => (LYRICS[t.album.file] || {})[t.no] || null;
+
+// 그 곡 칸이 비어 있으면, 다른 앨범에 실린 같은 곡의 가사를 빌려 온다.
+function lyricsFor(t) {
+  const mine = own(t);
+  if (mine && has(mine.원문)) return { d: mine, from: null };
+  const twin = t.twins.find(o => has(own(o)?.원문));
+  if (twin) return { d: { ...own(twin), 메모: has(mine?.메모) ? mine.메모 : own(twin).메모 }, from: twin };
+  return { d: mine, from: null };
+}
+const hasLyrics = t => has(lyricsFor(t).d?.원문);
+const hasTranslation = t => has(lyricsFor(t).d?.해석);
+
+// 빈 줄을 빼고 원문·발음·해석을 줄 번호로 짝짓는다. 절 나눔은 원문의 빈 줄을 따른다.
+function layout(d) {
+  const nb = lines => lines.filter(l => l.trim());
+  const jp = nb(d.원문), pr = nb(d.발음), hg = nb(d.한글발음 || []), ko = nb(d.해석);
+  const n = Math.max(jp.length, pr.length, hg.length, ko.length);
+  const base = [d.원문, d.해석, d.발음, d.한글발음].find(has) || [];
+  const stanzas = [];
+  let start = 0, size = 0;
+  for (const l of base) {
+    if (l.trim()) size++;
+    else if (size) { stanzas.push([start, start + size]); start += size; size = 0; }
+  }
+  if (size) { stanzas.push([start, start + size]); start += size; }
+  if (start < n) stanzas.push([start, n]);
+  return { jp, pr, hg, ko, n, stanzas };
+}
+
+function mismatch(L) {
+  const parts = [["원문", L.jp], ["발음", L.pr], ["한글발음", L.hg], ["해석", L.ko]].filter(([, a]) => a.length);
+  if (new Set(parts.map(([, a]) => a.length)).size < 2) return "";
+  return parts.map(([k, a]) => `${k} ${a.length}줄`).join(" · ");
+}
+
+// [공부] 칸: 숫자만 있는 줄이 "몇 번째 가사 줄"이고, 그 아래 줄들이 "단어 - 뜻" 항목이다.
+// 앞에 공백을 두고 쓴 줄은 바로 위 항목의 자세한 설명(detail)이 된다.
+function studyNotes(lines) {
+  const notes = {};
+  let cur = null, last = null, loose = 0;
+  for (const l of lines || []) {
+    const s = l.trim();
+    if (!s) continue;
+    const num = s.match(/^(\d+)\s*(?:번째\s*줄|번째|번|줄|\.|\))?$/);
+    if (num) { cur = notes[Number(num[1]) - 1] ||= []; last = null; continue; }
+    if (/^\s/.test(l) && last) { last.detail.push(s); continue; }
+    if (!cur) { loose++; continue; }
+    const m = s.match(/^(.*?)\s+[-:]\s+(.*)$/);
+    const term = m ? m[1] : s;
+    last = { term, mean: m ? m[2] : "", gram: /^[～〜~]|=|→/.test(term), detail: [] };
+    cur.push(last);
+  }
+  return { notes, loose };
+}
+
+// 같은 가사가 되풀이되면 [공부]에 처음 한 번만 적어도 그 줄들에 같은 해설을 보여 준다. 따로 적은 줄은 그대로 둔다.
+function shareNotes(notes, jp) {
+  const first = new Map();
+  jp.forEach((s, i) => { const k = plain(s).trim(); if (notes[i]?.length && !first.has(k)) first.set(k, notes[i]); });
+  return jp.map((s, i) => notes[i]?.length ? notes[i] : first.get(plain(s).trim()) || []);
+}
+
+// 설명 안의 ">> 곡이름 줄번호 항목 ①" 줄은 그 항목의 설명을 이 자리에 그대로 가져온다.
+// 곡이름을 빼면 같은 곡, 끝의 ①을 빼면 설명 전체. 원본을 고치면 가져다 쓴 곳도 함께 바뀐다.
+const LINK = /^>>\s*(?:(.+?)\s+)?(\d+)\s+(.+?)(?:\s+([①-⑳]))?$/;
+// 가져온 설명에서는 원래 곡에만 해당하는 문장을 뺀다("이 줄", "1번째 줄"은 다른 곡에서 보면 뜻이 달라진다).
+// 문장 단위로 빼고, 소제목이 그런 말이면 그 소제목 전체를 뺀다. 표와 가져오기 줄은 그대로 둔다.
+const SONG_ONLY = /이 줄|이 곡|이번 가사|^가사에서|해석[의에]|여기서|\d+번째 줄/;
+const isSub = l => /^[①-⑳]/.test(l);
+const isRow = l => /\s\|\s/.test(l);
+const dropSongOnly = l => l.replace(/\([^()]*번째 줄[^()]*\)/g, "").replace(/([.?!])\s+/g, "$1\n").split("\n").filter(s => !SONG_ONLY.test(s)).join(" ");
+function generalOnly(lines, keepHead) {
+  let skip = false;
+  return lines.flatMap((l, i) => {
+    const head = keepHead && i === 0;
+    if (isSub(l)) skip = !head && SONG_ONLY.test(l);
+    if (skip) return [];
+    if (head || isRow(l) || l.startsWith(">>")) return [l];
+    const kept = dropSongOnly(l);
+    return kept ? [kept] : [];
+  });
+}
+function findLinked(s, ctx) {
+  const m = s.match(LINK);
+  if (!m) return null;
+  const t = m[1] ? ALL.find(o => norm(o.jp) === norm(m[1])) : ctx;
+  const d = t && lyricsFor(t).d;
+  const item = d && (studyNotes(d.공부).notes[m[2] - 1] || []).find(it => plain(it.term) === plain(m[3]));
+  if (!item) return null;
+  if (!m[4]) return { t, item, detail: generalOnly(item.detail) };
+  const a = item.detail.findIndex(l => l.startsWith(m[4]));
+  if (a < 0) return null;
+  let b = a + 1;
+  while (b < item.detail.length && !isSub(item.detail[b])) b++;
+  return { t, item, detail: generalOnly(item.detail.slice(a, b), true) };
+}
+
+function linkHTML(s, ctx, owner, depth) {
+  const found = depth < 6 && findLinked(s, ctx);
+  if (!found) return "";
+  const { t, item, detail } = found;
+  // 지금 항목과 같은 말이면 제목을 되풀이하지 않는다
+  if (owner && plain(owner.term) === plain(item.term)) return detailHTML(detail, t, item, depth + 1);
+  return `<div class="d-link"><p class="d-link-head"><span class="term" lang="ja">${rich(item.term)}</span>${
+    item.mean ? `<span class="mean">${rich(item.mean)}</span>` : ""}</p>${detailHTML(detail, t, item, depth + 1)}</div>`;
+}
+
+// 설명 줄: ① 소제목, - 목록, → 결과, " | " 표(첫 줄이 제목 칸), >> 다른 항목 가져오기, 나머지는 문단
+function detailHTML(lines, ctx, owner, depth = 0) {
+  let html = "", list = null, table = null;
+  const flush = () => {
+    if (list) html += `<ul>${list.join("")}</ul>`;
+    if (table) html += `<table><thead><tr>${table[0].map(c => `<th>${rich(c)}</th>`).join("")}</tr></thead><tbody>${
+      table.slice(1).map(r => `<tr>${r.map(c => `<td>${rich(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    list = table = null;
+  };
+  for (const s of lines) {
+    if (s.startsWith(">>")) {
+      flush();
+      html += linkHTML(s, ctx, owner, depth);
+      continue;
+    }
+    if (/\s\|\s/.test(s)) {
+      if (list) flush();
+      // 후리가나 {走|はし} 안의 | 는 앞뒤에 띄어쓰기가 없으니, 띄어 쓴 " | "로만 칸을 나눈다
+      (table ||= []).push(s.replace(/^\|\s+|\s+\|$/g, "").split(/\s+\|\s+/));
+      continue;
+    }
+    if (/^[-•・]\s+/.test(s)) {
+      if (table) flush();
+      (list ||= []).push(`<li>${rich(s.replace(/^[-•・]\s+/, ""))}</li>`);
+      continue;
+    }
+    flush();
+    const sub = s.match(/^([①-⑳])\s*(.*)$/);
+    const pair = sub && sub[2].match(/^(.*?)\s*[：:]\s*(.+)$/);
+    if (sub) html += `<p class="d-sub"><span class="d-mark">${sub[1]}</span>${pair ? `<b>${rich(pair[1])}</b><span>${rich(pair[2])}</span>` : `<b>${rich(sub[2])}</b>`}</p>`;
+    else if (/^→/.test(s)) html += `<p class="d-arrow">${rich(s)}</p>`;
+    else html += `<p>${rich(s)}</p>`;
+  }
+  flush();
+  return html;
+}
+
+const studyHTML = (items, ctx) => items && items.length ? `<div class="study">${items.map(it => {
+  const head = `${it.gram ? `<span class="tag">문법</span>` : ""}<span class="term" lang="ja">${rich(it.term)}</span>${
+    it.mean ? `<span class="mean">${rich(it.mean)}</span>` : ""}`;
+  const body = detailHTML(it.detail, ctx, it);
+  return body
+    ? `<details class="item-d"><summary class="item">${head}</summary><div class="detail">${body}</div></details>`
+    : `<div class="item">${head}</div>`;
+}).join("")}</div>` : "";
+
+const trimBlank = lines => {
+  let a = 0, b = lines.length;
+  while (a < b && !lines[a].trim()) a++;
+  while (b > a && !lines[b - 1].trim()) b--;
+  return lines.slice(a, b);
+};
+
+/* ---------- 글자 처리 ---------- */
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const FURI = /\{([^{}|]+)\|([^{}|]+)\}/g;
+// NFC: 따로 떨어진 장음 기호(o + ̄ 등)를 한 글자(ō)로 합쳐 글꼴이 바뀌어도 어긋나지 않게 한다
+const rich = s => esc(s.normalize("NFC")).replace(FURI, "<ruby>$1<rt>$2</rt></ruby>");
+const plain = s => s.replace(FURI, "$1");
+const pad = n => String(n).padStart(2, "0");
+const range = (a, b) => Array.from({ length: b - a }, (_, i) => a + i);
+
+function vscodeLink(al) {
+  if (location.protocol !== "file:") return "";
+  const dir = decodeURIComponent(location.pathname).replace(/\/[^/]*$/, "");
+  return "vscode://file" + encodeURI(`${dir}/가사/${al.file}.js`);
+}
+
+/* ---------- 저장 (보기 설정) ---------- */
+
+const store = {
+  get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
+  set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
+};
+const prefs = Object.assign({ mode: "all", pr: true, hg: true, furi: true, studyOpen: false }, store.get("ryokushaka-lyrics:prefs", {}));
+if (!["all", "ko", "jp"].includes(prefs.mode)) prefs.mode = "all";
+const savePrefs = () => store.set("ryokushaka-lyrics:prefs", prefs);
+
+/* ---------- 화면 ---------- */
+
+const app = document.getElementById("app");
+let query = "";
+
+function route() {
+  // 한 곡만 내보낸 파일은 주소와 상관없이 그 곡만 보여 준다
+  if (window.SINGLE) {
+    document.body.dataset.view = "song";
+    document.body.dataset.single = "";
+    renderSong(byKey[window.SINGLE.key].tracks[window.SINGLE.no - 1]);
+    return;
+  }
+  const [view, key, no, line] = location.hash.replace(/^#\/?/, "").split("/");
+  const al = byKey[key];
+  const t = al && al.tracks[no - 1];
+  if (view === "s" && t) { document.body.dataset.view = "song"; renderSong(t, line); }
+  else if (view === "a" && al) { document.body.dataset.view = "album"; renderAlbum(al); }
+  else { document.body.dataset.view = "home"; renderHome(); }
+}
+
+function problems(only) {
+  const list = ALBUMS.filter(al => (!only || al === only) && fileState[al.file] !== "ok");
+  if (!list.length) return "";
+  return `<div class="alert" role="alert"><b>가사 파일을 읽지 못했습니다</b><ul>${list.map(al => {
+    const f = `<code>가사/${esc(al.file)}.js</code>`;
+    if (fileState[al.file] === "missing") return `<li>${f}: 파일이 없습니다. 이름이 바뀌었거나 다른 폴더로 옮겨졌는지 확인이 필요합니다.</li>`;
+    const where = fileErrLine[al.file] ? ` ${fileErrLine[al.file]}번째 줄 근처에 문제가 있습니다.` : "";
+    return `<li>${f}: 파일 안의 형식이 깨졌습니다.${where} 맨 위의 <code>가사("${esc(al.file)}", &#96;</code>와 맨 아래의 <code>&#96;);</code>가 그대로 있는지, 가사 안에 <code>&#96;</code>(백틱)이 들어가지 않았는지 확인이 필요합니다.</li>`;
+  }).join("")}</ul></div>`;
+}
+
+function renderHome() {
+  document.title = "녹황색사회 가사 노트";
+  const total = ALL.filter(t => !t.inst).length;
+  const filled = ALL.filter(hasLyrics).length;
+  const translated = ALL.filter(hasTranslation).length;
+  app.innerHTML = `
+    <header class="top">
+      <div class="top-text">
+        <div class="kicker">緑黄色社会 · 歌詞ノート</div>
+        <h1><span class="g">녹황색</span><span class="y">사회</span> 가사 노트<span class="jp" lang="ja">歌詞で覚える日本語</span></h1>
+        <p class="lede">앨범별로 가사를 모아 원문·발음·해석을 한 줄씩 맞춰 보는 공부 노트입니다. 곡을 누르면 가사가 열리고, 해석이나 원문을 가려 놓고 외울 수 있습니다.</p>
+        <div class="maker-row"><span class="maker-k">만든 사람</span><a class="maker" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener" title="제작자 인스타그램"><img src="Instagram_icon.png" alt="" onerror="this.remove()">@brocoplaylist</a><a class="maker" href="https://brocokr.github.io/ryokucallguide/" target="_blank" rel="noopener" title="제작자가 만든 녹황색사회 떼창 가이드"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>떼창 가이드</a></div>
+      </div>
+      <figure class="hero">
+        <img src="${encodeURI(PROFILE_PHOTO)}" alt="녹황색사회 멤버 네 명의 2026년 프로필 사진" onerror="this.closest('figure').remove()">
+        <figcaption>
+          <span class="cap">『あたまご』 아티스트 사진 · 왼쪽부터</span>
+          <span class="members">${MEMBERS.map(m => `<a href="https://www.instagram.com/${m.ig}/" target="_blank" rel="noopener" title="${m.name} 인스타그램"><img src="Instagram_icon.png" alt="" onerror="this.remove()"><span><b>${m.name}</b><small>${m.part}</small></span></a>`).join("")}</span>
+          <span class="cap">공식 링크</span>
+          <span class="official">${OFFICIAL.map(o => `<a href="${o.url}" target="_blank" rel="noopener" title="녹황색사회 ${o.name}">${o.img ? `<img src="${o.img}" alt="" onerror="this.remove()">` : `<svg viewBox="0 0 24 24" fill="${o.color}" aria-hidden="true"><path d="${o.path}"/></svg>`}${o.name}</a>`).join("")}</span>
+        </figcaption>
+      </figure>
+    </header>
+    <div class="bar">
+      <label class="search"><span class="sr">곡 찾기</span><input id="q" type="search" placeholder="곡 제목이나 가사로 찾기" value="${esc(query)}" autocomplete="off"></label>
+      <div class="stat">가사 <b>${filled}</b>/${total}곡 · 해석 <b>${translated}</b>/${total}곡</div>
+    </div>
+    ${problems()}
+    <div id="homeBody"></div>`;
+  renderHomeBody();
+  const q = document.getElementById("q");
+  q.addEventListener("input", () => { query = q.value; renderHomeBody(); });
+  scrollTo(0, 0);
+}
+
+function renderHomeBody() {
+  const body = document.getElementById("homeBody");
+  const needle = query.trim().toLowerCase();
+  if (needle) { body.innerHTML = resultsHTML(search(needle), needle); return; }
+  body.innerHTML = GROUPS.map(g => `
+    <section class="group">
+      <h2>${g.name}</h2>
+      <p class="sub">${g.sub}</p>
+      <div class="albums" style="--cols: ${g.cols}">${ALBUMS.filter(al => al.group === g.id).map(albumCard).join("")}</div>
+    </section>`).join("");
+}
+
+// 첫 화면 밴드 사진 (index.html 옆에 둔 파일)
+const PROFILE_PHOTO = "녹황색사회 2026 프로필.jpg";
+// 사진 아래 멤버 링크. 사진 속 왼쪽부터 순서. 주소는 나무위키 멤버 문서 기준.
+const MEMBERS = [
+  { name: "peppe", part: "키보드", ig: "peppe1206" },
+  { name: "아나미 싱고", part: "베이스", ig: "shingoanami" },
+  { name: "나가야 하루코", part: "보컬", ig: "haruyama_555" },
+  { name: "코바야시 잇세이", part: "기타", ig: "isseyman" },
+];
+// 사진 아래 공식 링크. 주소는 나무위키 녹황색사회 문서 기준, 팬클럽은 사용자가 알려 준 주소.
+const OFFICIAL = [
+  { name: "공식 홈페이지", url: "https://www.ryokushaka.com", color: "var(--leaf)", path: "M12 3 2 11.5h3V21h5.5v-6h3v6H19v-9.5h3z" },
+  { name: "LINE", url: "https://line.me/R/ti/p/%40ryokushaka", color: "#06C755", path: "M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" },
+  { name: "Instagram", url: "https://www.instagram.com/ryokushaka_official/", img: "Instagram_icon.png" },
+  { name: "X", url: "https://x.com/ryokushaka", color: "currentColor", path: "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" },
+  { name: "TikTok", url: "https://www.tiktok.com/@ryokushaka", color: "currentColor", path: "M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" },
+  { name: "YouTube", url: "https://www.youtube.com/channel/UC_1GPhYlXI2ka2ji5gnqWFQ", color: "#FF0000", path: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" },
+  { name: "팬클럽", url: "https://ryokushaka-fc.com", color: "var(--leaf)", path: "M12 21s-7.5-4.6-10-9.3C.4 8.6 2.1 4.8 5.7 4.3c2.2-.3 4.6.7 6.3 3.2 1.7-2.5 4.1-3.5 6.3-3.2 3.6.5 5.3 4.3 3.7 7.4C19.5 16.4 12 21 12 21z" },
+];
+
+// 앨범 커버: index.html 옆의 「파일 이름.webp」(예: 정규1집.webp). 이름이 다르면 ALBUMS에 "cover"를 적는다.
+const coverHTML = (al, cls = "") => `<span class="cover${cls}"><img src="${(window.EMBED_COVERS || {})[al.key] || encodeURI(al.cover || `${al.file}.webp`)}" alt="" loading="lazy" onerror="this.parentNode.classList.add('none')"></span>`;
+
+function albumCard(al) {
+  const all = al.tracks.length, n = al.tracks.filter(t => !t.inst).length;
+  const filled = al.tracks.filter(hasLyrics).length;
+  const translated = al.tracks.filter(hasTranslation).length;
+  const kinds = {};
+  for (const t of al.tracks) if (t.inst) kinds[t.inst] = (kinds[t.inst] || 0) + 1;
+  const extra = Object.entries(kinds).map(([k, c]) => `${k} ${c}`).join(", ");
+  return `<a class="album" href="#/a/${al.key}">
+    ${coverHTML(al)}
+    <div class="album-body">
+    <div class="album-top"><span class="ord">${al.label}</span><span>${al.date}</span></div>
+    <div class="album-title" lang="ja">${esc(al.title)}</div>
+    ${al.ko ? `<div class="album-ko">${esc(al.ko)}</div>` : ""}${al.en ? `<div class="album-ko">${esc(al.en)}</div>` : ""}
+    <div class="album-foot">
+      <div class="meter" role="img" aria-label="${n}곡 중 가사 ${filled}곡"><i class="m-fill" style="width:${filled / n * 100}%"></i></div>
+      <div class="meter m-second" role="img" aria-label="${n}곡 중 해석 ${translated}곡"><i class="m-ko" style="width:${translated / n * 100}%"></i></div>
+      <div class="meter-text"><span class="nw">${all}곡${extra ? ` (${extra})` : ""} ·</span> <span class="nw"><i class="dot leaf"></i>가사 ${filled}</span> <span class="nw"><i class="dot yolk"></i>해석 ${translated}</span></div>
+    </div>
+    </div>
+  </a>`;
+}
+
+// 로마자는 ā, é 같은 표시 없이 쳐도 찾아지게 합니다. 일본어와 한글은 그대로 두고, 글자 수도 변하지 않아 표시 위치가 어긋나지 않습니다
+const fold = s => s.normalize("NFC").replace(/[À-ɏ]/g, c => c.normalize("NFD")[0]).toLowerCase();
+
+function search(needle) {
+  const q = fold(needle);
+  const hits = [];
+  for (const t of ALL) {
+    const title = [t.jp, t.ko, t.read, t.en].some(s => fold(s).includes(q));
+    const { d, from } = lyricsFor(t);
+    let row = -1, text = "";
+    if (d && !from) {
+      const L = layout(d);
+      const { notes } = studyNotes(d.공부);
+      for (let i = 0; i < L.n && row < 0; i++) {
+        const words = (notes[i] || []).flatMap(it => [it.mean ? `${it.term} - ${it.mean}` : it.term, ...it.detail.filter(l => !l.startsWith(">>"))]);
+        const s = [L.jp[i], L.pr[i], L.hg[i], L.ko[i], ...words].find(s => s && fold(plain(s)).includes(q));
+        if (s) { row = i; text = plain(s); }
+      }
+    }
+    if (title || row >= 0) hits.push({ t, row, text });
+  }
+  return hits;
+}
+
+function resultsHTML(hits, needle) {
+  if (!hits.length) return `<p class="none">찾는 곡이나 가사가 없습니다.</p>`;
+  const q = fold(needle);
+  const mark = raw => {
+    const s = raw.normalize("NFC");
+    const i = fold(s).indexOf(q);
+    return i < 0 ? esc(s) : esc(s.slice(0, i)) + `<mark>${esc(s.slice(i, i + q.length))}</mark>` + esc(s.slice(i + q.length));
+  };
+  return `<p class="count">${hits.length}곡</p><ul class="results">${hits.map(({ t, row, text }) => `
+    <li><a href="#/s/${t.album.key}/${t.no}${row >= 0 ? `/${row}` : ""}">
+      <span class="where">${t.album.label} 『${esc(t.album.title)}』 · ${t.no}번</span>
+      <span class="tjp" lang="ja">${mark(t.jp)}</span>${t.ko ? `<span class="tko">${mark(t.ko)}</span>` : ""}${t.en ? `<span class="tko">${mark(t.en)}</span>` : ""}
+      ${row >= 0 ? `<span class="snip">${mark(text)}</span>` : ""}
+    </a></li>`).join("")}</ul>`;
+}
+
+function renderAlbum(al) {
+  document.title = `${al.title} · 녹황색사회 가사 노트`;
+  const link = vscodeLink(al);
+  app.innerHTML = `<div class="narrow">
+    <a class="back" href="#/">← 전체 앨범</a>
+    <header class="album-head">
+      ${coverHTML(al)}
+      <div>
+        <div class="album-top"><span class="ord">${al.label}</span><span>${al.date}${al.note ? ` · ${al.note}` : ""}</span></div>
+        <h1 class="album-name" lang="ja">${esc(al.title)}</h1>
+        ${al.ko ? `<div class="album-ko">${esc(al.ko)}</div>` : ""}${al.en ? `<div class="album-ko">${esc(al.en)}</div>` : ""}
+      </div>
+    </header>
+    ${problems(al)}
+    <ol class="tracks">${al.tracks.map(t => `<li>${trackRow(t)}</li>`).join("")}</ol>
+    <p class="file-hint">가사 파일: <code>가사/${esc(al.file)}.js</code>${link ? ` · <a href="${link}">VS Code에서 열기</a>` : ""}</p>
+  </div>`;
+  scrollTo(0, 0);
+}
+
+function trackRow(t) {
+  const { d } = lyricsFor(t);
+  return `<a class="track" href="#/s/${t.album.key}/${t.no}">
+    <span class="tno">${pad(t.no)}</span>
+    <span><span class="tjp" lang="ja">${esc(t.jp)}</span>${t.read ? `<span class="tread">${esc(t.read)}</span>` : ""}${t.ko ? `<span class="tko">${esc(t.ko)}</span>` : ""}${t.en ? `<span class="tko">${esc(t.en)}</span>` : ""}
+      ${t.twins.length ? `<span class="tnote">${t.twins.map(o => `${o.album.label} ${o.no}번`).join(", ")}에도 실린 곡</span>` : ""}</span>
+    <span class="badges">${has(d?.원문) ? `<span class="badge has">가사</span>` : `<span class="badge">${t.inst ? `${t.inst} · 가사 없음` : "비어 있음"}</span>`}</span>
+  </a>`;
+}
+
+// 곡별 유튜브 영상: "곡 제목": ["영상 ID", "mv" | "audio"]. 뮤직비디오가 없는 곡은 공식 음원(audio). 같은 제목이면 어느 앨범에서든 같은 영상을 씁니다.
+const VIDEOS = {
+  "Re": ["FVW_4-7E6JE", "mv"], "始まりの歌": ["cjf9c6TwH6o", "mv"], "大人ごっこ": ["ZNgA7S3MabU", "mv"], "キラキラ": ["4HVYckTsLts", "audio"], "Alice": ["68i9jwSTVyI", "audio"],
+  "君が望む世界": ["HCfiHrgzv7w", "audio"], "恋って": ["mu9P1pAlQVI", "audio"], "regret": ["GHPgezEGz7I", "audio"], "真夜中ドライブ": ["lPXm7_vhvJc", "mv"], "またね": ["XO_xemefjY8", "mv"],
+  "Sabotage": ["FWQzurioulQ", "mv"], "Mela!": ["aRDURmIYBZ4", "mv"], "想い人": ["DpSqbVNsezA", "mv"], "inori": ["et77uEPw5a0", "audio"], "Shout Baby": ["Ww8oxgqDQSs", "mv"],
+  "スカーレット": ["KvRbyBS2xlw", "audio"], "一歩": ["gNm0LpDVYkY", "audio"], "愛のかたち": ["sw-tRnZ1wSg", "audio"], "幸せ": ["S__5u0vlXkI", "mv"], "Brand New World": ["UxsefEcaMSs", "audio"],
+  "あのころ見た光": ["mMngsrzCf3I", "mv"], "冬の朝": ["fGILT-5l3wY", "audio"], "キャラクター": ["ulforNn47PM", "mv"], "merry-go-round": ["t-6vQLdz6C8", "audio"], "これからのこと、それからのこと": ["o_r0TLtQEIQ", "audio"],
+  "安心してね": ["MKzWsGeEHTc", "audio"], "LITMUS": ["-xpP0dmoy8s", "mv"], "ずっとずっとずっと": ["GaSM-9V18t8", "mv"], "揺れる": ["VEuWUUjFZh8", "audio"], "たとえたとえ": ["v-GwqWH_72s", "mv"],
+  "アラモードにワルツ": ["Y1sChaIVuCg", "audio"], "結証": ["1422nca02G4", "mv"], "S.T.U.D": ["rCAQyXvkIGM", "audio"], "Landscape": ["-41g2NmbHUM", "audio"], "スクリーンと横顔": ["kPjNfJs2GxA", "audio"],
+  "ピンクブルー": ["vudrTjCf-LM", "mv"], "Starry Drama": ["n3W-CiadkZc", "audio"], "ジブンセイフク": ["bJQ_WGhN4Qk", "audio"], "あうん": ["ktugi6Lfwho", "audio"], "ミチヲユケ": ["su5o63BnOUM", "mv"],
+  "うそつき": ["5WYGW1c2j1k", "mv"], "陽はまた昇るから": ["e5FEOVTRfFc", "mv"], "湿気っている": ["ifUUn6ES17s", "audio"], "Don!!": ["c0mDXxdCAm0", "audio"], "White Rabbit": ["0tXwiF68kZ4", "audio"],
+  "さもなくば誰がやる": ["PlBn9Ulvdpw", "mv"], "Slow dance": ["DU7aITiW3Cg", "audio"], "PLAYER 1": ["KWV3V1Vjx-Y", "mv"], "恥ずかしいか青春は": ["G9KznOYqyOg", "mv"], "ナイスアイディア！": ["cZA1B9NZlqk", "audio"],
+  "Monkey Dance": ["LwM02kYdIok", "audio"], "マジックアワー": ["7AM6VgOvmMQ", "mv"], "僕らはいきものだから": ["h5uP8eqKah8", "mv"], "Channel Me": ["tDW3DAqi_tY", "audio"], "馬鹿の一つ覚え": ["oowSgjv49vk", "mv"],
+  "Each Ring": ["A-iVPqRa2Zg", "audio"], "サマータイムシンデレラ": ["nFR3uXaR0wk", "mv"], "言えない": ["zQqb0hBhfJM", "mv"], "コーヒーとましゅまろ": ["Wm88vNUYPd4", "audio"], "Party!!": ["7-h8UA7fFmg", "mv"],
+  "花になって": ["v-WcMQbXbKY", "mv"], "オーロラを探しに": ["eC2-XMKQUYQ", "audio"], "誰かの国": ["QyfOgjPEDsI", "audio"], "TABOO": ["Q7Qm9rRHS6Q", "mv"], "My Answer": ["9TQ0G7NptM0", "mv"],
+  "illusion": ["-0DE-T_bqy0", "mv"], "うたまご": ["qktddKnRoUE", "audio"], "章": ["umWmpL6ERWM", "mv"], "分かりにくい": ["gOpLukrFh9s", "audio"], "アルゴリズム": ["-ISMyEx325Q", "audio"],
+  "レジスダンス": ["dA1-z3N0ms8", "audio"], "風に乗る": ["D0k--RXcIT8", "mv"], "つづく": ["K4qa3zmNY7A", "mv"], "晴々": ["KMV8SVnZK7Q", "mv"], "アウトサイダー": ["Ks-6AbtEXu4", "audio"],
+  "Bitter": ["9p3Q0IKFt4I", "mv"], "丘と小さなパラダイム": ["PXWAE5PAsbg", "audio"], "want": ["UZaZT38nQio", "audio"], "それなりの生活": ["31bjUZzF-gE", "audio"], "視線": ["V3qqZJW7p38", "audio"],
+  "Never Come Back": ["q4cE92Yqnm8", "audio"], "サボテン": ["rZ-ww9tIj5M", "audio"], "リトルシンガー": ["72iMwjbNGak", "mv"], "逆転": ["n1lsYZCfD0Q", "audio"], "ひとりごと": ["LKii10hZI1E", "audio"],
+  "にちようび": ["coYYQJPRTko", "audio"], "Alright!!": ["pVGewDEGOUM", "audio"], "空に歌えば": ["IHqMXgo01Gc", "audio"], "LADYBUG": ["aCgW-ndrkLI", "audio"], "Copy": ["HkUwm7AbUv8", "audio"],
+  "アーユーレディー": ["tuf7boOx_SE", "mv"], "時のいたずら": ["wIPB3jRsnB0", "mv"], "夢と悪魔とファンタジー": ["pEXXb6HfJw4", "audio"], "Tap Tap Dance": ["sgC2pA6byHw", "audio"], "étoile": ["GiICoiNy-fg", "audio"],
+  // 싱글의 인스트루멘털 트랙
+  "sabotage (Instrumental)": ["-EUl9-pXqXs", "audio"], "Shout Baby (Instrumental)": ["Tung9Tpj6Iw", "audio"], "結証 (Instrumental)": ["KNrywUGLxOQ", "audio"], "LADYBUG (Instrumental)": ["DvWL5WIUjrU", "audio"],
+  "Copy (Instrumental)": ["bMwjFpa4-VU", "audio"], "LITMUS (Instrumental)": ["ytLYcwIq3qY", "audio"], "アーユーレディー (Instrumental)": ["_L9KZVtzTuY", "audio"], "これからのこと、それからのこと (Instrumental)": ["i23d1aBXP0c", "audio"],
+  "陽はまた昇るから -instrumental-": ["fxdeH4w12Lw", "audio"], "時のいたずら -instrumental-": ["h5asRngTk1M", "audio"], "ミチヲユケ -Instrumental-": ["VPLR9whznkg", "audio"], "Don!! -Instrumental-": ["VG_lSJN_h9Y", "audio"],
+  "サマータイムシンデレラ -Instrumental-": ["N-S526_q9WY", "audio"], "マジックアワー -Instrumental-": ["xMoKXtwDcU0", "audio"], "花になって -Instrumental-": ["Y_yetj9gB30", "audio"], "夢と悪魔とファンタジー -Instrumental-": ["PfZFczB0w6A", "audio"],
+  "Party!! -Instrumental-": ["mALIw0k07Ws", "audio"], "Tap Tap Dance -Instrumental-": ["GXBkTr40adM", "audio"], "My Answer -Instrumental-": ["I_Fobf2REZ0", "audio"], "さもなくば誰がやる -Instrumental-": ["PgoLjdHFHbo", "audio"],
+  "風に乗る -Instrumental-": ["fFm_SFrclkk", "audio"], "étoile -Instrumental-": ["yvq2ZPcIZ_M", "audio"],
+};
+const VIDEO_BY_TITLE = Object.fromEntries(Object.entries(VIDEOS).map(([k, v]) => [norm(k), v]));
+const YT_KIND = { mv: "뮤직비디오 보기", audio: "노래 듣기" };
+const YT_MARK = `<svg viewBox="0 0 24 24" fill="#FF0000" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`;
+function videoHTML(t) {
+  const v = VIDEO_BY_TITLE[norm(t.jp)];
+  if (t.inst && !v) return "";
+  if (v && location.protocol !== "file:") return `<div class="yt-player"><iframe src="https://www.youtube.com/embed/${v[0]}" title="${esc(t.jp)} ${YT_KIND[v[1]]}" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>`;
+  if (!v) return `<a class="yt plain" href="https://www.youtube.com/results?search_query=${encodeURIComponent(`緑黄色社会 ${t.jp}`)}" target="_blank" rel="noopener">${YT_MARK}<span class="yt-text"><b>유튜브에서 이 곡 찾기</b><small>새 탭에서 검색 결과가 열립니다</small></span></a>`;
+  return `<a class="yt" href="https://www.youtube.com/watch?v=${v[0]}" target="_blank" rel="noopener"><span class="yt-thumb"><img src="https://i.ytimg.com/vi/${v[0]}/mqdefault.jpg" alt="" loading="lazy">${YT_MARK}</span><span class="yt-text"><b>${YT_KIND[v[1]]}</b><small>지금은 새 탭으로 열립니다 · GitHub에 올린 사이트에서는 여기서 바로 재생됩니다</small></span></a>`;
+}
+
+function renderSong(t, line) {
+  const al = t.album;
+  const { d, from } = lyricsFor(t);
+  const prev = al.tracks[t.no - 2], next = al.tracks[t.no];
+  document.title = `${t.jp} · 녹황색사회 가사 노트`;
+
+  let body = "";
+  if (d && (has(d.원문) || has(d.해석))) {
+    const L = layout(d);
+    const { notes, loose } = studyNotes(d.공부);
+    const shared = shareNotes(notes, L.jp);
+    const stray = Object.keys(notes).map(Number).filter(i => i < 0 || i >= L.n);
+    const warns = [];
+    if (mismatch(L)) warns.push(`${mismatch(L)}: 줄 수가 달라서 뒤로 갈수록 짝이 어긋날 수 있습니다.`);
+    if (stray.length) warns.push(`[공부] 칸의 ${stray.map(i => i + 1).join(", ")}번은 가사에 없는 줄 번호입니다.`);
+    if (loose) warns.push(`[공부] 칸 맨 위에 줄 번호 없이 적힌 항목이 ${loose}개 있습니다. 그 위에 줄 번호를 적어야 합니다.`);
+    // 한 곡만 내보낸 파일에는 다른 곡의 설명이 없으므로 확인하지 않는다
+    const lost = window.SINGLE ? [] : Object.values(notes).flat().flatMap(it => it.detail).filter(l => l.startsWith(">>") && !findLinked(l, t));
+    if (lost.length) warns.push(`[공부] 칸에서 가져올 설명을 찾지 못했습니다: ${lost.map(l => esc(l.slice(2).trim())).join(", ")}`);
+    const hasFuri = [...L.jp, ...Object.values(notes).flat().flatMap(it => [it.term, ...it.detail])].some(s => /\{[^{}|]+\|[^{}|]+\}/.test(s));
+    body = `
+      <div class="controls">
+        <div class="seg" role="group" aria-label="가리기">
+          <button type="button" data-mode="all">모두 보기</button>
+          <button type="button" data-mode="ko">해석 가리기</button>
+          <button type="button" data-mode="jp">원문 가리기</button>
+        </div>
+        ${L.pr.length ? `<label class="check"><input type="checkbox" data-pref="pr"${prefs.pr ? " checked" : ""}> 로마자</label>` : ""}
+        ${L.hg.length ? `<label class="check"><input type="checkbox" data-pref="hg"${prefs.hg ? " checked" : ""}> 한글 발음</label>` : ""}
+        ${hasFuri ? `<label class="check"><input type="checkbox" data-pref="furi"${prefs.furi ? " checked" : ""}> 후리가나</label>` : ""}
+        ${Object.keys(notes).length ? `<button type="button" class="ghost-btn study-all"></button>` : ""}
+        <p class="hint" id="hint" hidden>가려진 줄을 누르면 단어·문법과 함께 보이고, 한 번 더 누르면 다시 가려집니다.</p>
+      </div>
+      ${from ? `<p class="info">${from.album.label} 『${esc(from.album.title)}』 ${from.no}번에 넣은 가사를 보여 주고 있습니다.</p>` : ""}
+      ${warns.map(w => `<p class="warn">${w}</p>`).join("")}
+      <div id="lyrics">${L.stanzas.map(([a, b]) => `<div class="stanza">${range(a, b).map(i => {
+        const items = shared[i] || notes[i] || [];
+        const cls = items.length ? ` has-study${prefs.studyOpen ? " open" : ""}` : "";
+        return `<div class="row${cls}" data-row="${i}"><span class="ln">${i + 1}</span><div class="row-body">${
+          L.jp[i] ? `<div class="jp" lang="ja">${rich(L.jp[i])}</div>` : ""}${
+          L.pr[i] ? `<div class="pr">${rich(L.pr[i])}</div>` : ""}${
+          L.hg[i] ? `<div class="hg">${rich(L.hg[i])}</div>` : ""}${
+          L.ko[i] ? `<div class="ko">${rich(L.ko[i])}</div>` : ""}${
+          items.length ? `<button type="button" class="study-btn" aria-expanded="${prefs.studyOpen}">단어·문법 <span class="n">${items.length}</span></button>${studyHTML(items, t)}` : ""}</div></div>`;
+      }).join("")}</div>`).join("")}</div>`;
+  } else if (t.inst) {
+    body = `<div class="empty-card">
+      <p class="empty-title">가사가 없는 ${esc(t.inst)} 곡입니다</p>
+      <p>연주만 있는 곡이라 가사·발음·해석 칸을 채우지 않아도 됩니다. 앨범 진행률에서도 빠집니다.</p>
+    </div>`;
+  } else {
+    const link = vscodeLink(al);
+    body = `<div class="empty-card">
+      <p class="empty-title">아직 가사가 없습니다</p>
+      <p><code>가사/${esc(al.file)}.js</code> 파일에서 <code>### ${pad(t.no)} ${esc(t.jp)}</code> 줄 아래 <code>[원문]</code> 칸에 일본어 가사를 붙여 넣으면 여기에 보입니다. <code>[발음]</code>, <code>[한글발음]</code>, <code>[해석]</code>도 같은 줄 순서로 넣으면 한 줄씩 짝지어집니다.</p>
+      ${t.twins.length ? `<p>${t.twins.map(o => `${o.album.label} ${o.no}번`).join(", ")}에도 실린 곡이라, 어느 한쪽에만 넣어도 양쪽에서 보입니다.</p>` : ""}
+      <p>${link ? `<a href="${link}">VS Code에서 이 파일 열기</a> · ` : ""}저장한 뒤 이 페이지를 새로고침합니다.</p>
+    </div>`;
+  }
+
+  const memo = d ? trimBlank(d.메모) : [];
+  app.innerHTML = `<div class="narrow">
+    <a class="back" href="#/a/${al.key}">${window.SINGLE ? "" : "← "}${coverHTML(al, " mini")}${al.label} 『${esc(al.title)}』</a>
+    <header class="song-head">
+      <div class="album-top"><span class="ord">${pad(t.no)}번 트랙</span></div>
+      <h1 class="song-title" lang="ja">${esc(t.jp)}${t.read ? `<span class="read">${esc(t.read)}</span>` : ""}</h1>
+      ${t.ko || t.en ? `<div class="song-ko">${[t.ko, t.en].filter(Boolean).map(esc).join(" · ")}</div>` : ""}
+    </header>
+    ${videoHTML(t)}
+    ${problems(al)}
+    ${body}
+    ${memo.length ? `<section class="memo"><h2>메모</h2><div class="memo-body">${memo.map(rich).join("\n")}</div></section>` : ""}
+    <nav class="pager" aria-label="곡 이동">
+      ${prev ? `<a class="prev" href="#/s/${al.key}/${prev.no}"><small>← 이전 곡</small><span lang="ja">${esc(prev.jp)}</span></a>` : ""}
+      ${next ? `<a class="next" href="#/s/${al.key}/${next.no}"><small>다음 곡 →</small><span lang="ja">${esc(next.jp)}</span></a>` : ""}
+    </nav>
+  </div>`;
+  applyPrefs();
+
+  const target = line != null && document.querySelector(`[data-row="${Number(line)}"]`);
+  if (target) {
+    if (target.classList.contains("has-study")) setStudyOpen(target, true);
+    target.scrollIntoView({ block: "center" });
+    target.classList.add("flash");
+  } else scrollTo(0, 0);
+  syncStudyAll();
+}
+
+function setStudyOpen(row, open) {
+  row.classList.toggle("open", open);
+  row.querySelector(".study-btn").setAttribute("aria-expanded", open);
+}
+
+// 위쪽 버튼 글자: 하나라도 접혀 있으면 "모두 펼치기", 전부 펼쳐져 있으면 "모두 접기"
+function syncStudyAll() {
+  const btn = document.querySelector(".study-all");
+  if (!btn) return;
+  const allOpen = [...document.querySelectorAll(".row.has-study")].every(r => r.classList.contains("open"));
+  btn.textContent = allOpen ? "단어·문법 모두 접기" : "단어·문법 모두 펼치기";
+  btn.setAttribute("aria-expanded", allOpen);
+}
+
+function applyPrefs() {
+  const box = document.getElementById("lyrics");
+  if (!box) return;
+  box.className = `lyrics mode-${prefs.mode}${prefs.pr ? "" : " no-pr"}${prefs.hg ? "" : " no-hg"}${prefs.furi ? "" : " no-furi"}`;
+  document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === prefs.mode));
+  document.getElementById("hint").hidden = prefs.mode === "all";
+  box.querySelectorAll(".row").forEach(r => r.tabIndex = prefs.mode === "all" ? -1 : 0);
+}
+
+app.addEventListener("click", e => {
+  const modeBtn = e.target.closest("[data-mode]");
+  if (modeBtn) {
+    prefs.mode = modeBtn.dataset.mode;
+    savePrefs();
+    document.querySelectorAll(".row.shown").forEach(r => r.classList.remove("shown"));
+    applyPrefs();
+    return;
+  }
+  const studyBtn = e.target.closest(".study-btn");
+  if (studyBtn) {
+    const r = studyBtn.closest(".row");
+    setStudyOpen(r, !r.classList.contains("open"));
+    syncStudyAll();
+    return;
+  }
+  if (e.target.closest(".study-all")) {
+    const rows = [...document.querySelectorAll(".row.has-study")];
+    const open = !rows.every(r => r.classList.contains("open"));
+    rows.forEach(r => setStudyOpen(r, open));
+    prefs.studyOpen = open;
+    savePrefs();
+    syncStudyAll();
+    return;
+  }
+  const row = e.target.closest(".row");
+  if (row && prefs.mode !== "all" && !e.target.closest(".study")) row.classList.toggle("shown");
+});
+
+app.addEventListener("keydown", e => {
+  if (e.target.closest("button, summary")) return;
+  const row = e.target.closest(".row");
+  if (row && prefs.mode !== "all" && (e.key === "Enter" || e.key === " ")) {
+    e.preventDefault();
+    row.classList.toggle("shown");
+  }
+});
+
+app.addEventListener("change", e => {
+  const key = e.target.dataset.pref;
+  if (!key) return;
+  prefs[key] = e.target.checked;
+  savePrefs();
+  applyPrefs();
+});
+
+// 가사 화면에서 ← → 키로 이전·다음 곡
+document.addEventListener("keydown", e => {
+  if (e.target.closest("input, textarea") || e.altKey || e.ctrlKey || e.metaKey) return;
+  const link = document.querySelector(e.key === "ArrowLeft" ? ".pager .prev" : e.key === "ArrowRight" ? ".pager .next" : null);
+  if (link) location.hash = link.getAttribute("href");
+});
+
+loadLyrics().then(() => {
+  addEventListener("hashchange", route);
+  route();
+});
+</script>
+</body>
+</html>
