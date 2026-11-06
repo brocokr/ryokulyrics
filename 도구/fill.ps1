@@ -159,6 +159,7 @@ function Apply-Fixes([string]$secName) {
 $plainOf = { param($s) [regex]::Replace($s, '\{([^{}|]+)\|[^{}|]+\}', '$1').Trim() }
 $order = @('EP.js','미니1집.js','미니2집.js','미니3집.js','정규1집.js','정규2집.js','정규3집.js','정규4집.js','정규5집.js','정규6집.js') +
   @(Get-ChildItem -Path $Dir -Filter '싱글*집.js' | Sort-Object { [int]($_.Name -replace '\D', '') } | ForEach-Object { $_.Name })
+$order += @(Get-ChildItem -Path $Dir -Filter '*.js' | Where-Object { $order -notcontains $_.Name } | Sort-Object Name | ForEach-Object { $_.Name })    # 그 외의 곡처럼 곡 이름으로 된 파일
 $order = @($order | Where-Object { Test-Path -LiteralPath (Join-Path $Dir $_) })    # 복사본 폴더에 일부 파일만 있어도 돌아가게
 $files = [ordered]@{}
 foreach ($n in $order) { $files[$n] = New-Object System.Collections.Generic.List[string]; $files[$n].AddRange([string[]]([IO.File]::ReadAllText((Join-Path $Dir $n), $enc) -split "`r?`n")) }

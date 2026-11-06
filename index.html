@@ -126,6 +126,7 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 /* 앨범 커버: 이미지가 없거나 깨지면 회색 칸만 남는다 */
 .cover { display: block; aspect-ratio: 1; background: var(--mask); overflow: hidden; }
 .cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cover.none { margin: 0; } /* 검색 안내문의 .none 여백이 적용되지 않게 합니다 */
 .cover.none img { display: none; }
 .album .cover { border-bottom: 1px solid var(--line); }
 .album-head .cover { border-radius: 10px; border: 1px solid var(--line); }
@@ -135,6 +136,21 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .ord { font-weight: 800; color: var(--leaf); }
 .album-title { font-family: var(--font-display); font-size: 21px; line-height: 1.25; margin-top: 6px; overflow-wrap: anywhere; }
 .album-ko { font-size: 13px; color: var(--muted); }
+.album-desc { margin-top: 6px; font-size: 12px; line-height: 1.5; color: var(--muted); word-break: keep-all; text-wrap: balance; }
+/* 작은 카드(그 외의 곡): GROUPS의 small. PC는 cols대로, 좁은 화면은 3장씩 */
+.albums.small { gap: 10px; }
+.albums.small .album-body { gap: 2px; padding: 10px 12px 12px; }
+.albums.small .album-top { flex-wrap: wrap; gap: 0 6px; font-size: 11px; }
+.albums.small .album-title { margin-top: 4px; font-size: 15px; }
+.albums.small .album-ko { font-size: 11px; }
+.albums.small .album-desc { margin-top: 4px; font-size: 11px; line-height: 1.4; }
+.albums.small .album-foot { padding-top: 8px; }
+.albums.small .meter-text { font-size: 11px; }
+@media (max-width: 760px) {
+  .albums.small { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .albums.small .album-body { padding: 8px 8px 10px; }
+  .albums.small .album-title { font-size: 13px; }
+}
 .album-foot { margin-top: auto; padding-top: 12px; }
 .meter { display: flex; height: 6px; border-radius: 999px; background: var(--mask); overflow: hidden; }
 .meter i { display: block; height: 100%; }
@@ -311,7 +327,7 @@ body:not([data-view="home"]) .copyright { margin-top: 32px; text-align: center; 
 <div class="wrap">
   <div id="app"></div>
 
-  <footer class="home-only">곡 목록: 나무위키 「녹황색사회/디스코그래피」 통상판 기준(2026.10.18 판).</footer>
+  <footer class="home-only">곡 목록: 나무위키 「녹황색사회/디스코그래피」 통상판 기준(2026.10.18 판). 그 외의 곡은 따로 추가했습니다.</footer>
   <footer class="copyright">모든 저작권은 녹황색사회에게 있습니다. copyright 2019 <span lang="ja">緑黄色社会</span></footer>
 </div>
 
@@ -393,8 +409,23 @@ const ALBUMS = /*ALBUMS*/[
   {"key": "single10", "file": "싱글10집", "group": "single", "label": "싱글 10집", "title": "My Answer", "date": "2025.11.12", "inst": {"3": "인스트", "4": "인스트"}, "tracks": [
     ["My Answer"], ["さもなくば誰がやる", "아니면 누가 하겠어"], ["My Answer -Instrumental-"], ["さもなくば誰がやる -Instrumental-"]
   ]},
-  {"key": "single11", "file": "싱글11집", "group": "single", "label": "싱글 11집", "title": "風に乗る", "ko": "바람을 타고", "date": "2026.03.18", "inst": {"3": "인스트", "4": "인스트"}, "tracks": [
-    ["風に乗る", "바람을 타고"], ["étoile", "별"], ["風に乗る -Instrumental-"], ["étoile -Instrumental-"]
+  {"key": "single11", "file": "싱글11집", "group": "single", "label": "싱글 11집", "title": "風に乗る", "ko": "바람을 타다", "date": "2026.03.18", "inst": {"3": "인스트", "4": "인스트"}, "tracks": [
+    ["風に乗る", "바람을 타다"], ["étoile", "별"], ["風に乗る -Instrumental-"], ["étoile -Instrumental-"]
+  ]},
+  {"key": "etc1", "file": "마일스톤의씨앗", "group": "etc", "label": "초기곡", "title": "マイルストーンの種", "ko": "마일스톤의 씨앗", "date": "2013", "cover": "milestonenotane.jpg", "desc": "2013년 고교 시절, 섬광 라이엇 준우승 곡", "tracks": [
+    ["マイルストーンの種", "마일스톤의 씨앗"]
+  ]},
+  {"key": "etc2", "file": "여름을살아", "group": "etc", "label": "디지털 발매", "title": "夏を生きる", "ko": "여름을 살아", "date": "2020.07.31", "cover": "natsuwoikiru.jpg", "tracks": [
+    ["夏を生きる", "여름을 살아"]
+  ]},
+  {"key": "etc5", "file": "브레스", "group": "etc", "label": "디지털 발매", "title": "ブレス", "ko": "브레스", "date": "2022.07.04", "cover": "Breath.webp", "tracks": [
+    ["ブレス", "브레스"]
+  ]},
+  {"key": "etc3", "file": "야사이온도", "group": "etc", "label": "디지털 발매", "title": "夜祭音頭", "ko": "야사이 온도", "date": "2024.05.21", "cover": "yasaiondo.jpg", "tracks": [
+    ["夜祭音頭", "야사이 온도"]
+  ]},
+  {"key": "etc4", "file": "투명했던세계", "group": "etc", "label": "커버", "title": "透明だった世界", "ko": "투명했던 세계", "date": "2026.11.04", "cover": "透明だった世界.jpg", "desc": "하타 모토히로 트리뷰트 커버", "credit": "원곡: 하타 모토히로(<span lang='ja'>秦 基博</span>) · 커버: 녹황색사회(<span lang='ja'>緑黄色社会</span>). 모든 저작권은 각 권리자에게 있습니다.", "tracks": [
+    ["透明だった世界", "투명했던 세계"]
   ]}
 ]/*END*/;
 
@@ -402,6 +433,7 @@ const GROUPS = [
   { id: "full", name: "정규 앨범", sub: "정규 1집부터 6집까지", cols: 3 },
   { id: "sub", name: "서브 앨범", sub: "미니 앨범 1~3집과 EP", cols: 4 },
   { id: "single", name: "싱글", sub: "싱글 1~11집 · 통상판 수록곡", cols: 4 },
+  { id: "etc", name: "그 외의 곡", sub: "위 앨범과 싱글의 통상판에 없는 곡", cols: 5, small: true },
 ];
 
 // 제목의 로마자. 앨범 제목과 곡 제목이 같이 쓴다. 영어로 된 제목은 적지 않는다.
@@ -426,6 +458,7 @@ const TITLE_EN = {
   "溢れた水の行方": "Afureta Mizuno Yukue", "視線": "Shisen", "サボテン": "Saboten", "リトルシンガー": "Little Singer",
   "逆転": "Gyakuten", "ひとりごと": "Hitorigoto", "にちようび": "Nichiyoubi",
   "空に歌えば": "Sorani Utaeba", "アーユーレディー": "Are You Ready", "時のいたずら": "Tokino Itazura", "夢と悪魔とファンタジー": "Yumeto Akumato Fantasy",
+  "マイルストーンの種": "Milestone no Tane", "夏を生きる": "Natsu wo Ikiru", "ブレス": "Breath", "夜祭音頭": "Yasai Ondo", "透明だった世界": "Toumei Datta Sekai",
 };
 // "風に乗る -Instrumental-"나 "幸せ -EP-"처럼 뒤에 붙은 말은 그대로 두고 앞부분만 찾는다.
 function titleEn(s) {
@@ -690,7 +723,12 @@ const savePrefs = () => store.set("ryokushaka-lyrics:prefs", prefs);
 const app = document.getElementById("app");
 let query = "";
 
+// 맨 아래 저작권 문구. 다른 사람의 곡을 커버한 곡은 그 곡 화면에서만 ALBUMS의 "credit"을 대신 보여 줍니다.
+const copyright = document.querySelector(".copyright");
+const COPYRIGHT = copyright.innerHTML;
+
 function route() {
+  copyright.innerHTML = COPYRIGHT;
   // 한 곡만 내보낸 파일은 주소와 상관없이 그 곡만 보여 준다
   if (window.SINGLE) {
     document.body.dataset.view = "song";
@@ -760,7 +798,7 @@ function renderHomeBody() {
     <section class="group">
       <h2>${g.name}</h2>
       <p class="sub">${g.sub}</p>
-      <div class="albums" style="--cols: ${g.cols}">${ALBUMS.filter(al => al.group === g.id).map(albumCard).join("")}</div>
+      <div class="albums${g.small ? " small" : ""}" style="--cols: ${g.cols}">${ALBUMS.filter(al => al.group === g.id).map(albumCard).join("")}</div>
     </section>`).join("");
 }
 
@@ -787,6 +825,9 @@ const OFFICIAL = [
 // 앨범 커버: index.html 옆의 「파일 이름.webp」(예: 정규1집.webp). 이름이 다르면 ALBUMS에 "cover"를 적는다.
 const coverHTML = (al, cls = "") => `<span class="cover${cls}"><img src="${(window.EMBED_COVERS || {})[al.key] || encodeURI(al.cover || `${al.file}.webp`)}" alt="" loading="lazy" onerror="this.parentNode.classList.add('none')"></span>`;
 
+// 곡이 하나뿐인 카드(그 외의 곡)는 곡 목록을 거치지 않고 바로 가사 화면을 엽니다.
+const isSolo = al => al.tracks.length === 1;
+
 function albumCard(al) {
   const all = al.tracks.length, n = al.tracks.filter(t => !t.inst).length;
   const filled = al.tracks.filter(hasLyrics).length;
@@ -794,12 +835,13 @@ function albumCard(al) {
   const kinds = {};
   for (const t of al.tracks) if (t.inst) kinds[t.inst] = (kinds[t.inst] || 0) + 1;
   const extra = Object.entries(kinds).map(([k, c]) => `${k} ${c}`).join(", ");
-  return `<a class="album" href="#/a/${al.key}">
+  return `<a class="album" href="${isSolo(al) ? `#/s/${al.key}/1` : `#/a/${al.key}`}">
     ${coverHTML(al)}
     <div class="album-body">
     <div class="album-top"><span class="ord">${al.label}</span><span>${al.date}</span></div>
     <div class="album-title" lang="ja">${esc(al.title)}</div>
     ${al.ko ? `<div class="album-ko">${esc(al.ko)}</div>` : ""}${al.en ? `<div class="album-ko">${esc(al.en)}</div>` : ""}
+    ${al.desc ? `<div class="album-desc">${esc(al.desc)}</div>` : ""}
     <div class="album-foot">
       <div class="meter" role="img" aria-label="${n}곡 중 가사 ${filled}곡"><i class="m-fill" style="width:${filled / n * 100}%"></i></div>
       <div class="meter m-second" role="img" aria-label="${n}곡 중 해석 ${translated}곡"><i class="m-ko" style="width:${translated / n * 100}%"></i></div>
@@ -843,7 +885,7 @@ function resultsHTML(hits, needle) {
   };
   return `<p class="count">${hits.length}곡</p><ul class="results">${hits.map(({ t, row, text }) => `
     <li><a href="#/s/${t.album.key}/${t.no}${row >= 0 ? `/${row}` : ""}">
-      <span class="where">${t.album.label} 『${esc(t.album.title)}』 · ${t.no}번</span>
+      <span class="where">${isSolo(t.album) ? `${t.album.label} · ${t.album.date}` : `${t.album.label} 『${esc(t.album.title)}』 · ${t.no}번`}</span>
       <span class="tjp" lang="ja">${mark(t.jp)}</span>${t.ko ? `<span class="tko">${mark(t.ko)}</span>` : ""}${t.en ? `<span class="tko">${mark(t.en)}</span>` : ""}
       ${row >= 0 ? `<span class="snip">${mark(text)}</span>` : ""}
     </a></li>`).join("")}</ul>`;
@@ -900,6 +942,8 @@ const VIDEOS = {
   "Never Come Back": ["q4cE92Yqnm8", "audio"], "サボテン": ["rZ-ww9tIj5M", "audio"], "リトルシンガー": ["72iMwjbNGak", "mv"], "逆転": ["n1lsYZCfD0Q", "audio"], "ひとりごと": ["LKii10hZI1E", "audio"],
   "にちようび": ["coYYQJPRTko", "audio"], "Alright!!": ["pVGewDEGOUM", "audio"], "空に歌えば": ["IHqMXgo01Gc", "audio"], "LADYBUG": ["aCgW-ndrkLI", "audio"], "Copy": ["HkUwm7AbUv8", "audio"],
   "アーユーレディー": ["tuf7boOx_SE", "mv"], "時のいたずら": ["wIPB3jRsnB0", "mv"], "夢と悪魔とファンタジー": ["pEXXb6HfJw4", "audio"], "Tap Tap Dance": ["sgC2pA6byHw", "audio"], "étoile": ["GiICoiNy-fg", "audio"],
+  // 그 외의 곡
+  "マイルストーンの種": ["YIY-Yp9V2Q0", "audio"], "夏を生きる": ["I6VkVm4J3bM", "mv"], "ブレス": ["h54_B3XxRYI", "mv"], "夜祭音頭": ["Tz_16uhUMGM", "mv"], "透明だった世界": ["u3tKstvwi3I", "audio"],
   // 싱글의 인스트루멘털 트랙
   "sabotage (Instrumental)": ["-EUl9-pXqXs", "audio"], "Shout Baby (Instrumental)": ["Tung9Tpj6Iw", "audio"], "結証 (Instrumental)": ["KNrywUGLxOQ", "audio"], "LADYBUG (Instrumental)": ["DvWL5WIUjrU", "audio"],
   "Copy (Instrumental)": ["bMwjFpa4-VU", "audio"], "LITMUS (Instrumental)": ["ytLYcwIq3qY", "audio"], "アーユーレディー (Instrumental)": ["_L9KZVtzTuY", "audio"], "これからのこと、それからのこと (Instrumental)": ["i23d1aBXP0c", "audio"],
@@ -981,11 +1025,12 @@ function renderSong(t, line) {
 
   const memo = d ? trimBlank(d.메모) : [];
   app.innerHTML = `<div class="narrow">
-    <a class="back" href="#/a/${al.key}">${window.SINGLE ? "" : "← "}${coverHTML(al, " mini")}${al.label} 『${esc(al.title)}』</a>
+    ${isSolo(al) && !window.SINGLE ? `<a class="back" href="#/">← 전체 앨범</a>` : `<a class="back" href="#/a/${al.key}">${window.SINGLE ? "" : "← "}${coverHTML(al, " mini")}${al.label} 『${esc(al.title)}』</a>`}
     <header class="song-head">
-      <div class="album-top"><span class="ord">${pad(t.no)}번 트랙</span></div>
+      <div class="album-top">${isSolo(al) ? `<span class="ord">${al.label}</span><span>${al.date}</span>` : `<span class="ord">${pad(t.no)}번 트랙</span>`}</div>
       <h1 class="song-title" lang="ja">${esc(t.jp)}${t.read ? `<span class="read">${esc(t.read)}</span>` : ""}</h1>
       ${t.ko || t.en ? `<div class="song-ko">${[t.ko, t.en].filter(Boolean).map(esc).join(" · ")}</div>` : ""}
+      ${al.desc ? `<div class="album-desc">${esc(al.desc)}</div>` : ""}
     </header>
     ${videoHTML(t)}
     ${problems(al)}
@@ -997,6 +1042,8 @@ function renderSong(t, line) {
     </nav>
   </div>`;
   applyPrefs();
+
+  if (al.credit) copyright.innerHTML = al.credit;
 
   const target = line != null && document.querySelector(`[data-row="${Number(line)}"]`);
   if (target) {
