@@ -38,10 +38,190 @@
 ### 02 アーユーレディー · Are You Ready
 
 [원문]
+アーユーレディー
+{僕|ぼく}らは{夢|ゆめ}をたぐり{寄|よ}せて
+{旅|たび}を{始|はじ}めよう
+まだ{迷|まよ}ってしまうけど
+{世界|せかい}へ　{未来|みらい}へ
+{飛|と}び{出|だ}していこう
+
+{声|こえ}に{出|だ}せば
+{言霊|ことだま}があるね
+{君|きみ}とふたり
+{薄暗|うすぐら}い{部屋|へや}の{中|なか}
+
+{恥|は}じらいながら
+{語|かた}り{明|あ}かした{夜|よる}を　{放|はな}て
+
+アーユーレディー
+{僕|ぼく}らは{夢|ゆめ}に{怯|おび}えていたから
+{繋|つな}がっていたんだね
+
+どうしたいの？
+{息|いき}が{止|と}まったとき
+{最期|さいご}が{迫|せま}ったとき
+やり{残|のこ}してしまえば{何|なに}を{思|おも}うの？
+{君|きみ}と{選|えら}んだから
+{君|きみ}と{望|のぞ}んだから
+{始|はじ}まってもないこの{世界|せかい}が{愛|いと}しいんだよ
+{届|とど}きそうだ
+どんな{未来|みらい}も{君|きみ}となら
+
+{握|にぎ}りしめた
+{無名|むめい}のパスポート
+ここから{僕|ぼく}ら
+{何者|なにもの}にでもなれる
+
+{痛|いた}む{日々|ひび}よ
+{翔|か}け{上|あ}がる{羽|はね}となれ
+
+ただ{怖|こわ}い{怖|こわ}いと{夢|ゆめ}を{隠|かく}した
+だってだってねこの{命|いのち}は
+{一度|いちど}きりだけど{一度|いちど}きりだから
+どうかどうかこの{道|みち}の{果|は}て
+{幸|こう}か{不幸|ふこう}か{秤|はかり}にかけて
+{心|こころ}のどこかで{迷|まよ}ってる
+(アーユーレディー {僕|ぼく}らは
+アーユーレディー {僕|ぼく}らは)
+
+アーユーレディー
+{僕|ぼく}らは{夢|ゆめ}に{踊|おど}らされながら
+{本気|ほんき}のステップで
+まだ{見|み}ぬステージへ
+
+どうしたいの？
+{息苦|いきぐる}しい{夜|よる}に
+{生|い}きがいがあったなら
+{始|はじ}まってもない{朝日|あさひ}がきっと{昇|のぼ}るよ
+{君|きみ}を{選|えら}んだから
+{君|きみ}を{望|のぞ}んだから
+{取|と}るに{足|た}らないこの{世界|せかい}も{愛|いと}しいんだよ
+{届|とど}きそうだ
+どんな{未来|みらい}も{君|きみ}となら
 
 [발음]
+Āyūredī
+Bokura wa yume o taguriyosete
+Tabi o hajimeyou
+Mada mayotte shimaukedo
+Sekai e mirai e
+Tobidashite ikou
+
+Koe ni daseba
+Kotodama ga aru ne
+Kimi to futari
+Usugurai heya no naka
+
+Hajirainagara
+Katariakashita yoru o hanate
+
+Āyūredī
+Bokura wa yume ni obiete itakara
+Tsunagatte ita nda ne
+
+Dō shitai no?
+Iki ga tomatta toki
+Saigo ga sematta toki
+Yarinokoshite shimaeba nani o omou no?
+Kimi to erandakara
+Kimi to nozondakara
+Hajimatte mo nai kono sekai ga itoshī nda yo
+Todoki-sōda
+Don'na mirai mo kimi to nara
+
+Nigirishimeta
+Mumei no pasupōto
+Koko kara bokura
+Nanimono ni demo nareru
+
+Itamu hibi yo
+Kakeagaru hane to nare
+
+Tada kowai kowai to yume o kakushita
+Datte datte ne kono inochi wa
+Ichido kiri dakedo ichido kiri dakara
+Dō ka dō ka kono michi no hate
+Kō ka fukō ka hakari ni kakete
+Kokoro no doko ka de mayotteru
+(Āyūredī bokura wa
+Āyūredī bokura wa)
+
+Āyūredī
+Bokura wa yume ni odorasarenagara
+Honki no suteppu de
+Mada minu sutēji e
+
+Dō shitai no?
+Ikigurushī yoru ni
+Ikigai ga attanara
+Hajimatte mo nai asahi ga kitto noboru yo
+Kimi o erandakara
+Kimi o nozondakara
+Torunitaranai kono sekai mo itoshī nda yo
+Todoki-sōda
+Don'na mirai mo kimi to nara
 
 [한글발음]
+아-유-레디-
+보쿠라와 유메오 타구리요세테
+타비오 하지메요우
+마다 마욧테 시마우케도
+세카이에 미라이에
+토비다시테 이코우
+
+코에니 다세바
+코토다마가 아루네
+키미토 후타리
+우스구라이 헤야노 나카
+
+하지라이나가라
+카타리아카시타 요루오 하나테
+
+아-유-레디-
+보쿠라와 유메니 오비에테 이타카라
+츠나갓테 이탄다네
+
+도- 시타이노?
+이키가 토맛타 토키
+사이고가 세맛타 토키
+야리노코시테 시마에바 나니오 오모우노?
+키미토 에란다카라
+키미토 노존다카라
+하지맛테모 나이 코노 세카이가 이토시인다요
+토도키소-다
+돈나 미라이모 키미토나라
+
+니기리시메타
+무메이노 파스포-토
+코코카라 보쿠라
+나니모노니데모 나레루
+
+이타무 히비요
+카케아가루 하네토 나레
+
+타다 코와이 코와이토 유메오 카쿠시타
+닷테 닷테네 코노 이노치와
+이치도 키리다케도 이치도 키리 다카라
+도-카 도-카 코노 미치노 하테
+코-카 후코-카 하카리니 카케테
+코코로노 도코카데 마욧테루
+(아-유-레디- 보쿠라와
+아-유-레디- 보쿠라와)
+
+아-유-레디-
+보쿠라와 유메니 오도라사레나가라
+혼키노 스텟푸데
+마다 미누 스테-지에
+
+도- 시타이노?
+이키구루시- 요루니
+이키가이가 앗타나라
+하지맛테모 나이 아사히가 킷토 노보루요
+키미오 에란다카라
+키미오 노존다카라
+토루니타라나이 코노 세카이모 이토시인다요
+토도키소-다
+돈나 미라이모 키미토나라
 
 [해석]
 
