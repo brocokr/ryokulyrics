@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "녹황색사회 가사 노트",
+  "short_name": "가사 노트",
+  "description": "녹황색사회 가사를 원문·발음·해석으로 한 줄씩 맞춰 보는 일본어 공부 노트",
+  "lang": "ko",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f6ee",
+  "theme_color": "#2f7a3e",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

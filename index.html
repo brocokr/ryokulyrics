@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>녹황색사회 가사 노트</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f6ee">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101a13">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="가사 노트">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Dela+Gothic+One&family=Gothic+A1:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap">
@@ -312,6 +320,40 @@ mark { background: var(--yolk); color: var(--on-yolk); border-radius: 3px; paddi
 footer { margin-top: 24px; font-size: 12px; color: var(--muted); }
 .copyright { margin-top: 8px; font-size: 11px; }
 body:not([data-view="home"]) .copyright { margin-top: 32px; text-align: center; }
+
+/* 앱 설치: 첫 화면 맨 위 버튼과 안내 창. PC는 가운데, 좁은 화면은 아래에서 올라온다 */
+.app-row { display: flex; justify-content: flex-end; padding-top: 12px; }
+.app-row + .top { padding-top: 12px; }
+.app-btn { display: inline-flex; align-items: center; gap: 6px; border-color: var(--leaf); color: var(--leaf); }
+.app-btn svg, .sheet-x svg { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.app-btn svg { width: 15px; height: 15px; }
+html:has(.sheet[open]) { overflow: hidden; }
+.sheet { width: min(600px, 100%); max-width: 100%; max-height: 88vh; max-height: 88dvh; margin: auto; padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; overscroll-behavior: contain; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 18px; }
+.sheet::backdrop { background: rgba(8, 16, 10, .55); }
+.sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.sheet-head h2 { margin: 0; font-size: 18px; font-weight: 800; line-height: 1.35; word-break: keep-all; }
+.sheet-x { flex: none; display: grid; place-items: center; width: 32px; height: 32px; margin: -4px -6px 0 0; padding: 0; color: var(--muted); background: none; border: 0; border-radius: 50%; cursor: pointer; }
+.sheet-x:hover { color: var(--ink); }
+.sheet-x svg { width: 18px; height: 18px; }
+.sheet-app { display: flex; align-items: center; gap: 14px; margin-top: 14px; }
+.sheet-app img { display: block; flex: none; width: 64px; height: 64px; border-radius: 14px; }
+.sheet-app b { font-size: 15px; font-weight: 800; }
+.sheet-app p { margin: 2px 0 0; font-size: 13px; line-height: 1.5; color: var(--muted); word-break: keep-all; }
+.sheet-warn { margin-top: 14px; padding: 12px 14px; font-size: 13.5px; line-height: 1.55; color: var(--warn-ink); background: var(--warn-bg); border-radius: 12px; word-break: keep-all; }
+.sheet-warn p { margin: 0 0 8px; }
+.sheet-warn b { overflow-wrap: anywhere; word-break: normal; user-select: all; }
+.sheet-go { display: block; width: 100%; margin-top: 14px; padding: 11px 16px; font: inherit; font-size: 15px; font-weight: 800; color: var(--bg); background: var(--leaf); border: 0; border-radius: 12px; cursor: pointer; }
+.sheet-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.sheet-tabs button { min-height: 34px; padding: 5px 12px; font: inherit; font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--ink); background: none; border: 1.5px solid var(--line); border-radius: 999px; cursor: pointer; }
+.sheet-tabs button[aria-pressed="true"] { color: var(--bg); background: var(--ink); border-color: var(--ink); }
+.sheet-steps { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; counter-reset: step; }
+.sheet-steps li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 12px; padding: 10px 14px; font-size: 14px; line-height: 1.5; border: 1px solid var(--line); border-radius: 12px; word-break: keep-all; }
+.sheet-steps li::before { content: counter(step); display: grid; place-items: center; width: 28px; height: 28px; font-size: 13px; font-weight: 800; color: var(--bg); background: var(--ink); border-radius: 50%; }
+.sheet-steps b { font-weight: 800; }
+.sheet-foot { margin: 12px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--muted); word-break: keep-all; }
+@media (max-width: 520px) {
+  .sheet { width: 100%; margin: auto 0 0; border-width: 1px 0 0; border-radius: 18px 18px 0 0; }
+}
 
 @media (max-width: 520px) {
   .stat { margin-left: 0; }
@@ -761,6 +803,7 @@ function renderHome() {
   const filled = ALL.filter(hasLyrics).length;
   const translated = ALL.filter(hasTranslation).length;
   app.innerHTML = `
+    ${installButtonHTML()}
     <header class="top">
       <div class="top-text">
         <div class="kicker">緑黄色社会 · 歌詞ノート</div>
@@ -958,6 +1001,8 @@ const YT_MARK = `<svg viewBox="0 0 24 24" fill="#FF0000" aria-hidden="true"><pat
 function videoHTML(t) {
   const v = VIDEO_BY_TITLE[norm(t.jp)];
   if (t.inst && !v) return "";
+  // 앱을 인터넷 없이 열었을 때: 가사는 저장본으로 보이지만 영상은 나오지 않는다
+  if (navigator.onLine === false) return `<p class="info">영상은 인터넷이 연결되어 있을 때 볼 수 있습니다.</p>`;
   if (v && location.protocol !== "file:") return `<div class="yt-player"><iframe src="https://www.youtube.com/embed/${v[0]}" title="${esc(t.jp)} ${YT_KIND[v[1]]}" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>`;
   if (!v) return `<a class="yt plain" href="https://www.youtube.com/results?search_query=${encodeURIComponent(`緑黄色社会 ${t.jp}`)}" target="_blank" rel="noopener">${YT_MARK}<span class="yt-text"><b>유튜브에서 이 곡 찾기</b><small>새 탭에서 검색 결과가 열립니다</small></span></a>`;
   return `<a class="yt" href="https://www.youtube.com/watch?v=${v[0]}" target="_blank" rel="noopener"><span class="yt-thumb"><img src="https://i.ytimg.com/vi/${v[0]}/mqdefault.jpg" alt="" loading="lazy">${YT_MARK}</span><span class="yt-text"><b>${YT_KIND[v[1]]}</b><small>지금은 새 탭으로 열립니다 · GitHub에 올린 사이트에서는 여기서 바로 재생됩니다</small></span></a>`;
@@ -1129,6 +1174,148 @@ document.addEventListener("keydown", e => {
   const link = document.querySelector(e.key === "ArrowLeft" ? ".pager .prev" : e.key === "ArrowRight" ? ".pager .next" : null);
   if (link) location.hash = link.getAttribute("href");
 });
+
+/* ---------- 앱 설치 ---------- */
+
+// 사이트 주소가 바뀌면 여기와 안내 문구가 함께 바뀝니다.
+const APP_URL = "https://brocokr.github.io/ryokulyrics/";
+const USER_AGENT = navigator.userAgent;
+// 파일로 직접 열었거나 카카오톡·인스타그램 같은 앱 안의 브라우저로 열면 설치할 수 없어 휴대폰 브라우저로 열도록 안내합니다.
+const CANNOT_INSTALL = location.protocol === "file:" || /KAKAOTALK|Instagram|FBAN|FBAV|FB_IAB|Barcelona|NAVER\(inapp|Line\/|everytimeApp|DaumApps|; wv\)/i.test(USER_AGENT);
+const IS_IOS = /iPhone|iPad|iPod/.test(USER_AGENT) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const INSTALL_TABS = [
+  { id: "android", name: "안드로이드 (크롬)", steps: [
+    "주소창 오른쪽의 <b>⋮</b> 메뉴를 누릅니다",
+    "<b>‘홈 화면에 추가’</b> 또는 <b>‘앱 설치’</b>를 누릅니다",
+    "<b>‘설치’</b>를 누릅니다",
+  ] },
+  { id: "samsung", name: "갤럭시 (삼성 인터넷)", steps: [
+    "오른쪽 아래의 <b>≡</b> 메뉴를 누릅니다",
+    "<b>‘현재 페이지 추가’</b> → <b>‘홈 화면’</b>을 누릅니다",
+    "<b>‘추가’</b>를 누릅니다",
+  ] },
+  { id: "ios", name: "아이폰 / 아이패드", steps: [
+    "공유 버튼(네모에 위쪽 화살표)을 누릅니다. 안 보이면 주소창 옆 <b>⋯</b> → <b>‘공유’</b>를 누릅니다",
+    "목록을 내려서 <b>‘홈 화면에 추가’</b>를 누릅니다",
+    "<b>‘웹 앱으로 열기’</b>가 보이면 켜 두고 <b>‘추가’</b>를 누릅니다",
+  ] },
+  { id: "pc", name: "PC (크롬 / 엣지)", steps: [
+    "주소창 오른쪽 끝의 설치 아이콘을 누릅니다",
+    "안 보이면 <b>⋮</b>(엣지는 <b>⋯</b>) 메뉴 → <b>‘전송, 저장 및 공유’</b> 또는 <b>‘앱’</b> → <b>‘앱으로 설치’</b>를 누릅니다",
+    "<b>‘설치’</b>를 누릅니다",
+  ] },
+];
+let installTab = IS_IOS ? "ios" : /SamsungBrowser/.test(USER_AGENT) ? "samsung" : /Android/.test(USER_AGENT) ? "android" : "pc";
+let installPrompt = null; // 브라우저가 바로 설치를 허락하면 담기는 이벤트. 있으면 '지금 설치하기' 버튼이 보입니다.
+
+// 이미 앱으로 열었거나 한 곡만 내보낸 파일이면 버튼을 보여 주지 않습니다.
+const isInstalled = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const installButtonHTML = () => window.SINGLE || isInstalled() ? "" : `<div class="app-row"><button type="button" class="ghost-btn app-btn" data-install-open><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 20h14"/></svg>앱 설치</button></div>`;
+const installStepsHTML = () => INSTALL_TABS.find(t => t.id === installTab).steps.map(s => `<li><span>${s}</span></li>`).join("");
+
+function installSheetHTML() {
+  return `
+    <div class="sheet-head">
+      <h2 id="sheetTitle">홈 화면에 추가해서 앱처럼 쓰기</h2>
+      <button type="button" class="sheet-x" data-sheet="close" aria-label="닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="sheet-app">
+      <img src="icon-192.png" alt="">
+      <div><b>녹황색사회 가사 노트</b><p>아이콘을 누르면 주소창 없이 전체 화면으로 열립니다. 한 번 열어 둔 뒤에는 지하철처럼 인터넷이 끊겨도 가사를 볼 수 있습니다.</p></div>
+    </div>
+    ${CANNOT_INSTALL ? `<div class="sheet-warn"><p>여기서는 설치가 안 됩니다. 휴대폰 브라우저에서 <b>${APP_URL.replace(/^https:\/\/|\/$/g, "")}</b>를 열고 아래 순서대로 하면 됩니다.</p><button type="button" class="ghost-btn" data-sheet="copy">주소 복사</button></div>` : ""}
+    ${installPrompt && !CANNOT_INSTALL ? `<button type="button" class="sheet-go" data-sheet="install">지금 설치하기</button>` : ""}
+    <div class="sheet-tabs">${INSTALL_TABS.map(t => `<button type="button" data-tab="${t.id}" aria-pressed="${t.id === installTab}">${t.name}</button>`).join("")}</div>
+    <ol class="sheet-steps">${installStepsHTML()}</ol>
+    <p class="sheet-foot">새로 추가된 가사와 해석은 앱을 열 때 자동으로 들어옵니다. 영상은 인터넷이 연결되어 있을 때만 나옵니다. 아이콘을 지우고 싶으면 다른 앱처럼 길게 눌러서 삭제하면 됩니다.</p>`;
+}
+
+function openInstallSheet() {
+  let sheet = document.getElementById("installSheet");
+  if (!sheet) {
+    sheet = document.createElement("dialog");
+    sheet.id = "installSheet";
+    sheet.className = "sheet";
+    sheet.setAttribute("aria-labelledby", "sheetTitle");
+    sheet.addEventListener("click", onSheetClick);
+    document.body.append(sheet);
+  }
+  sheet.innerHTML = installSheetHTML();
+  sheet.showModal();
+}
+
+function onSheetClick(e) {
+  const sheet = e.currentTarget;
+  // 창 바깥의 어두운 부분을 누르면 닫습니다.
+  if (e.target === sheet) {
+    const r = sheet.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) sheet.close();
+    return;
+  }
+  const tab = e.target.closest("[data-tab]");
+  if (tab) {
+    installTab = tab.dataset.tab;
+    sheet.querySelectorAll("[data-tab]").forEach(b => b.setAttribute("aria-pressed", String(b === tab)));
+    sheet.querySelector(".sheet-steps").innerHTML = installStepsHTML();
+    return;
+  }
+  const button = e.target.closest("[data-sheet]");
+  const action = button && button.dataset.sheet;
+  if (action === "close") sheet.close();
+  if (action === "copy") copyAppUrl(button);
+  if (action === "install" && installPrompt) {
+    const prompt = installPrompt;
+    installPrompt = null;
+    sheet.close();
+    prompt.prompt();
+  }
+}
+
+async function copyAppUrl(button) {
+  let ok = false;
+  try {
+    await navigator.clipboard.writeText(APP_URL);
+    ok = true;
+  } catch {
+    // 앱 안의 브라우저는 복사 기능을 막기도 해서 옛날 방식으로 한 번 더 시도합니다.
+    const box = document.createElement("textarea");
+    box.value = APP_URL;
+    button.after(box);
+    box.select();
+    try { ok = document.execCommand("copy"); } catch {}
+    box.remove();
+  }
+  button.textContent = ok ? "복사했습니다" : "복사가 안 됩니다. 주소를 길게 눌러 복사할 수 있습니다";
+}
+
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-install-open]")) openInstallSheet();
+});
+addEventListener("beforeinstallprompt", e => {
+  e.preventDefault(); // 브라우저가 띄우는 작은 안내 대신 안내 창의 버튼을 씁니다.
+  installPrompt = e;
+  const sheet = document.getElementById("installSheet");
+  if (sheet && sheet.open) sheet.innerHTML = installSheetHTML();
+});
+addEventListener("appinstalled", () => {
+  installPrompt = null;
+  const sheet = document.getElementById("installSheet");
+  if (sheet && sheet.open) sheet.close();
+});
+
+// 인터넷이 끊겨도 열리도록 가사·커버·아이콘을 저장해 둡니다(sw.js). 파일 목록은 ALBUMS에서 만들므로 곡이나 앨범을 추가해도 여기를 고칠 필요가 없습니다.
+if ("serviceWorker" in navigator && location.protocol !== "file:" && !window.SINGLE) {
+  addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(reg => {
+      const files = new Set(["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "Instagram_icon.png", encodeURI(PROFILE_PHOTO)]);
+      for (const al of ALBUMS) {
+        files.add(encodeURI(`가사/${al.file}.js`));
+        files.add(encodeURI(al.cover || `${al.file}.webp`));
+      }
+      reg.active.postMessage({ type: "save-all", files: [...files] });
+    }).catch(() => {});
+  });
+}
 
 loadLyrics().then(() => {
   addEventListener("hashchange", route);

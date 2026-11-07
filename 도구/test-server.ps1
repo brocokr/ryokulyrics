@@ -11,7 +11,7 @@ try { $listener.Start() } catch {
 }
 $types = @{
   '.html' = 'text/html; charset=utf-8'; '.js' = 'text/javascript; charset=utf-8'; '.css' = 'text/css; charset=utf-8'
-  '.webp' = 'image/webp'; '.jpg' = 'image/jpeg'; '.png' = 'image/png'; '.svg' = 'image/svg+xml'; '.ico' = 'image/x-icon'
+  '.webp' = 'image/webp'; '.jpg' = 'image/jpeg'; '.png' = 'image/png'; '.svg' = 'image/svg+xml'; '.ico' = 'image/x-icon'; '.webmanifest' = 'application/manifest+json'
 }
 $full = [IO.Path]::GetFullPath($Root).TrimEnd('\')
 if (-not $NoBrowser) { Start-Process $url }
