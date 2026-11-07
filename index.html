@@ -67,13 +67,11 @@ body:not([data-view="home"]) .home-only { display: none; }
 .top:not(:has(.hero)) { grid-template-columns: minmax(0, 1fr); }
 .top-text { display: grid; gap: 14px; }
 /* 제작자 인스타그램 링크 */
-.maker-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.maker-k { font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--muted); }
 .maker { display: inline-flex; align-items: center; gap: 8px; padding: 5px 14px 5px 6px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 700; }
 .maker:hover { border-color: var(--leaf); color: var(--leaf); }
 .maker img { display: block; width: 22px; height: 22px; border-radius: 6px; }
 .maker svg { display: block; width: 22px; height: 22px; padding: 2px; flex: none; fill: var(--leaf); }
-/* 콜 가이드로 가는 큰 배너: 만든 사람 줄 바로 아래. 아이콘 윤곽선이 어두운 화면에서도 보이도록 바탕은 항상 흰색 */
+/* 콜 가이드로 가는 큰 배너: 첫 화면 소개글 아래. 아이콘 윤곽선이 어두운 화면에서도 보이도록 바탕은 항상 흰색 */
 .call-banner { display: flex; align-items: center; gap: 14px; min-width: 0; padding: 14px 20px 14px 14px; color: var(--bg); text-decoration: none; background: var(--leaf); border-radius: 16px; }
 .call-banner:hover { filter: brightness(1.08); }
 .call-banner img { display: block; flex: none; width: 68px; height: 68px; padding: 10px; background: #fff; border-radius: 14px; }
@@ -81,6 +79,9 @@ body:not([data-view="home"]) .home-only { display: none; }
 .call-banner b { font-size: 22px; font-weight: 800; line-height: 1.25; }
 .call-banner small { font-size: 13px; line-height: 1.45; word-break: keep-all; }
 .call-banner::after { content: ""; flex: none; width: 11px; height: 11px; border-top: 2.5px solid currentColor; border-right: 2.5px solid currentColor; transform: rotate(45deg); }
+/* 왼쪽 묶음: 제목·설명과 같은 크기의 배너 2개(콜 가이드, 인스타그램) */
+.top-left { display: grid; gap: 18px; min-width: 0; }
+.home-banners { display: grid; gap: 8px; min-width: 0; }
 /* 밴드 사진: 원래 비율 그대로. 파일이 없으면 자리째 빠진다 */
 .hero { margin: 0; }
 .hero img { display: block; width: 100%; height: auto; aspect-ratio: 2400 / 1642; object-fit: cover; border-radius: 14px; border: 1px solid var(--line); background: var(--mask); }
@@ -345,17 +346,13 @@ body:not([data-view="home"]) .copyright { margin-top: 32px; text-align: center; 
 h1.ja { font-family: var(--font-display); font-size: clamp(28px, 5vw, 44px); }
 .lede:lang(ja) { font-family: var(--font-jp); }
 .app-row + .top { padding-top: 12px; }
-/* 넓은 화면: 위 줄은 제목·사진, 아래 줄은 배너·사진 설명으로 나눈다. 배너 윗선이 멤버 칸 윗선과 맞고(사진 설명 한 줄 + 간격만큼 내림), 사진 크기가 바뀌어도 어긋나지 않는다 */
+/* 넓은 화면: 왼쪽 묶음(제목·설명·배너 2개)의 아랫선을 오른쪽 공식 링크 아랫선에 맞춘다. 배너가 커진 만큼 제목이 위쪽 빈 칸으로 올라간다 */
 @media (min-width: 761px) {
-  .top:has(.hero) { row-gap: 8px; }
-  .top:has(.hero) .top-text { grid-column: 1; grid-row: 1; align-self: end; }
+  .top:has(.hero) { grid-template-rows: auto 1fr; row-gap: 8px; }
+  .top:has(.hero) .top-left { grid-column: 1; grid-row: 1 / span 2; align-self: end; gap: 33px; }
   .hero { display: contents; }
-  .hero img { grid-column: 2; grid-row: 1; align-self: end; }
+  .hero img { grid-column: 2; grid-row: 1; align-self: start; }
   .hero figcaption { grid-column: 2; grid-row: 2; align-self: start; margin-top: 0; }
-  .top:has(.hero) .call-banner { grid-column: 1; grid-row: 2; align-self: start; margin-top: calc(12px * 1.6 + 6px); }
-}
-@media (max-width: 760px) {
-  .call-banner { margin-top: -4px; }
 }
 .app-btn { display: inline-flex; align-items: center; gap: 6px; border-color: var(--leaf); color: var(--leaf); }
 .app-btn svg, .sheet-x svg { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
@@ -854,13 +851,17 @@ function renderHome() {
   app.innerHTML = `
     ${topRowHTML()}
     <header class="top">
+      <div class="top-left">
       <div class="top-text">
         <div class="kicker">緑黄色社会 · 歌詞ノート</div>
         <h1${homeLang === "ja" ? ' class="ja"' : ""}>${homeLang === "ja" ? `<span class="g" lang="ja">緑黄色</span><span class="y" lang="ja">社会</span> <span lang="ja">歌詞ノート</span>` : `<span class="g">녹황색</span><span class="y">사회</span> 가사 노트`}<span class="jp" lang="ja">歌詞で覚える日本語</span></h1>
         ${homeLang === "ja" ? `<p class="lede" lang="ja">アルバムごとに歌詞を集めて、原文・発音・韓国語訳を1行ずつ見比べながら日本語を勉強するノートです。曲を押すと歌詞が開き、訳や原文を隠して覚えることもできます。</p>` : `<p class="lede">앨범별로 가사를 모아 원문·발음·해석을 한 줄씩 맞춰 보는 공부 노트예요. 곡을 누르면 가사가 열리고, 해석이나 원문을 가려 놓고 외울 수 있어요.</p>`}
-        <div class="maker-row"><span class="maker-k">만든 사람</span><a class="maker" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener" title="제작자 인스타그램"><img src="Instagram_icon.png" alt="" onerror="this.remove()">@brocoplaylist</a></div>
       </div>
-      <a class="call-banner" href="call/index.html"><img src="call/119956.png" alt="" onerror="this.remove()"><span><b>콜 가이드</b><small>라이브에서 다 같이 하는 콜과 동작을 곡별로 모았어요</small></span></a>
+      <div class="home-banners">
+        <a class="call-banner" href="call/index.html"><img src="call/119956.png" alt="" onerror="this.remove()"><span><b>콜 가이드</b><small>라이브에서 다 같이 하는 콜과 동작을 곡별로 모았어요</small></span></a>
+        <a class="call-banner" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener" title="제작자 인스타그램"><img src="Instagram_icon.png" alt="" onerror="this.remove()"><span><b>@brocoplaylist</b><small>인스타그램</small></span></a>
+      </div>
+      </div>
       <figure class="hero">
         <img src="${encodeURI(PROFILE_PHOTO)}" alt="녹황색사회 멤버 네 명의 2026년 프로필 사진" onerror="this.closest('figure').remove()">
         <figcaption>
