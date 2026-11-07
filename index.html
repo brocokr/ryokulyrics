@@ -337,6 +337,13 @@ body:not([data-view="home"]) .copyright { margin-top: 32px; text-align: center; 
 .site-nav a:hover { color: var(--leaf); }
 .site-nav a[aria-current="page"] { color: var(--bg); background: var(--ink); }
 .call-link { margin-top: 12px; padding-left: 10px; }
+/* 언어 버튼(콜 가이드와 같은 모양)과 일본어 제목·설명. 긴 일본어 제목이 한 줄에 들어가도록 조금 작게 한다 */
+.app-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: auto; }
+.lang-switch button { padding: 4px 12px; font: inherit; font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--muted); background: none; border: 0; border-radius: 999px; cursor: pointer; }
+.lang-switch button:hover { color: var(--leaf); }
+.lang-switch button[aria-pressed="true"] { color: var(--bg); background: var(--ink); }
+h1.ja { font-family: var(--font-display); font-size: clamp(28px, 5vw, 44px); }
+.lede:lang(ja) { font-family: var(--font-jp); }
 .app-row + .top { padding-top: 12px; }
 /* 넓은 화면: 위 줄은 제목·사진, 아래 줄은 배너·사진 설명으로 나눈다. 배너 윗선이 멤버 칸 윗선과 맞고(사진 설명 한 줄 + 간격만큼 내림), 사진 크기가 바뀌어도 어긋나지 않는다 */
 @media (min-width: 761px) {
@@ -840,7 +847,7 @@ function problems(only) {
 }
 
 function renderHome() {
-  document.title = "녹황색사회 가사 노트";
+  document.title = homeLang === "ja" ? "緑黄色社会 歌詞ノート" : "녹황색사회 가사 노트";
   const total = ALL.filter(t => !t.inst).length;
   const filled = ALL.filter(hasLyrics).length;
   const translated = ALL.filter(hasTranslation).length;
@@ -849,8 +856,8 @@ function renderHome() {
     <header class="top">
       <div class="top-text">
         <div class="kicker">緑黄色社会 · 歌詞ノート</div>
-        <h1><span class="g">녹황색</span><span class="y">사회</span> 가사 노트<span class="jp" lang="ja">歌詞で覚える日本語</span></h1>
-        <p class="lede">앨범별로 가사를 모아 원문·발음·해석을 한 줄씩 맞춰 보는 공부 노트예요. 곡을 누르면 가사가 열리고, 해석이나 원문을 가려 놓고 외울 수 있어요.</p>
+        <h1${homeLang === "ja" ? ' class="ja"' : ""}>${homeLang === "ja" ? `<span class="g" lang="ja">緑黄色</span><span class="y" lang="ja">社会</span> <span lang="ja">歌詞ノート</span>` : `<span class="g">녹황색</span><span class="y">사회</span> 가사 노트`}<span class="jp" lang="ja">歌詞で覚える日本語</span></h1>
+        ${homeLang === "ja" ? `<p class="lede" lang="ja">アルバムごとに歌詞を集めて、原文・発音・韓国語訳を1行ずつ見比べながら日本語を勉強するノートです。曲を押すと歌詞が開き、訳や原文を隠して覚えることもできます。</p>` : `<p class="lede">앨범별로 가사를 모아 원문·발음·해석을 한 줄씩 맞춰 보는 공부 노트예요. 곡을 누르면 가사가 열리고, 해석이나 원문을 가려 놓고 외울 수 있어요.</p>`}
         <div class="maker-row"><span class="maker-k">만든 사람</span><a class="maker" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener" title="제작자 인스타그램"><img src="Instagram_icon.png" alt="" onerror="this.remove()">@brocoplaylist</a></div>
       </div>
       <a class="call-banner" href="call/index.html"><img src="call/119956.png" alt="" onerror="this.remove()"><span><b>콜 가이드</b><small>라이브에서 다 같이 하는 콜과 동작을 곡별로 모았어요</small></span></a>
@@ -1265,9 +1272,17 @@ const INSTALL_TABS = [
 let installTab = IS_IOS ? "ios" : /SamsungBrowser/.test(USER_AGENT) ? "samsung" : /Android/.test(USER_AGENT) ? "android" : "pc";
 let installPrompt = null; // 브라우저가 바로 설치를 허락하면 담기는 이벤트. 있으면 '지금 설치하기' 버튼이 보입니다.
 
-// 첫 화면 맨 위 줄: 사이트 메뉴와 앱 설치 버튼. 이미 앱으로 열었으면 설치 버튼만 빠집니다.
+// 첫 화면의 한국어/日本語 버튼: 첫 화면의 제목과 설명만 바뀝니다. 가사·해석·문법 설명과 다른 화면은 한국어 그대로입니다.
+// 콜 가이드와 같은 선택을 씁니다(ryokulyrics:lang). 브라우저 언어와 상관없이 처음에는 한국어로 열립니다.
+let homeLang = (() => {
+  const asked = new URLSearchParams(location.search).get("lang");
+  if (asked === "ja" || asked === "ko") return asked;
+  try { const saved = localStorage.getItem("ryokulyrics:lang"); if (saved === "ja" || saved === "ko") return saved; } catch {}
+  return "ko";
+})();
+// 첫 화면 맨 위 줄: 사이트 메뉴, 언어 버튼, 앱 설치 버튼. 이미 앱으로 열었으면 설치 버튼만 빠집니다.
 const isInstalled = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
-const topRowHTML = () => `<div class="app-row"><nav class="site-nav" aria-label="사이트 메뉴"><a href="#/" aria-current="page">가사 노트</a><a href="call/index.html">콜 가이드</a></nav>${isInstalled() ? "" : `<button type="button" class="ghost-btn app-btn" data-install-open><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 20h14"/></svg>앱 설치</button>`}</div>`;
+const topRowHTML = () => `<div class="app-row"><nav class="site-nav" aria-label="사이트 메뉴"><a href="#/" aria-current="page">가사 노트</a><a href="call/index.html">콜 가이드</a></nav><div class="app-tools"><div class="site-nav lang-switch" role="group" aria-label="언어 / 言語"><button type="button" data-lang="ko" aria-pressed="${homeLang === "ko"}">한국어</button><button type="button" data-lang="ja" aria-pressed="${homeLang === "ja"}">日本語</button></div>${isInstalled() ? "" : `<button type="button" class="ghost-btn app-btn" data-install-open><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 20h14"/></svg>앱 설치</button>`}</div></div>`;
 const installStepsHTML = () => INSTALL_TABS.find(t => t.id === installTab).steps.map(s => `<li><span>${s}</span></li>`).join("");
 
 function installSheetHTML() {
@@ -1347,6 +1362,16 @@ async function copyAppUrl(button) {
 
 document.addEventListener("click", e => {
   if (e.target.closest("[data-install-open]")) openInstallSheet();
+  const langButton = e.target.closest("[data-lang]");
+  if (langButton) {
+    homeLang = langButton.dataset.lang;
+    try { localStorage.setItem("ryokulyrics:lang", homeLang); } catch {}
+    if (location.search.includes("lang=")) history.replaceState(null, "", location.pathname + location.hash);
+    const y = scrollY;
+    renderHome();
+    scrollTo(0, y);
+    document.querySelector(`[data-lang="${homeLang}"]`).focus();
+  }
 });
 addEventListener("beforeinstallprompt", e => {
   e.preventDefault(); // 브라우저가 띄우는 작은 안내 대신 안내 창의 버튼을 씁니다.

@@ -54,6 +54,14 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 a { color: var(--leaf); }
 :focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
 
+/* 언어 전환 버튼과 앱 설치 버튼. 일본어 화면은 일본어 글꼴을 쓰고, 긴 제목이 한 줄에 들어가도록 조금 작게 한다 */
+.app-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: auto; }
+.lang-switch button { padding: 4px 12px; font: inherit; font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--muted); background: none; border: 0; border-radius: 999px; cursor: pointer; }
+.lang-switch button:hover { color: var(--leaf); }
+.lang-switch button[aria-pressed="true"] { color: var(--bg); background: var(--ink); }
+.app-btn[hidden] { display: none; }
+html[lang="ja"] { --font-head: "Dela Gothic One", "Hiragino Sans", "Yu Gothic", sans-serif; --font-body: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif; }
+html[lang="ja"] h1 { font-size: clamp(28px, 5vw, 44px); }
 /* 사이트 메뉴: 가사 노트(../index.html)와 같은 모양 */
 .app-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-top: 12px; }
 .site-nav { display: inline-flex; padding: 2px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; }
@@ -104,8 +112,47 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .poster a { display: block; }
 .poster img { display: block; width: 100%; max-width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); }
 .poster figcaption { font-size: 12px; color: var(--muted); margin-top: 6px; }
+/* 작은 배너(인스타그램)와 큰 배너 2개(가사 노트, Ryoku.님 note). 큰 배너 제목이 같은 높이에 오도록 글자는 위에서부터 놓는다 */
+.banners { display: grid; gap: 8px; min-width: 0; }
+.banner { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 12px 14px 12px 12px; color: var(--bg); text-decoration: none; background: var(--leaf); border-radius: 14px; }
+.banner:hover { filter: brightness(1.08); }
+.banner img, .banner svg { display: block; flex: none; width: 56px; height: 56px; padding: 9px; background: #fff; border-radius: 12px; }
+.banner svg { fill: none; stroke: #2f7a3e; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.banner span { display: grid; flex: 1; gap: 2px; min-width: 0; padding-top: 8px; }
+.banner b { font-size: 16px; font-weight: 800; line-height: 1.25; overflow-wrap: anywhere; }
+.banner small { font-size: 12px; line-height: 1.4; word-break: keep-all; }
+.banner::after { content: ""; flex: none; align-self: center; width: 9px; height: 9px; margin-right: 2px; border-top: 2px solid currentColor; border-right: 2px solid currentColor; transform: rotate(45deg); }
+.banner.small { justify-self: start; align-items: center; padding: 10px 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); }
+.banner.small:hover { filter: none; border-color: var(--leaf); }
+.banner.small img { width: 38px; height: 38px; padding: 0; background: none; border-radius: 10px; }
+.banner.small span { gap: 0; padding-top: 0; }
+.banner.small b { font-size: 15px; }
+.banner.small small { font-size: 12px; color: var(--muted); }
+/* 넓은 화면: 포스터 설명은 포스터 바로 아래 줄로 빼고, 인스타와 큰 배너는 소개·포스터 아래 전체 폭에 놓는다 */
+@media (min-width: 641px) {
+  .head-layout { row-gap: 6px; }
+  .head-text { grid-column: 1; grid-row: 1; align-self: end; }
+  .poster { display: contents; }
+  .poster a { grid-column: 2; grid-row: 1; }
+  .poster figcaption { grid-column: 2; grid-row: 2; align-self: start; margin-top: 0; }
+  .banner.small { grid-column: 1 / -1; grid-row: 3; margin-top: 8px; }
+  .banners { grid-column: 1 / -1; grid-row: 4; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 2px; }
+}
+/* 더 넓은 화면: 인스타는 제목 오른쪽 빈 공간으로 올라가고, 큰 배너는 그 아래 왼쪽 칸을 채운다.
+   인스타는 제목 줄과 같은 높이에 놓이고, 제목·포스터 윗선이 같으며, 큰 배너 아랫선은 포스터 아랫선과, 인스타 오른쪽 끝은 큰 배너 오른쪽 끝과 맞는다 */
+@media (min-width: 1040px) {
+  .head-layout { grid-template-columns: minmax(0, 1fr) auto minmax(0, 220px); }
+  .head-text { align-self: start; }
+  .banner.small { grid-column: 2; grid-row: 1; align-self: start; margin-top: calc(12px * 1.6 + 14px); }
+  html[lang="ja"] .banner.small { margin-top: calc(12px * 1.6 + 14px - 7px); }
+  .poster a { grid-column: 3; grid-row: 1 / span 2; }
+  .poster figcaption { grid-column: 3; grid-row: 3; }
+  .banners { grid-column: 1 / span 2; grid-row: 2; align-self: end; margin-top: 0; }
+}
+
 @media (max-width: 640px) {
   .head-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .banner.small { margin-bottom: -10px; }
   .poster { max-width: 240px; }
 }
 .song { scroll-margin-top: 120px; }
@@ -196,59 +243,63 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 
 <div class="wrap">
   <div class="app-row">
-    <nav class="site-nav" aria-label="사이트 메뉴"><a href="../index.html">가사 노트</a><a href="#" aria-current="page">콜 가이드</a></nav>
-    <a class="app-btn" id="appInstall" href="../index.html#/install"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 20h14"/></svg>앱 설치</a>
+    <nav class="site-nav" aria-label="사이트 메뉴"><a href="../index.html" data-t="navLyrics">가사 노트</a><a href="#" aria-current="page" data-t="navCall">콜 가이드</a></nav>
+    <div class="app-tools">
+      <div class="site-nav lang-switch" role="group" aria-label="언어 / 言語"><button type="button" data-lang="ko">한국어</button><button type="button" data-lang="ja">日本語</button></div>
+      <a class="app-btn" id="appInstall" href="../index.html#/install"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 20h14"/></svg>앱 설치</a>
+    </div>
   </div>
   <nav class="links" aria-label="관련 링크">
-    <div class="lgroup"><span class="lhead">공식</span>
-      <a href="https://ryokushaka-fc.com" target="_blank" rel="noopener">팬클럽</a>
-      <a href="https://www.instagram.com/ryokushaka_official/" target="_blank" rel="noopener">인스타그램</a>
+    <div class="lgroup"><span class="lhead" data-t="lOfficial">공식</span>
+      <a href="https://ryokushaka-fc.com" target="_blank" rel="noopener" data-t="lFc">팬클럽</a>
+      <a href="https://www.instagram.com/ryokushaka_official/" target="_blank" rel="noopener" data-t="lIg">인스타그램</a>
     </div>
-    <div class="lgroup"><span class="lhead">멤버</span>
-      <a href="https://www.instagram.com/haruyama_555" target="_blank" rel="noopener">하루코<span>보컬</span></a>
-      <a href="https://www.instagram.com/isseyman/" target="_blank" rel="noopener">잇세이<span>기타</span></a>
-      <a href="https://www.instagram.com/peppe1206" target="_blank" rel="noopener">peppe<span>키보드</span></a>
-      <a href="https://www.instagram.com/shingoanami" target="_blank" rel="noopener">싱고<span>베이스</span></a>
+    <div class="lgroup"><span class="lhead" data-t="lMembers">멤버</span>
+      <a href="https://www.instagram.com/haruyama_555" target="_blank" rel="noopener" data-t="mHaruko">하루코<span>보컬</span></a>
+      <a href="https://www.instagram.com/isseyman/" target="_blank" rel="noopener" data-t="mIssey">잇세이<span>기타</span></a>
+      <a href="https://www.instagram.com/peppe1206" target="_blank" rel="noopener" data-t="mPeppe">peppe<span>키보드</span></a>
+      <a href="https://www.instagram.com/shingoanami" target="_blank" rel="noopener" data-t="mShingo">싱고<span>베이스</span></a>
     </div>
-    <div class="lgroup"><span class="lhead">원문 정리</span>
+    <div class="lgroup"><span class="lhead" data-t="lSource">원문 정리</span>
       <a href="https://note.com/ryoku_528/n/n13c0ff390aef" target="_blank" rel="noopener">Ryoku.<span>note</span></a>
-      <a href="https://note.com/ryoku_528/n/ndee2efbcef5d" target="_blank" rel="noopener">한국어 번역판</a>
-    </div>
-    <div class="lgroup"><span class="lhead">만든 사람</span>
-      <a href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener">@brocoplaylist</a>
+      <a href="https://note.com/ryoku_528/n/ndee2efbcef5d" target="_blank" rel="noopener" data-t="lKoVer">한국어 번역판</a>
     </div>
   </nav>
 
   <header class="head-layout">
     <div class="head-text">
-      <div class="kicker">緑黄色社会 · LIVE 예습 노트</div>
-      <h1><span class="g">녹황색</span><span class="y">사회</span> 콜 가이드<span class="jp">リョクシャカ ライブ予習</span></h1>
-      <p class="lede">라이브에서 관객이 다 같이 하는 동작과 콜을 노래별로 모았어요. 곡 이름을 누르면 콜이 펼쳐지고, 다 외운 부분은 오른쪽 체크를 눌러 두면 이 브라우저에 기억돼요.</p>
+      <div class="kicker" data-t="kicker">緑黄色社会 · LIVE 예습 노트</div>
+      <h1><span data-t="h1"><span class="g">녹황색</span><span class="y">사회</span> 콜 가이드</span><span class="jp">リョクシャカ ライブ予習</span></h1>
+      <p class="lede" data-t="lede">라이브에서 관객이 다 같이 하는 동작과 콜을 노래별로 모았어요. 곡 이름을 누르면 콜이 펼쳐지고, 다 외운 부분은 오른쪽 체크를 눌러 두면 이 브라우저에 기억돼요.</p>
     </div>
-    <figure class="poster">
-      <a href="poster.jpg" target="_blank" rel="noopener"><img src="poster.jpg" alt="녹황색사회 아시아 투어 2025 서울 공연 포스터. 2025년 10월 11일 토, 12일 일 오후 6시, YES24 LIVE HALL" width="850" height="1203"></a>
-      <figcaption>ASIA TOUR 2025 서울 · 누르면 크게 보여요</figcaption>
+    <a class="banner small" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener"><img src="../Instagram_icon.png" alt="" onerror="this.remove()"><span><b>@brocoplaylist</b><small data-t="bIg">인스타그램</small></span></a>
+    <nav class="banners" aria-label="바로 가기">
+      <a class="banner" href="../index.html"><img src="../icon-192.png" alt="" onerror="this.remove()"><span><b data-t="bLyrics">가사 노트</b><small data-t="bLyricsSub">원문·발음·해석 공부 노트</small></span></a>
+      <a class="banner" href="https://note.com/ryoku_528/n/n13c0ff390aef" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 12h7M9 16h7"/></svg><span><b data-t="bNote">Ryoku.님 note</b><small data-t="bNoteSub">dedicated to Ryoku.님</small></span></a>
+    </nav>
+    <figure class="poster">      <a href="poster.jpg" target="_blank" rel="noopener"><img src="poster.jpg" alt="녹황색사회 아시아 투어 2025 서울 공연 포스터. 2025년 10월 11일 토, 12일 일 오후 6시, YES24 LIVE HALL" width="850" height="1203"></a>
+      <figcaption data-t="cap">ASIA TOUR 2025 서울 · 누르면 크게 보여요</figcaption>
     </figure>
   </header>
 
   <section class="setlist" aria-labelledby="slTitle">
     <div class="sl-head">
       <div>
-        <h2 class="sl-title" id="slTitle">2025 내한 세트리스트</h2>
-        <div class="sl-meta">ASIA TOUR 2025 · 서울 YES24 LIVE HALL</div>
+        <h2 class="sl-title" id="slTitle" data-t="slTitle">2025 내한 세트리스트</h2>
+        <div class="sl-meta" data-t="slMeta">ASIA TOUR 2025 · 서울 YES24 LIVE HALL</div>
       </div>
       <div class="days" id="days">
-        <button type="button" class="day" id="day-1011" data-day="1011" aria-pressed="true">10.11 토</button>
-        <button type="button" class="day" id="day-1012" data-day="1012" aria-pressed="false">10.12 일</button>
+        <button type="button" class="day" id="day-1011" data-day="1011" aria-pressed="true" data-t="day1">10.11 토</button>
+        <button type="button" class="day" id="day-1012" data-day="1012" aria-pressed="false" data-t="day2">10.12 일</button>
       </div>
     </div>
     <ol class="sl-list" id="slList"></ol>
-    <div class="sl-foot">두 날은 12번, 14번 곡만 달라요. <b>콜 보기</b>를 누르면 아래 가이드로 이동해요.</div>
+    <div class="sl-foot" data-t="slFoot">두 날은 12번, 14번 곡만 달라요. <b>콜 보기</b>를 누르면 아래 가이드로 이동해요.</div>
   </section>
 
   <div class="bar" role="search">
     <label class="search"><input id="q" type="search" placeholder="곡 제목이나 가사로 찾기" aria-label="곡 제목이나 가사로 찾기"></label>
-    <label class="toggle"><input id="todo" type="checkbox"> 안 외운 것만</label>
+    <label class="toggle"><input id="todo" type="checkbox"> <span data-t="todo">안 외운 것만</span></label>
     <button type="button" class="expand" id="expand">모두 펼치기</button>
     <span class="progress" id="progress"></span>
   </div>
@@ -340,6 +391,112 @@ const SONGS = [
   ] }
 ];
 
+// 일본어 표시: 오른쪽 위 버튼으로 바꿈. 브라우저 언어와 상관없이 처음에는 한국어로 열림(주소에 ?lang=ja가 있거나 전에 일본어를 골랐으면 일본어)
+let lang = (() => {
+  const asked = new URLSearchParams(location.search).get("lang");
+  if (asked === "ja" || asked === "ko") return asked;
+  try { const saved = localStorage.getItem("ryokulyrics:lang"); if (saved === "ja" || saved === "ko") return saved; } catch (e) {}
+  return "ko";
+})();
+const L = (ko, ja) => (lang === "ja" ? ja : ko);
+// 고정 문구의 일본어. 키는 HTML의 data-t 값
+const JA_UI = {
+  navLyrics: "歌詞ノート",
+  navCall: "コールガイド",
+  lOfficial: "公式",
+  lFc: "ファンクラブ",
+  lIg: "Instagram",
+  lMembers: "メンバー",
+  mHaruko: "長屋晴子<span>ボーカル</span>",
+  mIssey: "小林壱誓<span>ギター</span>",
+  mPeppe: "peppe<span>キーボード</span>",
+  mShingo: "穴見真吾<span>ベース</span>",
+  lSource: "元記事",
+  lKoVer: "韓国語翻訳版",
+  kicker: "緑黄色社会 · LIVE 予習ノート",
+  h1: '<span class="g">緑黄色</span><span class="y">社会</span> コールガイド',
+  lede: "ライブでみんなでする動きやコールを曲ごとにまとめました。Ryoku.さんのnoteをもとに韓国のファン向けに作ったガイドの日本語表示です。曲名を押すとコールが開き、覚えた部分は右のチェックを押すとこのブラウザに記録されます。",
+  bIg: "Instagram",
+  bLyrics: "歌詞ノート",
+  bLyricsSub: "韓国語で歌詞を学ぶノート",
+  bNote: "Ryoku.さんのnote",
+  bNoteSub: "dedicated to Ryoku.さん",
+  cap: "ASIA TOUR 2025 ソウル · 押すと拡大します",
+  slTitle: "2025 韓国公演セットリスト",
+  slMeta: "ASIA TOUR 2025 · ソウル YES24 LIVE HALL",
+  day1: "10.11 土",
+  day2: "10.12 日",
+  slFoot: "両日で違うのは12曲目と14曲目だけです。<b>コールを見る</b>を押すと下のガイドに移動します。",
+  todo: "まだ覚えていない部分だけ",
+};
+// 콜별 일본어. 키는 "곡 id:콜 순서"(외운 기록 키와 같음). 구간 이름은 Ryoku.님 note의 말을 따름(Aメロ, Bメロ, サビ, 大サビ前 등).
+// 번역이 없는 콜은 한국어로 보이니 곡이나 콜을 추가하면 여기도 추가. call을 적으면 일본어 화면에서 그 문구를 씀
+const JA_MOVES = {
+  "mela:0": { when: "イントロ（ラララの部分）", what: "手を上げて、右からワイパーのように左右に振る" },
+  "mela:1": { when: "Bメロ", what: "決まったリズムで手拍子", note: "1番の楽譜は元記事にあります。練習必須" },
+  "bitter:0": { when: "サビの「トゥールッ トゥ トゥールッ」から", what: "決まった手の形で左右にブンブン振る", note: "手の形は元記事の画像を参照" },
+  "alright:0": { when: "サビの決まったタイミング", what: "👍 → 👋 を交互に", note: "動きは元記事を参照" },
+  "hiwamata:0": { when: "サビ終わりの「陽はまた昇るから」（1回目と3回目）", what: "「る」の音で人差し指を上に 👆", note: "2回目はやりません" },
+  "pinkblue:0": { when: "2番Aメロ「世紀末」の「つ」", what: "ピース ✌️" },
+  "pinkblue:1": { when: "1番Aメロ2回、2番Aメロ1回", what: "ボーカルの「あーあ」のあとに続けて言う" },
+  "don:0": { when: "サビの「よーい Don!!」", what: "「Don!!」で拳を ✊" },
+  "don:1": { when: "大サビ前（問いかけのセリフのあと）", what: "全力で拍手", note: "公式TikTokにライブの楽しみ方の動画があります" },
+  "party:0": { when: "2番Bメロ「お手上げ」", what: "バンザイ 🙌 のように両手を上げて、そのまま手拍子2回", note: "ギターの小林壱誓さんが教えてくれた動きです" },
+  "party:1": { when: "1番・2番サビ終わり", what: "ジャンプを促すフレーズのあとに叫ぶ" },
+  "party:2": { when: "間奏（楽器のメロディの終わり）", what: "叫びながら指も ☝️✌️" },
+  "nice:0": { when: "サビ終わりの「アイディア!」", what: "人差し指を1本 ☝️" },
+  "yomatsuri:0": { when: "曲全体", what: "盆踊りスタイルの公式振付。メンバーのお手本動画で覚える", note: "「緑黄色夜祭 vol.12」に合わせて公開された振付" },
+  "taptap:0": { when: "サビ終わり「拳上げて」", what: "拳を上げる ✊" },
+  "player1:0": { when: "1番Bメロ終わり・1番サビの「無敵だZONE」", what: "「ZONE」で両手を使って「Z」を作る", alt: "ステージで両手を上下に交差させてZの形を作っている様子", cap: "上の手は横に、下の手は斜めにして「Z」を作ります" },
+  "player1:1": { when: "Bメロ頭の「o-eo-eo-eo-」", what: "リズムに合わせて手拍子" },
+  "player1:2": { when: "Aメロ終わり", what: "最後の言葉をみんなで", call: "HP（ヒットポイント）" },
+  "koitte:0": { when: "曲全体", what: "タンバリンを持った長屋晴子さんのリズムに合わせて手拍子" },
+  "koitte:1": { when: "イントロ", what: "ラララのメロディを3回みんなで" },
+  "scarlet:0": { when: "2番Aメロ", what: "決まったリズムで手拍子", note: "音楽経験者でも難しい部分。元記事の楽譜で練習必須" },
+  "landscape:0": { when: "2番Aメロ", what: "決まったリズムで手拍子", note: "元記事を参照" },
+  "hazukashii:0": { when: "Bメロ", what: "手拍子 パンー パンー パン パン パン ×4" },
+  "hazukashii:1": { when: "Cメロ終わり", what: "Cメロの最後の1行をみんなで歌う" },
+  "illusion:0": { when: "イントロ", what: "裏拍でフィンガースナップ", note: "手拍子の代わりに指を鳴らします" },
+  "alice:0": { when: "サビ終わり", what: "3回、順番に叫ぶ" },
+  "alice:1": { when: "間奏", what: "このリズムの手拍子を間奏の間くり返す", call: "パンパンー パン / パンパンー パン" },
+  "hajimari:0": { when: "間奏", what: "ドラムに合わせて表拍で手拍子", call: "パン パン パン パン パン パン" },
+  "hajimari:1": { when: "1番の途中", what: "「足元の鎖が」のところからパンー パンパンの手拍子", call: "パンー パンパン（両手を上げて） ×8" },
+  "hajimari:2": { when: "サビ", what: "ボーカルのフレーズ終わりに続けて、そのあとのララの部分もみんなで" },
+  "hajimari:3": { when: "サビ", what: "「さぁ始めようか」の部分" },
+  "hajimari:4": { when: "2番 小林壱誓さんのパートのあと", what: "みんなで歌う" },
+  "anokoro:0": { when: "イントロ", what: "長屋晴子さんが先に歌ったら、同じように返す" },
+  "character:0": { when: "「ケセラセラ」の部分", what: "前のフレーズが終わったらすぐ続けてみんなで歌う" },
+  "toki:0": { when: "1番終わり", what: "掛け合いのようにくり返す4行をみんなで歌う" },
+  "michi:0": { when: "1番Aメロ前・1番サビ後・アウトロ", what: "「オオッオー」をみんなで" },
+  "slowdance:0": { when: "1番・2番サビ終わり・アウトロ", what: "穴見真吾さんと小林壱誓さんが歌うコーラスを一緒に" },
+  "taboo:0": { when: "曲全体", what: "みんなで歌う" },
+  "taboo:1": { when: "間奏", what: "NO NO NOのあとに手拍子2回", call: "パン パン" },
+  "taboo:2": { when: "サビ", what: "「なのに taboo taboo」と「どうせ taboo taboo」の間に手拍子2回", call: "パン パン" },
+  "taboo:3": { when: "最後", what: "みんなで歌う" },
+  "algorithm:0": { when: "曲全体", what: "1,2,3,4を叫ぶ", call: "[1] {1} / [2] {2} / [3] {3} / [4] {4}" },
+  "algorithm:1": { when: "曲全体", what: "1,2,3,4の部分のあと", call: "無駄 [ヘイ] 無駄 [ヘイ] 無駄 [ヘイ]" },
+  "harebare:0": { when: "間奏", what: "みんなで歌う" },
+  "harebare:1": { when: "2番サビ", what: "みんなで歌う" },
+  "harebare:2": { when: "3番コーラス", what: "みんなで歌う" },
+};
+const JA_LINK = { "라이브 영상": "ライブ映像", "공식 안무 영상 (X)": "公式振付動画 (X)" };
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.title = L("녹황색사회 콜 가이드", "緑黄色社会 コールガイド");
+  document.querySelectorAll("[data-t]").forEach(el => {
+    if (el.dataset.ko === undefined) el.dataset.ko = el.innerHTML;
+    el.innerHTML = lang === "ja" ? JA_UI[el.dataset.t] : el.dataset.ko;
+  });
+  const box = document.getElementById("q"), label = L("곡 제목이나 가사로 찾기", "曲名や歌詞で探す");
+  box.placeholder = label;
+  box.setAttribute("aria-label", label);
+  document.querySelector(".poster img").alt = L("녹황색사회 아시아 투어 2025 서울 공연 포스터. 2025년 10월 11일 토, 12일 일 오후 6시, YES24 LIVE HALL", "緑黄色社会 ASIA TOUR 2025 ソウル公演のポスター。2025年10月11日（土）、12日（日）18時、YES24 LIVE HALL");
+  document.querySelectorAll("[data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  // 앱 설치 안내 창은 한국어뿐이라 일본어 화면에서는 버튼을 숨김
+  const install = document.getElementById("appInstall");
+  if (install) install.hidden = lang === "ja";
+}
+
 const store = {
   get() { try { return JSON.parse(localStorage.getItem("rs-call-done") || "{}"); } catch (e) { return {}; } },
   set(v) { try { localStorage.setItem("rs-call-done", JSON.stringify(v)); } catch (e) {} }
@@ -420,31 +577,31 @@ function render() {  const q = fold(state.q.trim());
     // 곡 제목에 없으면 가사와 콜에서 찾고, 찾은 줄을 카드에 보여 줌
     let found = "";
     if (q && ![s.t, s.ko, s.en || ""].some(x => fold(x).includes(q))) {
-      const calls = s.m.flatMap(m => [linked(m.call, s, "call"), linked(m.ko, s, "ko")]).filter(Boolean).flatMap(c => c.split(" / ")).map(c => c.replace(/[\[\]]/g, ""));
+      const calls = s.m.flatMap((m, i) => [linked(m.call, s, "call"), linked(m.ko, s, "ko"), linked((JA_MOVES[s.id + ":" + i] || {}).call, s, "call")]).filter(Boolean).flatMap(c => c.split(" / ")).map(c => c.replace(/[\[\]]/g, ""));
       found = [...(LYRIC_LINES[norm(s.t)] || []), ...calls].find(l => fold(l).includes(q));
       if (!found) return "";
     }
-    const ms = s.m.map((m, i) => ({ ...m, call: linked(m.call, s, "call"), ko: linked(m.ko, s, "ko"), key: s.id + ":" + i })).filter(m => !state.todo || !done[m.key]);
+    const ms = s.m.map((m, i) => { const key = s.id + ":" + i, ja = lang === "ja" ? JA_MOVES[key] || {} : null; return { ...m, ...ja, call: linked((ja && ja.call) || m.call, s, "call"), ko: ja ? "" : linked(m.ko, s, "ko"), key }; }).filter(m => !state.todo || !done[m.key]);
     // 콜이 아직 없는 곡(m: [])은 '준비 중' 카드로 보여 줌
     if (!ms.length && (s.m.length || state.todo)) return "";
-    const links = [`<a href="../index.html#/t/${encodeURIComponent(s.t)}">가사 보기 →</a>`, ...(s.links || []).map(([l, u]) => `<a href="${u}" target="_blank" rel="noopener">${esc(l)} ↗</a>`)];
-    if (s.m.some(m => m.score)) links.push(`<a href="${NOTE}" target="_blank" rel="noopener">원문 그림·악보 ↗</a>`);
+    const links = [`<a href="../index.html#/t/${encodeURIComponent(s.t)}">${L("가사 보기", "歌詞ノートを見る")} →</a>`, ...(s.links || []).map(([l, u]) => `<a href="${u}" target="_blank" rel="noopener">${esc(lang === "ja" ? JA_LINK[l] || l : l)} ↗</a>`)];
+    if (s.m.some(m => m.score)) links.push(`<a href="${NOTE}" target="_blank" rel="noopener">${L("원문 그림·악보", "元記事の図・楽譜")} ↗</a>`);
     const sl = SLM[s.id];
-    const badge = sl ? `<span class="must">중요 · 내한 셋리 ${String(sl.n).padStart(2, "0")}번${sl.days.length ? ` (${sl.days.map(d => DAY_LABEL[d]).join(", ")}만)` : ""}</span>` : "";
-    const tag = s.al ? `<span class="tag">『${ALBUM}』 ${String(s.al).padStart(2, "0")}번</span>` : "";
+    const badge = sl ? `<span class="must">${L("중요 · 내한 셋리", "重要 · 韓国公演セトリ")} ${String(sl.n).padStart(2, "0")}${L("번", "曲目")}${sl.days.length ? ` (${sl.days.map(d => DAY_LABEL[d]).join(", ")}${L("만", "のみ")})` : ""}</span>` : "";
+    const tag = s.al ? `<span class="tag">『${ALBUM}』 ${String(s.al).padStart(2, "0")}${L("번", "曲目")}</span>` : "";
     const nDone = s.m.filter((m, i) => done[s.id + ":" + i]).length;
     return `<details class="song${sl ? " key" : ""}" id="song-${s.id}" data-id="${s.id}"${opened.has(s.id) ? " open" : ""}>
       <summary class="song-head">
-        <h3 class="song-title" lang="ja">${sl ? `<span class="star" aria-label="중요">★</span>` : ""}${esc(s.t)}</h3>
-        <span class="song-ko">${esc(s.ko)}${s.en ? `<span class="en">${esc(s.en)}</span>` : ""}</span>
+        <h3 class="song-title" lang="ja">${sl ? `<span class="star" aria-label="${L("중요", "重要")}">★</span>` : ""}${esc(s.t)}</h3>
+        ${lang === "ja" ? "" : `<span class="song-ko">${esc(s.ko)}${s.en ? `<span class="en">${esc(s.en)}</span>` : ""}</span>`}
         ${badge || tag ? `<span class="badges">${badge}${tag}</span>` : ""}
         ${found ? `<span class="found">${markHit(found, q)}</span>` : ""}
-        <span class="song-count">${s.m.length ? `외움 ${nDone}/${s.m.length}` : "준비 중"}</span>
+        <span class="song-count">${s.m.length ? `${L("외움", "覚えた")} ${nDone}/${s.m.length}` : L("준비 중", "準備中")}</span>
         <span class="chev" aria-hidden="true"></span>
       </summary>
       <div class="song-body">
       ${links.length ? `<div class="song-links">${links.join("")}</div>` : ""}
-      ${s.m.length ? "" : `<p class="tbd">아직 정리된 콜이 없어요.</p>`}
+      ${s.m.length ? "" : `<p class="tbd">${L("아직 정리된 콜이 없어요.", "まだコールがまとまっていません。")}</p>`}
       <ul class="moves">${ms.map(m => `<li class="move ${done[m.key] ? "is-done" : ""}">
         <div class="move-body">
           <div class="when">${esc(m.when)}</div>
@@ -453,25 +610,25 @@ function render() {  const q = fold(state.q.trim());
           ${m.note ? `<div class="note">${esc(m.note)}</div>` : ""}
           ${m.img ? `<figure class="shot"><img src="${m.img}" alt="${esc(m.alt || "")}" width="486" height="486" loading="lazy">${m.cap ? `<figcaption>${esc(m.cap)}</figcaption>` : ""}</figure>` : ""}
         </div>
-        <button type="button" class="got" id="got-${m.key.replace(":", "-")}" data-key="${m.key}" aria-pressed="${!!done[m.key]}" aria-label="외웠어요">✓</button>
+        <button type="button" class="got" id="got-${m.key.replace(":", "-")}" data-key="${m.key}" aria-pressed="${!!done[m.key]}" aria-label="${L("외웠어요", "覚えた")}">✓</button>
       </li>`).join("")}</ul></div></details>`;
   };
   const ordered = [...SONGS].sort((a, b) => (SLM[a.id] ? SLM[a.id].n : 999) - (SLM[b.id] ? SLM[b.id].n : 999));
   const keyHtml = ordered.filter(s => SLM[s.id]).map(card).join("");
   const albumHtml = ordered.filter(s => !SLM[s.id] && s.al).sort((a, b) => a.al - b.al).map(card).join("");
   const restHtml = ordered.filter(s => !SLM[s.id] && !s.al).map(card).join("");
-  const html = (keyHtml ? `<h2 class="group-label"><span class="star" aria-hidden="true">★</span>내한 세트리스트 곡</h2>` + keyHtml : "")
-    + (albumHtml ? `<div class="group-head"><h2 class="group-label">새 앨범 <span class="jp-inline" lang="ja">『${ALBUM}』</span></h2><p class="group-note">※ 아직 확정된 콜 가이드가 아니니 주의해서 봐 주세요.</p></div>` + albumHtml : "")
-    + (restHtml ? `<h2 class="group-label">그 밖의 콜 있는 곡</h2>` + restHtml : "");
+  const html = (keyHtml ? `<h2 class="group-label"><span class="star" aria-hidden="true">★</span>${L("내한 세트리스트 곡", "韓国公演セットリストの曲")}</h2>` + keyHtml : "")
+    + (albumHtml ? `<div class="group-head"><h2 class="group-label">${L("새 앨범", "新アルバム")} <span class="jp-inline" lang="ja">『${ALBUM}』</span></h2><p class="group-note">${L("※ 아직 확정된 콜 가이드가 아니니 주의해서 봐 주세요.", "※ まだ確定したコールガイドではないので、ご注意ください。")}</p></div>` + albumHtml : "")
+    + (restHtml ? `<h2 class="group-label">${L("그 밖의 콜 있는 곡", "その他のコールがある曲")}</h2>` + restHtml : "");
   document.getElementById("grid").innerHTML = html;
   document.getElementById("empty").hidden = !!html;
-  document.getElementById("empty").textContent = lyricState === "loading" ? "가사에서 찾는 중이에요." : "찾는 곡이 없어요. 검색어를 바꿔 보세요.";
+  document.getElementById("empty").textContent = lyricState === "loading" ? L("가사에서 찾는 중이에요.", "歌詞から探しています。") : L("찾는 곡이 없어요. 검색어를 바꿔 보세요.", "見つかりませんでした。別の言葉で探してみてください。");
   const n = allKeys.filter(k => done[k]).length;
-  document.getElementById("progress").textContent = `${SONGS.filter(s => s.m.length).length}곡 · 외운 부분 ${n} / ${allKeys.length}`;
+  document.getElementById("progress").textContent = `${SONGS.filter(s => s.m.length).length}${L("곡 · 외운 부분", "曲 · 覚えた部分")} ${n} / ${allKeys.length}`;
   syncExpand();
 }
 function syncExpand() {
-  document.getElementById("expand").textContent = opened.size === SONGS.length ? "모두 접기" : "모두 펼치기";
+  document.getElementById("expand").textContent = opened.size === SONGS.length ? L("모두 접기", "すべて閉じる") : L("모두 펼치기", "すべて開く");
 }
 // toggle 이벤트는 버블링되지 않아서 캡처로 받음
 document.getElementById("grid").addEventListener("toggle", e => {
@@ -541,8 +698,8 @@ function renderSetlist() {
     const n = i + 1;
     const [t, ko, id, en] = row || d[n];
     return `<li><span class="sl-no">${String(n).padStart(2, "0")}</span>
-      <span class="sl-name"><span class="sl-jp" lang="ja">${esc(t)}</span>${ko ? `<span class="sl-ko">${esc(ko)}${en ? `<span class="en">${esc(en)}</span>` : ""}</span>` : ""}${row ? "" : `<span class="only">이 날만</span>`}</span>
-      ${id ? `<a class="jump" href="#song-${id}" data-id="${id}">콜 보기</a>` : "<span></span>"}</li>`;
+      <span class="sl-name"><span class="sl-jp" lang="ja">${esc(t)}</span>${ko && lang !== "ja" ? `<span class="sl-ko">${esc(ko)}${en ? `<span class="en">${esc(en)}</span>` : ""}</span>` : ""}${row ? "" : `<span class="only">${L("이 날만", "この日のみ")}</span>`}</span>
+      ${id ? `<a class="jump" href="#song-${id}" data-id="${id}">${L("콜 보기", "コールを見る")}</a>` : "<span></span>"}</li>`;
   }).join("");
 }
 document.getElementById("days").addEventListener("click", e => {
@@ -568,10 +725,18 @@ document.getElementById("slList").addEventListener("click", e => {
 });
 const jumpFromHash = () => { if (location.hash.startsWith("#song-")) jumpTo(location.hash.slice(6)); };
 addEventListener("hashchange", jumpFromHash);
+document.querySelectorAll("[data-lang]").forEach(b => b.addEventListener("click", () => {
+  lang = b.dataset.lang;
+  try { localStorage.setItem("ryokulyrics:lang", lang); } catch (e) {}
+  if (location.search.includes("lang=")) history.replaceState(null, "", location.pathname + location.hash);
+  applyLang();
+  renderSetlist();
+  render();
+}));
+applyLang();
 renderSetlist();
 render();
-jumpFromHash();
-loadLyrics();
+jumpFromHash();loadLyrics();
 
 // 앱으로 열었으면 설치 버튼을 뺍니다.
 if (matchMedia("(display-mode: standalone)").matches || navigator.standalone === true) document.getElementById("appInstall").remove();
@@ -580,7 +745,7 @@ if (matchMedia("(display-mode: standalone)").matches || navigator.standalone ===
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   addEventListener("load", () => {
     navigator.serviceWorker.register("../sw.js", { scope: "../" }).then(() => navigator.serviceWorker.ready).then(reg => {
-      reg.active.postMessage({ type: "save-all", files: ["call/", "call/index.html", "call/poster.jpg", "call/zone.jpg", "./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", ...LYRIC_FILES.map(f => encodeURI(`가사/${f}.js`))] });
+      reg.active.postMessage({ type: "save-all", files: ["call/", "call/index.html", "call/poster.jpg", "call/zone.jpg", "./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "Instagram_icon.png", ...LYRIC_FILES.map(f => encodeURI(`가사/${f}.js`))] });
     }).catch(() => {});
   });
 }

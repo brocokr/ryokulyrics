@@ -45,15 +45,22 @@ self.addEventListener("fetch", e => {
   else if (url.startsWith(SCOPE)) e.respondWith(freshFile(url, e));
 });
 
-async function freshFile(url, e) {
-  // 주소 끝의 /가 빠져 서버가 다른 주소로 보낸 경우(.../call → .../call/) 브라우저가 직접 따라가게 합니다.
+// 저장본이 없는 주소로 들어왔을 때(?fbclid=… 같은 꼬리가 붙은 링크 등): 꼬리를 뗀 같은 페이지를 찾습니다.
+// 다른 폴더의 페이지를 보여 주면 그림과 파일 경로가 어긋나므로 같은 폴더 안에서만 찾습니다.
+async function findPage(url) {
+  const { origin, pathname } = new URL(url);
+  const dir = origin + pathname.replace(/[^/]*$/, "");
+  return await find(FILES, origin + pathname) || await find(FILES, dir) || await find(FILES, dir + "index.html");
+}
+
+async function freshFile(url, e) {  // 주소 끝의 /가 빠져 서버가 다른 주소로 보낸 경우(.../call → .../call/) 브라우저가 직접 따라가게 합니다.
   const network = fetch(url, { cache: "no-cache" }).then(res =>
     (res.redirected && e.request.mode === "navigate" ? Response.redirect(res.url, 302) : res));
   // 3초가 지나 저장본을 보여 준 뒤에도 끝까지 받아서 다음번에 씁니다.
   e.waitUntil(network.then(res => (res.ok ? keep(FILES, url, res.clone()) : null)).catch(() => {}));
 
-  const saved = await find(FILES, url)
-    || (e.request.mode === "navigate" ? await find(FILES, SCOPE) || await find(FILES, SCOPE + "index.html") : undefined);
+  const saved = await find(FILES, url) || (e.request.mode === "navigate" ? await findPage(url) : undefined);
+
   if (!saved) return network;
   return Promise.race([
     network.catch(() => saved),
