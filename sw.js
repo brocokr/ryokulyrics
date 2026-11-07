@@ -46,7 +46,9 @@ self.addEventListener("fetch", e => {
 });
 
 async function freshFile(url, e) {
-  const network = fetch(url, { cache: "no-cache" });
+  // 주소 끝의 /가 빠져 서버가 다른 주소로 보낸 경우(.../call → .../call/) 브라우저가 직접 따라가게 합니다.
+  const network = fetch(url, { cache: "no-cache" }).then(res =>
+    (res.redirected && e.request.mode === "navigate" ? Response.redirect(res.url, 302) : res));
   // 3초가 지나 저장본을 보여 준 뒤에도 끝까지 받아서 다음번에 씁니다.
   e.waitUntil(network.then(res => (res.ok ? keep(FILES, url, res.clone()) : null)).catch(() => {}));
 

@@ -25,6 +25,11 @@ while ($listener.IsListening) {
     $rel = [Uri]::UnescapeDataString($ctx.Request.Url.AbsolutePath).TrimStart('/')
     if (-not $rel) { $rel = 'index.html' }
     $path = [IO.Path]::GetFullPath([IO.Path]::Combine($full, $rel))
+    # GitHub Pages처럼 폴더 주소는 그 안의 index.html을 보여 주고, 끝에 /가 없으면 붙여서 다시 보냅니다.
+    if ($path.StartsWith($full + '\') -and [IO.Directory]::Exists($path)) {
+      if (-not $rel.EndsWith('/')) { $ctx.Response.Redirect($ctx.Request.Url.AbsolutePath + '/'); continue }
+      $path = [IO.Path]::Combine($path, 'index.html')
+    }
     $ext = [IO.Path]::GetExtension($path).ToLowerInvariant()
     if ($path.StartsWith($full + '\') -and $types.ContainsKey($ext) -and [IO.File]::Exists($path)) {
       $bytes = [IO.File]::ReadAllBytes($path)

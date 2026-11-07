@@ -11,7 +11,7 @@
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101a13">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="가사 노트">
+<meta name="apple-mobile-web-app-title" content="녹황색사회 노트">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Dela+Gothic+One&family=Gothic+A1:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap">
@@ -73,6 +73,14 @@ body:not([data-view="home"]) .home-only { display: none; }
 .maker:hover { border-color: var(--leaf); color: var(--leaf); }
 .maker img { display: block; width: 22px; height: 22px; border-radius: 6px; }
 .maker svg { display: block; width: 22px; height: 22px; padding: 2px; flex: none; fill: var(--leaf); }
+/* 콜 가이드로 가는 큰 배너: 만든 사람 줄 바로 아래. 아이콘 윤곽선이 어두운 화면에서도 보이도록 바탕은 항상 흰색 */
+.call-banner { display: flex; align-items: center; gap: 14px; min-width: 0; padding: 14px 20px 14px 14px; color: var(--bg); text-decoration: none; background: var(--leaf); border-radius: 16px; }
+.call-banner:hover { filter: brightness(1.08); }
+.call-banner img { display: block; flex: none; width: 68px; height: 68px; padding: 10px; background: #fff; border-radius: 14px; }
+.call-banner span { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.call-banner b { font-size: 22px; font-weight: 800; line-height: 1.25; }
+.call-banner small { font-size: 13px; line-height: 1.45; word-break: keep-all; }
+.call-banner::after { content: ""; flex: none; width: 11px; height: 11px; border-top: 2.5px solid currentColor; border-right: 2.5px solid currentColor; transform: rotate(45deg); }
 /* 밴드 사진: 원래 비율 그대로. 파일이 없으면 자리째 빠진다 */
 .hero { margin: 0; }
 .hero img { display: block; width: 100%; height: auto; aspect-ratio: 2400 / 1642; object-fit: cover; border-radius: 14px; border: 1px solid var(--line); background: var(--mask); }
@@ -322,8 +330,26 @@ footer { margin-top: 24px; font-size: 12px; color: var(--muted); }
 body:not([data-view="home"]) .copyright { margin-top: 32px; text-align: center; }
 
 /* 앱 설치: 첫 화면 맨 위 버튼과 안내 창. PC는 가운데, 좁은 화면은 아래에서 올라온다 */
-.app-row { display: flex; justify-content: flex-end; padding-top: 12px; }
+.app-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-top: 12px; }
+/* 사이트 메뉴: 가사 노트와 콜 가이드(call 폴더)를 오간다. call/index.html에도 같은 모양이 있다 */
+.site-nav { display: inline-flex; padding: 2px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; }
+.site-nav a { padding: 4px 14px; font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--muted); text-decoration: none; border-radius: 999px; }
+.site-nav a:hover { color: var(--leaf); }
+.site-nav a[aria-current="page"] { color: var(--bg); background: var(--ink); }
+.call-link { margin-top: 12px; padding-left: 10px; }
 .app-row + .top { padding-top: 12px; }
+/* 넓은 화면: 위 줄은 제목·사진, 아래 줄은 배너·사진 설명으로 나눈다. 배너 윗선이 멤버 칸 윗선과 맞고(사진 설명 한 줄 + 간격만큼 내림), 사진 크기가 바뀌어도 어긋나지 않는다 */
+@media (min-width: 761px) {
+  .top:has(.hero) { row-gap: 8px; }
+  .top:has(.hero) .top-text { grid-column: 1; grid-row: 1; align-self: end; }
+  .hero { display: contents; }
+  .hero img { grid-column: 2; grid-row: 1; align-self: end; }
+  .hero figcaption { grid-column: 2; grid-row: 2; align-self: start; margin-top: 0; }
+  .top:has(.hero) .call-banner { grid-column: 1; grid-row: 2; align-self: start; margin-top: calc(12px * 1.6 + 6px); }
+}
+@media (max-width: 760px) {
+  .call-banner { margin-top: -4px; }
+}
 .app-btn { display: inline-flex; align-items: center; gap: 6px; border-color: var(--leaf); color: var(--leaf); }
 .app-btn svg, .sheet-x svg { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .app-btn svg { width: 15px; height: 15px; }
@@ -369,7 +395,7 @@ html:has(.sheet[open]) { overflow: hidden; }
 <div class="wrap">
   <div id="app"></div>
 
-  <footer class="home-only">곡 목록: 나무위키 「녹황색사회/디스코그래피」 통상판 기준(2026.10.18 판). 그 외의 곡은 따로 추가했습니다.</footer>
+  <footer class="home-only">곡 목록: 나무위키 「녹황색사회/디스코그래피」 통상판 기준(2026.10.18 판). 그 외의 곡은 따로 추가했어요.</footer>
   <footer class="copyright">모든 저작권은 녹황색사회에게 있습니다. copyright 2019 <span lang="ja">緑黄色社会</span></footer>
 </div>
 
@@ -781,6 +807,22 @@ function route() {
   const [view, key, no, line] = location.hash.replace(/^#\/?/, "").split("/");
   const al = byKey[key];
   const t = al && al.tracks[no - 1];
+  // 콜 가이드에서 곡 이름으로 넘어올 때(#/t/곡이름): 가사가 있는 앨범의 곡 화면으로 보냅니다.
+  if (view === "t") {
+    const name = norm(decodeURIComponent(key || ""));
+    const same = ALL.filter(o => norm(o.jp) === name);
+    const hit = same.find(hasLyrics) || same[0];
+    location.replace(hit ? `#/s/${hit.album.key}/${hit.no}` : "#/");
+    return;
+  }
+  // 콜 가이드의 '앱 설치'를 눌렀을 때(#/install): 첫 화면에서 설치 안내 창을 엽니다.
+  if (view === "install") {
+    history.replaceState(null, "", "#/");
+    document.body.dataset.view = "home";
+    renderHome();
+    openInstallSheet();
+    return;
+  }
   if (view === "s" && t) { document.body.dataset.view = "song"; renderSong(t, line); }
   else if (view === "a" && al) { document.body.dataset.view = "album"; renderAlbum(al); }
   else { document.body.dataset.view = "home"; renderHome(); }
@@ -789,11 +831,11 @@ function route() {
 function problems(only) {
   const list = ALBUMS.filter(al => (!only || al === only) && fileState[al.file] !== "ok");
   if (!list.length) return "";
-  return `<div class="alert" role="alert"><b>가사 파일을 읽지 못했습니다</b><ul>${list.map(al => {
+  return `<div class="alert" role="alert"><b>가사 파일을 읽지 못했어요</b><ul>${list.map(al => {
     const f = `<code>가사/${esc(al.file)}.js</code>`;
-    if (fileState[al.file] === "missing") return `<li>${f}: 파일이 없습니다. 이름이 바뀌었거나 다른 폴더로 옮겨졌는지 확인이 필요합니다.</li>`;
-    const where = fileErrLine[al.file] ? ` ${fileErrLine[al.file]}번째 줄 근처에 문제가 있습니다.` : "";
-    return `<li>${f}: 파일 안의 형식이 깨졌습니다.${where} 맨 위의 <code>가사("${esc(al.file)}", &#96;</code>와 맨 아래의 <code>&#96;);</code>가 그대로 있는지, 가사 안에 <code>&#96;</code>(백틱)이 들어가지 않았는지 확인이 필요합니다.</li>`;
+    if (fileState[al.file] === "missing") return `<li>${f}: 파일이 없어요. 이름이 바뀌었거나 다른 폴더로 옮겨졌는지 확인해 주세요.</li>`;
+    const where = fileErrLine[al.file] ? ` ${fileErrLine[al.file]}번째 줄 근처에 문제가 있어요.` : "";
+    return `<li>${f}: 파일 안의 형식이 깨졌어요.${where} 맨 위의 <code>가사("${esc(al.file)}", &#96;</code>와 맨 아래의 <code>&#96;);</code>가 그대로 있는지, 가사 안에 <code>&#96;</code>(백틱)이 들어가지 않았는지 확인해 주세요.</li>`;
   }).join("")}</ul></div>`;
 }
 
@@ -803,14 +845,15 @@ function renderHome() {
   const filled = ALL.filter(hasLyrics).length;
   const translated = ALL.filter(hasTranslation).length;
   app.innerHTML = `
-    ${installButtonHTML()}
+    ${topRowHTML()}
     <header class="top">
       <div class="top-text">
         <div class="kicker">緑黄色社会 · 歌詞ノート</div>
         <h1><span class="g">녹황색</span><span class="y">사회</span> 가사 노트<span class="jp" lang="ja">歌詞で覚える日本語</span></h1>
-        <p class="lede">앨범별로 가사를 모아 원문·발음·해석을 한 줄씩 맞춰 보는 공부 노트입니다. 곡을 누르면 가사가 열리고, 해석이나 원문을 가려 놓고 외울 수 있습니다.</p>
-        <div class="maker-row"><span class="maker-k">만든 사람</span><a class="maker" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener" title="제작자 인스타그램"><img src="Instagram_icon.png" alt="" onerror="this.remove()">@brocoplaylist</a><a class="maker" href="https://brocokr.github.io/ryokucallguide/" target="_blank" rel="noopener" title="제작자가 만든 녹황색사회 떼창 가이드"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>떼창 가이드</a></div>
+        <p class="lede">앨범별로 가사를 모아 원문·발음·해석을 한 줄씩 맞춰 보는 공부 노트예요. 곡을 누르면 가사가 열리고, 해석이나 원문을 가려 놓고 외울 수 있어요.</p>
+        <div class="maker-row"><span class="maker-k">만든 사람</span><a class="maker" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener" title="제작자 인스타그램"><img src="Instagram_icon.png" alt="" onerror="this.remove()">@brocoplaylist</a></div>
       </div>
+      <a class="call-banner" href="call/index.html"><img src="call/119956.png" alt="" onerror="this.remove()"><span><b>콜 가이드</b><small>라이브에서 다 같이 하는 콜과 동작을 곡별로 모았어요</small></span></a>
       <figure class="hero">
         <img src="${encodeURI(PROFILE_PHOTO)}" alt="녹황색사회 멤버 네 명의 2026년 프로필 사진" onerror="this.closest('figure').remove()">
         <figcaption>
@@ -919,7 +962,7 @@ function search(needle) {
 }
 
 function resultsHTML(hits, needle) {
-  if (!hits.length) return `<p class="none">찾는 곡이나 가사가 없습니다.</p>`;
+  if (!hits.length) return `<p class="none">찾는 곡이나 가사가 없어요.</p>`;
   const q = fold(needle);
   const mark = raw => {
     const s = raw.normalize("NFC");
@@ -998,14 +1041,27 @@ const VIDEOS = {
 const VIDEO_BY_TITLE = Object.fromEntries(Object.entries(VIDEOS).map(([k, v]) => [norm(k), v]));
 const YT_KIND = { mv: "뮤직비디오 보기", audio: "노래 듣기" };
 const YT_MARK = `<svg viewBox="0 0 24 24" fill="#FF0000" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`;
+// 콜 가이드(call/index.html)의 곡 이름 → 곡 id. 곡 화면의 '이 곡 콜 보기' 링크에 쓰며, 콜 가이드에 곡을 추가하면 여기도 추가합니다.
+const CALL_IDS = Object.fromEntries(Object.entries({
+  "Mela!": "mela", "Bitter": "bitter", "Alright!!": "alright", "陽はまた昇るから": "hiwamata", "ピンクブルー": "pinkblue", "Don!!": "don",
+  "Party!!": "party", "ナイスアイディア!": "nice", "夜祭音頭": "yomatsuri", "Tap Tap Dance": "taptap", "PLAYER 1": "player1", "恋って": "koitte",
+  "スカーレット": "scarlet", "Landscape": "landscape", "恥ずかしいか青春は": "hazukashii", "illusion": "illusion", "Alice": "alice", "始まりの歌": "hajimari",
+  "あのころ見た光": "anokoro", "キャラクター": "character", "時のいたずら": "toki", "ミチヲユケ": "michi", "Slow dance": "slowdance", "TABOO": "taboo", "アルゴリズム": "algorithm", "晴々": "harebare",
+}).map(([title, id]) => [norm(title), id]));
+function callLinkHTML(t) {
+  const id = CALL_IDS[norm(t.jp)];
+  if (!id || window.SINGLE) return "";
+  return `<a class="maker call-link" href="call/index.html#song-${id}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>이 곡 콜 보기</a>`;
+}
+
 function videoHTML(t) {
   const v = VIDEO_BY_TITLE[norm(t.jp)];
   if (t.inst && !v) return "";
   // 앱을 인터넷 없이 열었을 때: 가사는 저장본으로 보이지만 영상은 나오지 않는다
-  if (navigator.onLine === false) return `<p class="info">영상은 인터넷이 연결되어 있을 때 볼 수 있습니다.</p>`;
+  if (navigator.onLine === false) return `<p class="info">영상은 인터넷이 연결되어 있을 때 볼 수 있어요.</p>`;
   if (v && location.protocol !== "file:") return `<div class="yt-player"><iframe src="https://www.youtube.com/embed/${v[0]}" title="${esc(t.jp)} ${YT_KIND[v[1]]}" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>`;
-  if (!v) return `<a class="yt plain" href="https://www.youtube.com/results?search_query=${encodeURIComponent(`緑黄色社会 ${t.jp}`)}" target="_blank" rel="noopener">${YT_MARK}<span class="yt-text"><b>유튜브에서 이 곡 찾기</b><small>새 탭에서 검색 결과가 열립니다</small></span></a>`;
-  return `<a class="yt" href="https://www.youtube.com/watch?v=${v[0]}" target="_blank" rel="noopener"><span class="yt-thumb"><img src="https://i.ytimg.com/vi/${v[0]}/mqdefault.jpg" alt="" loading="lazy">${YT_MARK}</span><span class="yt-text"><b>${YT_KIND[v[1]]}</b><small>지금은 새 탭으로 열립니다 · GitHub에 올린 사이트에서는 여기서 바로 재생됩니다</small></span></a>`;
+  if (!v) return `<a class="yt plain" href="https://www.youtube.com/results?search_query=${encodeURIComponent(`緑黄色社会 ${t.jp}`)}" target="_blank" rel="noopener">${YT_MARK}<span class="yt-text"><b>유튜브에서 이 곡 찾기</b><small>새 탭에서 검색 결과가 열려요</small></span></a>`;
+  return `<a class="yt" href="https://www.youtube.com/watch?v=${v[0]}" target="_blank" rel="noopener"><span class="yt-thumb"><img src="https://i.ytimg.com/vi/${v[0]}/mqdefault.jpg" alt="" loading="lazy">${YT_MARK}</span><span class="yt-text"><b>${YT_KIND[v[1]]}</b><small>지금은 새 탭으로 열려요 · GitHub에 올린 사이트에서는 여기서 바로 재생돼요</small></span></a>`;
 }
 
 function renderSong(t, line) {
@@ -1021,12 +1077,12 @@ function renderSong(t, line) {
     const shared = shareNotes(notes, L.jp);
     const stray = Object.keys(notes).map(Number).filter(i => i < 0 || i >= L.n);
     const warns = [];
-    if (mismatch(L)) warns.push(`${mismatch(L)}: 줄 수가 달라서 뒤로 갈수록 짝이 어긋날 수 있습니다.`);
-    if (stray.length) warns.push(`[공부] 칸의 ${stray.map(i => i + 1).join(", ")}번은 가사에 없는 줄 번호입니다.`);
-    if (loose) warns.push(`[공부] 칸 맨 위에 줄 번호 없이 적힌 항목이 ${loose}개 있습니다. 그 위에 줄 번호를 적어야 합니다.`);
+    if (mismatch(L)) warns.push(`${mismatch(L)}: 줄 수가 달라서 뒤로 갈수록 짝이 어긋날 수 있어요.`);
+    if (stray.length) warns.push(`[공부] 칸의 ${stray.map(i => i + 1).join(", ")}번은 가사에 없는 줄 번호예요.`);
+    if (loose) warns.push(`[공부] 칸 맨 위에 줄 번호 없이 적힌 항목이 ${loose}개 있어요. 그 위에 줄 번호를 적어야 해요.`);
     // 한 곡만 내보낸 파일에는 다른 곡의 설명이 없으므로 확인하지 않는다
     const lost = window.SINGLE ? [] : Object.values(notes).flat().flatMap(it => it.detail).filter(l => l.startsWith(">>") && !findLinked(l, t));
-    if (lost.length) warns.push(`[공부] 칸에서 가져올 설명을 찾지 못했습니다: ${lost.map(l => esc(l.slice(2).trim())).join(", ")}`);
+    if (lost.length) warns.push(`[공부] 칸에서 가져올 설명을 찾지 못했어요: ${lost.map(l => esc(l.slice(2).trim())).join(", ")}`);
     const hasFuri = [...L.jp, ...Object.values(notes).flat().flatMap(it => [it.term, ...it.detail])].some(s => /\{[^{}|]+\|[^{}|]+\}/.test(s));
     body = `
       <div class="controls">
@@ -1039,9 +1095,9 @@ function renderSong(t, line) {
         ${L.hg.length ? `<label class="check"><input type="checkbox" data-pref="hg"${prefs.hg ? " checked" : ""}> 한글 발음</label>` : ""}
         ${hasFuri ? `<label class="check"><input type="checkbox" data-pref="furi"${prefs.furi ? " checked" : ""}> 후리가나</label>` : ""}
         ${Object.keys(notes).length ? `<button type="button" class="ghost-btn study-all"></button>` : ""}
-        <p class="hint" id="hint" hidden>가려진 줄을 누르면 단어·문법과 함께 보이고, 한 번 더 누르면 다시 가려집니다.</p>
+        <p class="hint" id="hint" hidden>가려진 줄을 누르면 단어·문법과 함께 보이고, 한 번 더 누르면 다시 가려져요.</p>
       </div>
-      ${from ? `<p class="info">${from.album.label} 『${esc(from.album.title)}』 ${from.no}번에 넣은 가사를 보여 주고 있습니다.</p>` : ""}
+      ${from ? `<p class="info">${from.album.label} 『${esc(from.album.title)}』 ${from.no}번에 넣은 가사를 보여 주고 있어요.</p>` : ""}
       ${warns.map(w => `<p class="warn">${w}</p>`).join("")}
       <div id="lyrics">${L.stanzas.map(([a, b]) => `<div class="stanza">${range(a, b).map(i => {
         const items = shared[i] || notes[i] || [];
@@ -1055,16 +1111,16 @@ function renderSong(t, line) {
       }).join("")}</div>`).join("")}</div>`;
   } else if (t.inst) {
     body = `<div class="empty-card">
-      <p class="empty-title">가사가 없는 ${esc(t.inst)} 곡입니다</p>
-      <p>연주만 있는 곡이라 가사·발음·해석 칸을 채우지 않아도 됩니다. 앨범 진행률에서도 빠집니다.</p>
+      <p class="empty-title">가사가 없는 ${esc(t.inst)} 곡이에요</p>
+      <p>연주만 있는 곡이라 가사·발음·해석 칸을 채우지 않아도 돼요. 앨범 진행률에서도 빠져요.</p>
     </div>`;
   } else {
     const link = vscodeLink(al);
     body = `<div class="empty-card">
-      <p class="empty-title">아직 가사가 없습니다</p>
-      <p><code>가사/${esc(al.file)}.js</code> 파일에서 <code>### ${pad(t.no)} ${esc(t.jp)}</code> 줄 아래 <code>[원문]</code> 칸에 일본어 가사를 붙여 넣으면 여기에 보입니다. <code>[발음]</code>, <code>[한글발음]</code>, <code>[해석]</code>도 같은 줄 순서로 넣으면 한 줄씩 짝지어집니다.</p>
-      ${t.twins.length ? `<p>${t.twins.map(o => `${o.album.label} ${o.no}번`).join(", ")}에도 실린 곡이라, 어느 한쪽에만 넣어도 양쪽에서 보입니다.</p>` : ""}
-      <p>${link ? `<a href="${link}">VS Code에서 이 파일 열기</a> · ` : ""}저장한 뒤 이 페이지를 새로고침합니다.</p>
+      <p class="empty-title">아직 가사가 없어요</p>
+      <p><code>가사/${esc(al.file)}.js</code> 파일에서 <code>### ${pad(t.no)} ${esc(t.jp)}</code> 줄 아래 <code>[원문]</code> 칸에 일본어 가사를 붙여 넣으면 여기에 보여요. <code>[발음]</code>, <code>[한글발음]</code>, <code>[해석]</code>도 같은 줄 순서로 넣으면 한 줄씩 짝지어져요.</p>
+      ${t.twins.length ? `<p>${t.twins.map(o => `${o.album.label} ${o.no}번`).join(", ")}에도 실린 곡이라, 어느 한쪽에만 넣어도 양쪽에서 보여요.</p>` : ""}
+      <p>${link ? `<a href="${link}">VS Code에서 이 파일 열기</a> · ` : ""}저장한 뒤 이 페이지를 새로고침해 주세요.</p>
     </div>`;
   }
 
@@ -1078,6 +1134,7 @@ function renderSong(t, line) {
       ${al.desc ? `<div class="album-desc">${esc(al.desc)}</div>` : ""}
     </header>
     ${videoHTML(t)}
+    ${callLinkHTML(t)}
     ${problems(al)}
     ${body}
     ${memo.length ? `<section class="memo"><h2>메모</h2><div class="memo-body">${memo.map(rich).join("\n")}</div></section>` : ""}
@@ -1185,32 +1242,32 @@ const CANNOT_INSTALL = location.protocol === "file:" || /KAKAOTALK|Instagram|FBA
 const IS_IOS = /iPhone|iPad|iPod/.test(USER_AGENT) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const INSTALL_TABS = [
   { id: "android", name: "안드로이드 (크롬)", steps: [
-    "주소창 오른쪽의 <b>⋮</b> 메뉴를 누릅니다",
-    "<b>‘홈 화면에 추가’</b> 또는 <b>‘앱 설치’</b>를 누릅니다",
-    "<b>‘설치’</b>를 누릅니다",
+    "주소창 오른쪽의 <b>⋮</b> 메뉴를 눌러요",
+    "<b>‘홈 화면에 추가’</b> 또는 <b>‘앱 설치’</b>를 눌러요",
+    "<b>‘설치’</b>를 눌러요",
   ] },
   { id: "samsung", name: "갤럭시 (삼성 인터넷)", steps: [
-    "오른쪽 아래의 <b>≡</b> 메뉴를 누릅니다",
-    "<b>‘현재 페이지 추가’</b> → <b>‘홈 화면’</b>을 누릅니다",
-    "<b>‘추가’</b>를 누릅니다",
+    "오른쪽 아래의 <b>≡</b> 메뉴를 눌러요",
+    "<b>‘현재 페이지 추가’</b> → <b>‘홈 화면’</b>을 눌러요",
+    "<b>‘추가’</b>를 눌러요",
   ] },
   { id: "ios", name: "아이폰 / 아이패드", steps: [
-    "공유 버튼(네모에 위쪽 화살표)을 누릅니다. 안 보이면 주소창 옆 <b>⋯</b> → <b>‘공유’</b>를 누릅니다",
-    "목록을 내려서 <b>‘홈 화면에 추가’</b>를 누릅니다",
-    "<b>‘웹 앱으로 열기’</b>가 보이면 켜 두고 <b>‘추가’</b>를 누릅니다",
+    "공유 버튼(네모에 위쪽 화살표)을 눌러요. 안 보이면 주소창 옆 <b>⋯</b> → <b>‘공유’</b>를 눌러요",
+    "목록을 내려서 <b>‘홈 화면에 추가’</b>를 눌러요",
+    "<b>‘웹 앱으로 열기’</b>가 보이면 켜 두고 <b>‘추가’</b>를 눌러요",
   ] },
   { id: "pc", name: "PC (크롬 / 엣지)", steps: [
-    "주소창 오른쪽 끝의 설치 아이콘을 누릅니다",
-    "안 보이면 <b>⋮</b>(엣지는 <b>⋯</b>) 메뉴 → <b>‘전송, 저장 및 공유’</b> 또는 <b>‘앱’</b> → <b>‘앱으로 설치’</b>를 누릅니다",
-    "<b>‘설치’</b>를 누릅니다",
+    "주소창 오른쪽 끝의 설치 아이콘을 눌러요",
+    "안 보이면 <b>⋮</b>(엣지는 <b>⋯</b>) 메뉴 → <b>‘전송, 저장 및 공유’</b> 또는 <b>‘앱’</b> → <b>‘앱으로 설치’</b>를 눌러요",
+    "<b>‘설치’</b>를 눌러요",
   ] },
 ];
 let installTab = IS_IOS ? "ios" : /SamsungBrowser/.test(USER_AGENT) ? "samsung" : /Android/.test(USER_AGENT) ? "android" : "pc";
 let installPrompt = null; // 브라우저가 바로 설치를 허락하면 담기는 이벤트. 있으면 '지금 설치하기' 버튼이 보입니다.
 
-// 이미 앱으로 열었거나 한 곡만 내보낸 파일이면 버튼을 보여 주지 않습니다.
+// 첫 화면 맨 위 줄: 사이트 메뉴와 앱 설치 버튼. 이미 앱으로 열었으면 설치 버튼만 빠집니다.
 const isInstalled = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
-const installButtonHTML = () => window.SINGLE || isInstalled() ? "" : `<div class="app-row"><button type="button" class="ghost-btn app-btn" data-install-open><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 20h14"/></svg>앱 설치</button></div>`;
+const topRowHTML = () => `<div class="app-row"><nav class="site-nav" aria-label="사이트 메뉴"><a href="#/" aria-current="page">가사 노트</a><a href="call/index.html">콜 가이드</a></nav>${isInstalled() ? "" : `<button type="button" class="ghost-btn app-btn" data-install-open><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 20h14"/></svg>앱 설치</button>`}</div>`;
 const installStepsHTML = () => INSTALL_TABS.find(t => t.id === installTab).steps.map(s => `<li><span>${s}</span></li>`).join("");
 
 function installSheetHTML() {
@@ -1221,13 +1278,13 @@ function installSheetHTML() {
     </div>
     <div class="sheet-app">
       <img src="icon-192.png" alt="">
-      <div><b>녹황색사회 가사 노트</b><p>아이콘을 누르면 주소창 없이 전체 화면으로 열립니다. 한 번 열어 둔 뒤에는 지하철처럼 인터넷이 끊겨도 가사를 볼 수 있습니다.</p></div>
+      <div><b>녹황색사회 노트</b><p>아이콘을 누르면 주소창 없이 전체 화면으로 열려요. 한 번 열어 둔 뒤에는 지하철처럼 인터넷이 끊겨도 가사와 콜을 볼 수 있어요.</p></div>
     </div>
-    ${CANNOT_INSTALL ? `<div class="sheet-warn"><p>여기서는 설치가 안 됩니다. 휴대폰 브라우저에서 <b>${APP_URL.replace(/^https:\/\/|\/$/g, "")}</b>를 열고 아래 순서대로 하면 됩니다.</p><button type="button" class="ghost-btn" data-sheet="copy">주소 복사</button></div>` : ""}
+    ${CANNOT_INSTALL ? `<div class="sheet-warn"><p>여기서는 설치가 안 돼요. 휴대폰 브라우저에서 <b>${APP_URL.replace(/^https:\/\/|\/$/g, "")}</b>를 열고 아래 순서대로 해 주세요.</p><button type="button" class="ghost-btn" data-sheet="copy">주소 복사</button></div>` : ""}
     ${installPrompt && !CANNOT_INSTALL ? `<button type="button" class="sheet-go" data-sheet="install">지금 설치하기</button>` : ""}
     <div class="sheet-tabs">${INSTALL_TABS.map(t => `<button type="button" data-tab="${t.id}" aria-pressed="${t.id === installTab}">${t.name}</button>`).join("")}</div>
     <ol class="sheet-steps">${installStepsHTML()}</ol>
-    <p class="sheet-foot">새로 추가된 가사와 해석은 앱을 열 때 자동으로 들어옵니다. 영상은 인터넷이 연결되어 있을 때만 나옵니다. 아이콘을 지우고 싶으면 다른 앱처럼 길게 눌러서 삭제하면 됩니다.</p>`;
+    <p class="sheet-foot">새로 추가된 가사와 해석은 앱을 열 때 자동으로 들어와요. 영상은 인터넷이 연결되어 있을 때만 나와요. 아이콘을 지우고 싶으면 다른 앱처럼 길게 눌러서 삭제하면 돼요.</p>`;
 }
 
 function openInstallSheet() {
@@ -1285,7 +1342,7 @@ async function copyAppUrl(button) {
     try { ok = document.execCommand("copy"); } catch {}
     box.remove();
   }
-  button.textContent = ok ? "복사했습니다" : "복사가 안 됩니다. 주소를 길게 눌러 복사할 수 있습니다";
+  button.textContent = ok ? "복사했어요" : "복사가 안 돼요. 주소를 길게 눌러 복사할 수 있어요";
 }
 
 document.addEventListener("click", e => {
@@ -1307,7 +1364,7 @@ addEventListener("appinstalled", () => {
 if ("serviceWorker" in navigator && location.protocol !== "file:" && !window.SINGLE) {
   addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(reg => {
-      const files = new Set(["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "Instagram_icon.png", encodeURI(PROFILE_PHOTO)]);
+      const files = new Set(["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "Instagram_icon.png", encodeURI(PROFILE_PHOTO), "call/", "call/index.html", "call/poster.jpg", "call/zone.jpg", "call/119956.png"]);
       for (const al of ALBUMS) {
         files.add(encodeURI(`가사/${al.file}.js`));
         files.add(encodeURI(al.cover || `${al.file}.webp`));
