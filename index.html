@@ -948,11 +948,14 @@ function albumCard(al) {
 // 로마자는 ā, é 같은 표시 없이 쳐도 찾아지게 합니다. 일본어와 한글은 그대로 두고, 글자 수도 변하지 않아 표시 위치가 어긋나지 않습니다
 const fold = s => s.normalize("NFC").replace(/[À-ɏ]/g, c => c.normalize("NFD")[0]).toLowerCase();
 
+// 곡 제목과 다르게 부르는 이름도 찾아지게 합니다. 화면에는 나오지 않습니다.
+const SEARCH_ALIAS = { [norm("Mela!")]: ["멜라"] };
+
 function search(needle) {
   const q = fold(needle);
   const hits = [];
   for (const t of ALL) {
-    const title = [t.jp, t.ko, t.read, t.en].some(s => fold(s).includes(q));
+    const title = [t.jp, t.ko, t.read, t.en, ...(SEARCH_ALIAS[norm(t.jp)] || [])].some(s => fold(s).includes(q));
     const { d, from } = lyricsFor(t);
     let row = -1, text = "";
     if (d && !from) {
