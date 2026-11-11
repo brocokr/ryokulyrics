@@ -182,6 +182,31 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .marks { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
 .nw { white-space: nowrap; }
 
+/* 연도별 디스코그래피(첫 화면): 접어 두는 작은 타임라인. 펼치면 왼쪽 세로선에 해마다 점이 찍히고, 그 해에 나온 앨범·싱글이 작은 칩으로 놓인다.
+   색은 초록과 노랑을 해마다 번갈아 쓴다(--c: 선·점, --ct: 글자). 앨범 묶음(정규·서브·싱글·그 외)은 그 아래에 그대로 있다. */
+.tl { margin-top: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.tl summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; padding: 10px 16px; font-size: 14px; font-weight: 800; cursor: pointer; list-style: none; border-radius: 14px; }
+.tl summary::-webkit-details-marker { display: none; }
+.tl summary:hover { color: var(--leaf); }
+.tl summary small { font-size: 12px; font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tl summary::after { content: ""; align-self: center; width: 8px; height: 8px; margin: -4px 3px 0 auto; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); }
+.tl[open] summary::after { margin-top: 4px; transform: rotate(225deg); }
+.tl-body { padding: 4px 16px 6px; }
+.year { --c: var(--leaf); --ct: var(--leaf); position: relative; display: grid; grid-template-columns: 2.9em minmax(0, 1fr); align-items: start; gap: 0 8px; padding: 0 0 10px 22px; }
+.year.alt { --c: var(--yolk); --ct: color-mix(in srgb, var(--yolk) 55%, var(--ink)); }
+.year::before { content: ""; position: absolute; left: 5px; top: 10px; bottom: -10px; width: 2px; border-radius: 2px; background: var(--c); opacity: .55; }
+.year:last-child::before { display: none; }
+.year::after { content: ""; position: absolute; left: 0; top: 8px; width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px var(--surface); }
+.year-y { font-family: var(--font-head); font-weight: 400; font-size: 17px; line-height: 28px; font-variant-numeric: tabular-nums; }
+.rels { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.rel { display: inline-flex; align-items: center; gap: 7px; max-width: 100%; min-height: 28px; padding: 2px 10px 2px 3px; font-size: 12.5px; line-height: 1.4; color: var(--ink); text-decoration: none; background: var(--bg); border: 1px solid var(--line); border-radius: 9px; }
+.rel:hover { border-color: var(--c); }
+.cover.thumb { width: 22px; flex: none; border-radius: 6px; }
+.cover.thumb.none { display: none; }
+.rel:has(.cover.none) { padding-left: 10px; }
+.rel-tag { flex: none; font-size: 11.5px; font-weight: 800; white-space: nowrap; color: var(--ct); }
+.rel-title { min-width: 0; font-family: var(--font-mix); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
 /* album page */
 .back { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; font-size: 14px; font-weight: 700; text-decoration: none; }
 .back:hover { text-decoration: underline; }
@@ -786,7 +811,7 @@ const store = {
   get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
   set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
 };
-const prefs = Object.assign({ mode: "all", pr: true, hg: true, furi: true, studyOpen: false }, store.get("ryokushaka-lyrics:prefs", {}));
+const prefs = Object.assign({ mode: "all", pr: true, hg: true, furi: true, studyOpen: false, tl: false }, store.get("ryokushaka-lyrics:prefs", {}));
 if (!["all", "ko", "jp"].includes(prefs.mode)) prefs.mode = "all";
 const savePrefs = () => store.set("ryokushaka-lyrics:prefs", prefs);
 
@@ -888,12 +913,31 @@ function renderHomeBody() {
   const body = document.getElementById("homeBody");
   const needle = query.trim().toLowerCase();
   if (needle) { body.innerHTML = resultsHTML(search(needle), needle); return; }
-  body.innerHTML = GROUPS.map(g => `
+  body.innerHTML = timelineHTML() + GROUPS.map(g => `
     <section class="group">
       <h2>${g.name}</h2>
       <p class="sub">${g.sub}</p>
       <div class="albums${g.small ? " small" : ""}" style="--cols: ${g.cols}">${ALBUMS.filter(al => al.group === g.id).map(albumCard).join("")}</div>
     </section>`).join("");
+  // 연도별 디스코그래피를 펴 두었는지 기억한다
+  const tl = body.querySelector(".tl");
+  tl.addEventListener("toggle", () => { prefs.tl = tl.open; savePrefs(); });
+}
+
+// 연도별 디스코그래피: 접어 두는 작은 타임라인. 발매일 순서로 늘어놓고 해마다 묶는다. 날짜가 연도뿐인 곡(2013)은 그 해 맨 앞에 온다.
+const yearOf = al => al.date.slice(0, 4);
+function timelineHTML() {
+  const rels = [...ALBUMS].sort((a, b) => a.date.localeCompare(b.date));
+  const years = [...new Set(rels.map(yearOf))];
+  return `<details class="tl"${prefs.tl ? " open" : ""}>
+    <summary>연도별 디스코그래피<small>${years[0]}~${years[years.length - 1]} · 발매 ${rels.length}</small></summary>
+    <div class="tl-body">${years.map((y, i) => `
+      <div class="year${i % 2 ? " alt" : ""}">
+        <b class="year-y">${y}</b>
+        <div class="rels">${rels.filter(al => yearOf(al) === y).map(al => `<a class="rel" href="${isSolo(al) ? `#/s/${al.key}/1` : `#/a/${al.key}`}" title="${al.date} · ${al.tracks.length}곡">${coverHTML(al, " thumb")}<span class="rel-tag">${al.label}</span><span class="rel-title" lang="ja">${esc(al.title)}</span></a>`).join("")}</div>
+      </div>`).join("")}
+    </div>
+  </details>`;
 }
 
 // 첫 화면 밴드 사진 (index.html 옆에 둔 파일)
