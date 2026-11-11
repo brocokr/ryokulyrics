@@ -87,12 +87,26 @@ h1 .jp { font-family: var(--font-jp); display: block; font-size: .42em; letter-s
 h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .lede { max-width: 62ch; color: var(--muted); margin: 0; }
 
-/* setlist */
-.setlist { margin-bottom: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
-.sl-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px; }
-.sl-title { font-family: var(--font-head); font-weight: 400; font-size: 26px; line-height: 1.15; margin: 0; }
-.sl-meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
-.days { display: flex; gap: 6px; }
+/* setlist: 접어 두는 칸. 제목 줄을 누르면 곡 목록이 펼쳐지고, 날짜 버튼은 펼쳤을 때만 보인다. 좁은 화면에서는 날짜 버튼이 제목 아래로 내려간다 */
+.setlist { margin-bottom: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.sl-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 12px; align-items: end; padding: 18px; cursor: pointer; list-style: none; border-radius: 12px; }
+.sl-head::-webkit-details-marker { display: none; }
+.setlist[open] .sl-head { padding-bottom: 0; }
+.sl-title { grid-column: 1; font-family: var(--font-head); font-weight: 400; font-size: 26px; line-height: 1.15; margin: 0; }
+.sl-meta { grid-column: 1; grid-row: 2; font-size: 13px; color: var(--muted); margin-top: 4px; }
+.days { grid-column: 2; grid-row: 1 / span 2; display: flex; gap: 6px; cursor: default; }
+.setlist:not([open]) .days { display: none; }
+.sl-head .chev { grid-column: 3; grid-row: 1; align-self: start; width: 9px; height: 9px; margin: 9px 4px 0; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); }
+.sl-head:hover .chev { border-color: var(--leaf); }
+.setlist[open] .sl-head .chev { transform: rotate(-135deg); margin-top: 13px; }
+.sl-body { padding: 0 18px 18px; }
+@media (max-width: 640px) {
+  .sl-head { grid-template-columns: minmax(0, 1fr) auto; }
+  .sl-meta { grid-column: 1 / -1; }
+  .days { grid-column: 1 / -1; grid-row: 3; justify-self: start; margin-top: 12px; }
+  .sl-head .chev { grid-column: 2; }
+}
+@media (max-width: 340px) { .sl-title { font-size: 23px; } }
 .day { font: inherit; font-weight: 700; font-size: 14px; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; font-variant-numeric: tabular-nums; }
 .day[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .sl-list { list-style: none; margin: 14px 0 0; padding: 0; columns: 2 300px; column-gap: 32px; }
@@ -282,20 +296,21 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
     </figure>
   </header>
 
-  <section class="setlist" aria-labelledby="slTitle">
-    <div class="sl-head">
-      <div>
-        <h2 class="sl-title" id="slTitle" data-t="slTitle">2025 내한 세트리스트</h2>
-        <div class="sl-meta" data-t="slMeta">ASIA TOUR 2025 · 서울 YES24 LIVE HALL</div>
-      </div>
-      <div class="days" id="days">
+  <details class="setlist" id="setlist">
+    <summary class="sl-head">
+      <h2 class="sl-title" id="slTitle" data-t="slTitle">2025 내한 세트리스트</h2>
+      <span class="sl-meta" data-t="slMeta">ASIA TOUR 2025 · 서울 YES24 LIVE HALL</span>
+      <span class="days" id="days">
         <button type="button" class="day" id="day-1011" data-day="1011" aria-pressed="true" data-t="day1">10.11 토</button>
         <button type="button" class="day" id="day-1012" data-day="1012" aria-pressed="false" data-t="day2">10.12 일</button>
-      </div>
+      </span>
+      <span class="chev" aria-hidden="true"></span>
+    </summary>
+    <div class="sl-body">
+      <ol class="sl-list" id="slList"></ol>
+      <div class="sl-foot" data-t="slFoot">두 날은 12번, 14번 곡만 달라요. <b>콜 보기</b>를 누르면 아래 가이드로 이동해요.</div>
     </div>
-    <ol class="sl-list" id="slList"></ol>
-    <div class="sl-foot" data-t="slFoot">두 날은 12번, 14번 곡만 달라요. <b>콜 보기</b>를 누르면 아래 가이드로 이동해요.</div>
-  </section>
+  </details>
 
   <div class="bar" role="search">
     <label class="search"><input id="q" type="search" placeholder="곡 제목이나 가사로 찾기" aria-label="곡 제목이나 가사로 찾기"></label>
@@ -705,9 +720,14 @@ function renderSetlist() {
   }).join("");
 }
 document.getElementById("days").addEventListener("click", e => {
+  e.preventDefault(); // 날짜 버튼은 제목 줄 안에 있어서, 버튼이나 그 사이를 눌러도 칸이 접히지 않게 함
   const b = e.target.closest(".day"); if (!b) return;
   slDay = b.dataset.day; renderSetlist();
 });
+// 세트리스트 칸은 처음엔 접혀 있고, 펴 두었는지를 이 브라우저에 기억함
+const slBox = document.getElementById("setlist");
+try { slBox.open = localStorage.getItem("ryokulyrics:setlist") === "open"; } catch (e) {}
+slBox.addEventListener("toggle", () => { try { localStorage.setItem("ryokulyrics:setlist", slBox.open ? "open" : "closed"); } catch (e) {} });
 // 곡 카드로 이동: 세트리스트의 '콜 보기'와 가사 화면에서 넘어올 때(#song-곡id) 함께 씁니다.
 function jumpTo(id) {
   if (!SONGS.some(s => s.id === id)) return;
