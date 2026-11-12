@@ -231,6 +231,9 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .song-title { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 6vw, 42px); line-height: 1.2; margin: 8px 0 2px; overflow-wrap: anywhere; }
 .song-title .read { font-family: var(--font-jp); font-size: .42em; color: var(--muted); margin-left: 8px; }
 .song-ko { color: var(--muted); }
+/* 곡 화면 제목 아래 작사·작곡. 한 사람(또는 같은 사람들)이 둘 다 했으면 '작사·작곡' 한 칸으로 줄인다 */
+.song-credit { display: flex; flex-wrap: wrap; gap: 2px 14px; margin-top: 6px; font-size: 13px; line-height: 1.5; }
+.song-credit b { margin-right: 6px; font-size: 12px; font-weight: 700; color: var(--muted); }
 /* 곡 화면 위 유튜브: 웹 주소로 열면 사이트 안에서 재생. 파일로 직접 열면 유튜브가 막아서(오류 153) 새 탭으로 여는 카드를 보여 준다 */
 .yt-player { margin-top: 14px; aspect-ratio: 16 / 9; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--mask); }
 .yt-player iframe { display: block; width: 100%; height: 100%; border: 0; }
@@ -1109,6 +1112,52 @@ function callLinkHTML(t) {
   return `<a class="maker call-link" href="call/index.html#song-${id}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>이 곡 콜 보기</a>`;
 }
 
+// 곡별 작사·작곡: "곡 제목": [작사, 작곡]. 글자 하나가 한 사람이다(H 나가야 하루코, I 코바야시 잇세이, P peppe, S 아나미 싱고, R 녹황색사회 = 멤버 모두).
+// 멤버가 아닌 사람은 이름을 그대로 적는다. 출처: 나무위키 녹황색사회/디스코그래피(2026-10-18 판), 일본어 위키백과 앨범·싱글 문서, UtaTen(2026-11-13 확인).
+// 세 곳이 서로 다르면 두 곳이 같은 쪽을 따랐다(君が望む世界, 恋って, Alice, Never Come Back, 夜祭音頭). 같은 제목이면 어느 앨범에서든 같은 값을 쓰고,
+// 인스트루멘털 트랙은 원곡의 작곡만 보여 준다. 연주곡 ∩, U는 크레디트가 알려지지 않아 넣지 않았다. 새 곡을 ALBUMS에 넣으면 여기도 추가한다.
+const WHO = { H: "나가야 하루코", I: "코바야시 잇세이", P: "peppe", S: "아나미 싱고", R: "녹황색사회" };
+const WRITERS = {
+  // 정규 1집
+  "Re": ["H", "H"], "始まりの歌": ["H", "H"], "大人ごっこ": ["H", "H"], "キラキラ": ["H", "H"], "Alice": ["R", "R"],
+  "君が望む世界": ["H", "S"], "恋って": ["H", "P"], "regret": ["H", "H"], "真夜中ドライブ": ["H", "P"], "またね": ["H", "H"],
+  // 정규 2집
+  "SINGALONG": ["", "R"], "Sabotage": ["H", "H"], "Mela!": ["HI", "PS"], "想い人": ["H", "I"], "inori": ["I", "I"], "Shout Baby": ["H", "H"], "スカーレット": ["S", "S"],
+  "一歩": ["H", "H"], "愛のかたち": ["H", "H"], "幸せ": ["H", "H"], "Brand New World": ["I", "I"], "あのころ見た光": ["IH", "P"], "冬の朝": ["H", "H"],
+  // 정규 3집
+  "Actor": ["", "R"], "キャラクター": ["HI", "PS"], "merry-go-round": ["H", "S"], "これからのこと、それからのこと": ["H", "H"], "安心してね": ["H", "H"],
+  "LITMUS": ["I", "IS"], "ずっとずっとずっと": ["H", "H"], "揺れる": ["H", "H"], "たとえたとえ": ["I", "P"], "アラモードにワルツ": ["H", "P"],
+  "結証": ["H", "I"], "S.T.U.D": ["I", "S"], "Landscape": ["I", "S"], "スクリーンと横顔": ["H", "P"],
+  // 정규 4집
+  "ピンクブルー": ["H", "H"], "Starry Drama": ["I", "P"], "ジブンセイフク": ["I", "I"], "あうん": ["HI", "R"], "ミチヲユケ": ["H", "IS"], "うそつき": ["H", "H"],
+  "陽はまた昇るから": ["I", "S"], "湿気っている": ["I", "R"], "Don!!": ["I", "IS"], "White Rabbit": ["I", "S"], "さもなくば誰がやる": ["H", "H"], "Slow dance": ["HI", "PS"],
+  // 정규 5집
+  "PLAYER 1": ["HI", "PS"], "恥ずかしいか青春は": ["H", "H"], "ナイスアイディア！": ["H", "P"], "Monkey Dance": ["I", "S"], "マジックアワー": ["I", "I"],
+  "僕らはいきものだから": ["H", "H"], "Channel Me": ["R", "IS"], "馬鹿の一つ覚え": ["H", "H"], "Each Ring": ["H", "P"], "サマータイムシンデレラ": ["HI", "S"],
+  "言えない": ["I", "P"], "コーヒーとましゅまろ": ["I", "I"], "Party!!": ["I", "IS"], "花になって": ["H", "S"], "オーロラを探しに": ["H", "H"],
+  // 정규 6집
+  "誰かの国": ["H", "P"], "TABOO": ["HI", "SP"], "My Answer": ["H", "S"], "illusion": ["I", "S"], "うたまご": ["H", "H"], "章": ["H", "S"],
+  "分かりにくい": ["H", "H"], "アルゴリズム": ["I", "SP"], "レジスダンス": ["HI", "SP"], "風に乗る": ["H", "S"], "つづく": ["H", "P"], "晴々": ["HI", "S"],
+  // 미니 앨범·EP
+  "アウトサイダー": ["H", "H"], "Bitter": ["H", "PH"], "丘と小さなパラダイム": ["I", "I"], "want": ["H", "H"], "それなりの生活": ["H", "H"],
+  "視線": ["H", "H"], "Never Come Back": ["IH", "SI"], "サボテン": ["H", "H"], "リトルシンガー": ["H", "R"], "逆転": ["H", "H"], "ひとりごと": ["S", "S"], "にちようび": ["H", "H"],
+  // 싱글 커플링
+  "Alright!!": ["HS", "P"], "空に歌えば": ["아키타 히로무(amazarashi)", "아키타 히로무(amazarashi)"], "LADYBUG": ["H", "I"], "Copy": ["H", "H"],
+  "アーユーレディー": ["I", "IS"], "時のいたずら": ["H", "H"], "夢と悪魔とファンタジー": ["I", "PS"], "Tap Tap Dance": ["I", "S"], "étoile": ["H", "P"],
+  // 그 외의 곡
+  "マイルストーンの種": ["I", "R"], "夏を生きる": ["H", "H"], "ブレス": ["H", "P"], "夜祭音頭": ["R", "R"], "透明だった世界": ["하타 모토히로", "하타 모토히로"],
+};
+const WRITERS_BY_TITLE = Object.fromEntries(Object.entries(WRITERS).map(([k, v]) => [norm(k), v]));
+const writerNames = s => /^[HIPSR]+$/.test(s) ? [...s].map(c => WHO[c]).join(", ") : s;
+function creditHTML(t) {
+  const base = t.jp.replace(/\s*[(-]\s*instrumental\s*[)-]?\s*$/i, "");
+  const c = WRITERS_BY_TITLE[norm(t.jp)] || WRITERS_BY_TITLE[norm(base)];
+  if (!c) return "";
+  const lyrics = base === t.jp ? c[0] : ""; // 인스트루멘털 트랙은 가사가 없으니 작곡만
+  const items = lyrics && lyrics === c[1] ? [["작사·작곡", lyrics]] : [["작사", lyrics], ["작곡", c[1]]].filter(([, v]) => v);
+  return `<div class="song-credit">${items.map(([k, v]) => `<span><b>${k}</b>${esc(writerNames(v))}</span>`).join("")}</div>`;
+}
+
 function videoHTML(t) {
   const v = VIDEO_BY_TITLE[norm(t.jp)];
   if (t.inst && !v) return "";
@@ -1186,6 +1235,7 @@ function renderSong(t, line) {
       <div class="album-top">${isSolo(al) ? `<span class="ord">${al.label}</span><span>${al.date}</span>` : `<span class="ord">${pad(t.no)}번 트랙</span>`}</div>
       <h1 class="song-title" lang="ja">${esc(t.jp)}${t.read ? `<span class="read">${esc(t.read)}</span>` : ""}</h1>
       ${t.ko || t.en ? `<div class="song-ko">${[t.ko, t.en].filter(Boolean).map(esc).join(" · ")}</div>` : ""}
+      ${creditHTML(t)}
       ${al.desc ? `<div class="album-desc">${esc(al.desc)}</div>` : ""}
     </header>
     ${videoHTML(t)}
