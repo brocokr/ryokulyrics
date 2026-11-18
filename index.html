@@ -392,6 +392,8 @@ mark { background: var(--yolk); color: var(--on-yolk); border-radius: 3px; paddi
 .quiz-prog .bar i { display: block; height: 100%; background: var(--leaf); border-radius: 999px; }
 .quiz-card { display: grid; gap: 14px; margin-top: 14px; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
 .quiz-kind { font-size: 12px; font-weight: 800; color: var(--leaf); }
+.quiz-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.qz-lv { flex: none; padding: 1px 9px; font-size: 11.5px; font-weight: 800; white-space: nowrap; color: var(--leaf); border: 1.5px solid var(--leaf); border-radius: 999px; }
 .quiz-q { display: grid; gap: 6px; margin: 0; }
 .qz-term { font-family: var(--font-mix); font-size: clamp(24px, 6vw, 32px); font-weight: 800; line-height: 1.6; }
 .qz-line { font-family: var(--font-mix); font-size: clamp(18px, 4.6vw, 22px); font-weight: 700; line-height: 1.9; }
@@ -454,10 +456,10 @@ body:not([data-view="home"]) .made-by { text-align: center; }
 h1.ja { font-family: var(--font-display); font-size: clamp(28px, 5vw, 44px); }
 .lede:lang(ja) { font-family: var(--font-jp); }
 .app-row + .top { padding-top: 12px; }
-/* 넓은 화면: 왼쪽 묶음(제목·설명·배너 3개)을 오른쪽 높이에 맞춰 늘려서, 제목은 사진 윗선에, 배너는 공식 링크 아랫선에 맞춘다 */
+/* 넓은 화면: 왼쪽 묶음(제목·배너 3개)을 아래쪽에 모아서, 배너는 공식 링크 아랫선에 맞추고 제목은 배너 바로 위에 둔다 */
 @media (min-width: 761px) {
   .top:has(.hero) { grid-template-rows: auto 1fr; row-gap: 8px; }
-  .top:has(.hero) .top-left { grid-column: 1; grid-row: 1 / span 2; align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; gap: 24px; }
+  .top:has(.hero) .top-left { grid-column: 1; grid-row: 1 / span 2; align-self: end; gap: 28px; }
   .hero { display: contents; }
   .hero img { grid-column: 2; grid-row: 1; align-self: start; }
   .hero figcaption { grid-column: 2; grid-row: 2; align-self: start; margin-top: 0; }
@@ -702,13 +704,20 @@ function loadLyrics() {
       if (m && e.lineno) fileErrLine[m[1]] = e.lineno;
     } catch {}
   });
-  return Promise.all(ALBUMS.map(al => new Promise(resolve => {
+  // jlpt.js: 퀴즈 단어의 JLPT 급수표(window.JLPT). 없거나 깨져도 급수 표시만 빠지고 사이트는 그대로 열린다.
+  const jlpt = new Promise(resolve => {
+    const s = document.createElement("script");
+    s.src = "jlpt.js";
+    s.onload = s.onerror = () => resolve();
+    document.head.append(s);
+  });
+  return Promise.all([jlpt, ...ALBUMS.map(al => new Promise(resolve => {
     const s = document.createElement("script");
     s.src = `가사/${al.file}.js`;
     s.onload = () => { fileState[al.file] = LYRICS[al.file] ? "ok" : "broken"; resolve(); };
     s.onerror = () => { fileState[al.file] = "missing"; resolve(); };
     document.head.append(s);
-  })));
+  }))]);
 }
 
 const has = lines => !!lines && lines.some(l => l.trim());
@@ -922,6 +931,8 @@ const RQ = (() => {
   const HIRA = /^[ぁ-ゟー]+$/;
   const same = s => plain(s).normalize("NFKC").replace(/[\s、。,.!?！？「」'"‘’“”]/g, "");
   const hash = s => { let h = 2166136261; for (const ch of s) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36); };
+  // JLPT 급수표(jlpt.js)의 열쇠: "후리가나를 뺀 글자|읽기"
+  const lvKey = term => `${plain(term)}|${reading(term)}`;
   const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
   // 오답 후보: t = 보기 글, k = 그 글이 풀이하는 낱말이나 가사 줄. 같은 낱말·같은 줄의 다른 풀이는 정답과 뜻이 같을 수 있어서 오답으로 쓰지 않는다.
@@ -994,7 +1005,7 @@ const RQ = (() => {
   }
 
   // 모든 곡에서 모은 오답 후보: 한 곡 안에서 오답이 모자랄 때 쓴다
-  function pool(songs) {
+  function pool(songs, levels) {
     const items = songs.flatMap(s => s.items.filter(it => it.term && it.mean)), rd = items.filter(it => readable(it.term)), frames = {};
     for (const it of rd) (frames[frame(segs(it.term))] ||= []).push(entry(reading(it.term), it.term));
     for (const k in frames) frames[k] = lenIndex(frames[k]);
@@ -1003,6 +1014,7 @@ const RQ = (() => {
       lines: lenIndex(songs.flatMap(s => s.lines.filter(l => l.ko).map(l => entry(l.ko, l.jp)))),
       reads: lenIndex(rd.map(it => entry(reading(it.term), it.term))),
       frames,
+      levels: levels || {},
       segReads: lenIndex(rd.flatMap(it => segs(it.term).filter(s => s.kana == null).map(s => entry(s.read, s.kanji)))),
     };
   }
@@ -1019,7 +1031,7 @@ const RQ = (() => {
       if (wrong.length < 3) wrong = wrong.concat(pickWrong(it.mean, all.means[it.gram], 3 - wrong.length, it.term, wrong));
       if (wrong.length < 3) continue;
       const l = lineOf(it.line);
-      add("word", same(it.term), { q: `「${it.term}」의 뜻은?`, c: [it.mean, ...wrong], term: it.term, mean: it.mean, line: it.line,
+      add("word", same(it.term), { q: `「${it.term}」의 뜻은?`, c: [it.mean, ...wrong], term: it.term, mean: it.mean, line: it.line, lv: all.levels[lvKey(it.term)] || "",
         e: `${plain(it.term)} - ${it.mean}${l ? ` · 가사 ${it.line + 1}번째 줄: ${plain(l.jp)}` : ""}` });
     }
     // 2. 가사 줄 해석 고르기: 원문 한 줄과 그 줄의 해석 (추임새처럼 해석이 원문과 같은 줄은 뺀다)
@@ -1036,7 +1048,7 @@ const RQ = (() => {
       if (!readable(it.term)) continue;
       const r = reading(it.term), wrong = readWrong(it.term, all);
       if (wrong.length < 3) continue;
-      add("read", plain(it.term), { q: `「${plain(it.term)}」의 읽기는?`, c: [r, ...wrong], term: it.term, mean: it.mean, line: it.line,
+      add("read", plain(it.term), { q: `「${plain(it.term)}」의 읽기는?`, c: [r, ...wrong], term: it.term, mean: it.mean, line: it.line, lv: all.levels[lvKey(it.term)] || "",
         e: `${plain(it.term)}(${r}) - ${it.mean}` });
     }
     return qs;
@@ -1054,7 +1066,7 @@ const RQ = (() => {
     return shuffle(out);
   }
 
-  return { plain, reading, readable, misreads, readWrong, pool, bank, pick, shuffle, hash };
+  return { plain, reading, lvKey, readable, misreads, readWrong, pool, bank, pick, shuffle, hash };
 })();
 
 // 퀴즈에 쓰는 곡: 해석이나 [공부]가 있는 곡. 같은 곡이 두 앨범에 실렸으면 앞 앨범 것 하나만 쓴다.
@@ -1072,7 +1084,7 @@ function quizData() {
     seen.add(norm(t.jp));
     songs.push({ id: t.id, t, title: t.jp, ko: t.ko, lines: L.jp.map((jp, i) => ({ jp, ko: L.ko[i] || "" })), items });
   }
-  const all = RQ.pool(songs);
+  const all = RQ.pool(songs, window.JLPT || {});
   for (const s of songs) s.bank = RQ.bank(s, all);
   QUIZ = { songs: songs.filter(s => s.bank.length), keys: {} };
   for (const s of QUIZ.songs) for (const q of s.bank) QUIZ.keys[q.key] = q;
@@ -1153,7 +1165,7 @@ function drawQuiz() {
       <a class="back" href="#/quiz">← 가사 퀴즈</a>
       <div class="quiz-prog"><span>${r.i + 1} / ${r.list.length}</span><div class="bar"><i style="width:${r.i / r.list.length * 100}%"></i></div><span>${r.score}점</span></div>
       <div class="quiz-card">
-        <span class="quiz-kind">${QKIND[q.kind]} · <span lang="ja">${esc(q.song.title)}</span></span>
+        ${quizKindHTML(q)}
         <p class="quiz-q">${quizQHTML(q)}</p>
         <div class="quiz-opts${q.kind === "read" ? "" : " col"}">${r.opts.map((o, k) => `<button type="button" class="quiz-opt" data-qa="${k}"${q.kind === "read" ? ' lang="ja"' : ""}><span class="n">${k + 1}</span>${rich(o.t)}</button>`).join("")}</div>
         <div class="quiz-fb" id="qfb" hidden></div>
@@ -1208,11 +1220,16 @@ function drawQuizDone() {
           ${r.miss.length ? `<button type="button" class="quiz-go ghost" data-qmiss>틀린 것만 다시</button>` : ""}
           ${r.song ? `<a class="quiz-go ghost" href="#/s/${r.song.t.album.key}/${r.song.t.no}">가사 보기</a>` : ""}
         </div>
-        ${r.miss.length ? `<div class="qz-miss"><h2>틀린 문제</h2>${r.miss.map(q => `<div class="qz-m"><span class="quiz-kind">${QKIND[q.kind]} · <span lang="ja">${esc(q.song.title)}</span></span><p>${missQ(q)}</p><p class="qz-ans">정답: <span${q.kind === "read" ? ' lang="ja"' : ""}>${rich(q.c[0])}</span></p></div>`).join("")}</div>` : ""}
+        ${r.miss.length ? `<div class="qz-miss"><h2>틀린 문제</h2>${r.miss.map(q => `<div class="qz-m">${quizKindHTML(q)}<p>${missQ(q)}</p><p class="qz-ans">정답: <span${q.kind === "read" ? ' lang="ja"' : ""}>${rich(q.c[0])}</span></p></div>`).join("")}</div>` : ""}
       </div>
     </div>`;
   scrollTo(0, 0);
 }
+
+// 문제 위 작은 줄: 문제 종류 · 곡 제목, 단어·읽기 문제면 오른쪽에 JLPT 급수(jlpt.js)
+// 급수 글자: 1~5는 네이버 일본어사전의 JLPT 급수, b·m·a는 사전에 급수가 없어 broco Nihongo Anki 덱 단계로 짐작한 것
+const lvText = v => ({ b: "N5 (Anki)", m: "N4~N3 (Anki)", a: "N2~N1 (Anki)" })[v] || `JLPT N${v}`;
+const quizKindHTML = q => `<span class="quiz-top"><span class="quiz-kind">${QKIND[q.kind]} · <span lang="ja">${esc(q.song.title)}</span></span>${q.lv ? `<span class="qz-lv">${esc(lvText(q.lv))}</span>` : ""}</span>`;
 
 // 곡 화면의 '이 곡 퀴즈 풀기' 링크. 문제를 미리 만들지 않고 해석이나 [공부]가 있는지만 본다.
 function quizLinkHTML(t) {
@@ -1303,9 +1320,8 @@ function renderHome() {
       <div class="top-left">
       <div class="top-text">
         <div class="kicker">緑黄色社会 · 歌詞ノート</div>
-        <h1${homeLang === "ja" ? ' class="ja"' : ""}>${homeLang === "ja" ? `<span class="g" lang="ja">緑黄色</span><span class="y" lang="ja">社会</span> <span lang="ja">歌詞ノート</span>` : `<span class="g">녹황색</span><span class="y">사회</span> 가사 노트`}<span class="jp" lang="ja">歌詞で覚える日本語</span></h1>
-        ${homeLang === "ja" ? `<p class="lede" lang="ja">アルバムごとに歌詞を集めて、原文・発音・韓国語訳を1行ずつ見比べながら日本語を勉強するノートです。曲を押すと歌詞が開き、訳や原文を隠して覚えることもできます。</p>` : `<p class="lede">앨범별로 가사를 모아 원문·발음·해석을 한 줄씩 맞춰 보는 공부 노트예요. 곡을 누르면 가사가 열리고, 해석이나 원문을 가려 놓고 외울 수 있어요.</p>`}
-      </div>
+        <h1${homeLang === "ja" ? ' class="ja"' : ""}>${homeLang === "ja" ? `<span class="g" lang="ja">緑黄色</span><span class="y" lang="ja">社会</span> <span lang="ja">歌詞ノート</span>` : `<span class="g">녹황색</span><span class="y">사회</span> 가사 노트`}</h1>
+     </div>
       <div class="home-banners">
         <a class="call-banner" href="call/index.html"><img src="call/119956.png" alt="" onerror="this.remove()"><span><b>콜 가이드</b><small>라이브에서 다 같이 하는 콜과 동작을 곡별로 모았어요</small></span></a>
         <a class="call-banner" href="#/quiz"><svg class="ban-ic" viewBox="0 0 48 48" aria-hidden="true"><text x="24" y="33" text-anchor="middle">あ</text><rect x="13" y="38" width="22" height="3.5" rx="1.75"/></svg><span><b>가사로 일본어 공부</b><small>단어 뜻·가사 해석·읽기 퀴즈로 복습해요</small></span></a>
@@ -1936,7 +1952,7 @@ addEventListener("appinstalled", () => {
 if ("serviceWorker" in navigator && location.protocol !== "file:" && !window.SINGLE) {
   addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(reg => {
-      const files = new Set(["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "Instagram_icon.png", encodeURI(PROFILE_PHOTO), "call/", "call/index.html", "call/poster.jpg", "call/zone.jpg", "call/119956.png"]);
+      const files = new Set(["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "Instagram_icon.png", encodeURI(PROFILE_PHOTO), "call/", "call/index.html", "call/poster.jpg", "call/zone.jpg", "call/119956.png", "jlpt.js"]);
       for (const al of ALBUMS) {
         files.add(encodeURI(`가사/${al.file}.js`));
         files.add(encodeURI(al.cover || `${al.file}.webp`));
