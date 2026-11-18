@@ -124,7 +124,7 @@ Nandodemo iu yo bokura mōichido
 빠져 있던 조각들을 되찾아 가자
 다시 할 수 없는 일 따위는 없어
 그날 맹세했던 꿈들을 떠올리지 못해 멍하니
-결코 거짓말 같은 건 없는데도 똑바로 앞을 볼 수 없어
+결코 거짓말 같은 것은 없는데도 똑바로 앞을 볼 수 없어
 희미해져 간 기억을 전부
 다시 불러오고 싶다면
 몇 번이든 상관없어
@@ -2641,7 +2641,7 @@ Alice 라라라라
 {不真面目|ふまじめ}さだって{時|とき}には{大事|だいじ}
 お{願|ねが}い{僕|ぼく}に{任|まか}せて
 
-{君|きみ}が{望|のぞ}む{世界|せかい}を{僕|ぼく}と{一緒|いっしょ}に{見|み}に{行|い}こう
+{君|きみ}が{望|のぞ}む{世界|せかい}を{僕|ぼく}と{一緒|いっしょ}に{見|み}に{行|ゆ}こう
 {遠回|とおまわ}りも{何度|なんど}も{付|つ}き{合|あ}うよ {何|なに}も{怖|こわ}くはないさ
 (Na na na na na na na)
 {丸|まる}めたその{背中|せなか}{伸|の}ばして さあ
@@ -2653,7 +2653,7 @@ Alice 라라라라
 それは{本当|ほんとう}に{君|きみ}が{選|えら}んだ{道|みち}だったの?
 
 ひとりじゃ{怖|こわ}くて{進|すす}めないなら
-ふたりで{行|い}こうよ
+ふたりで{行|ゆ}こうよ
 ほら{目|め}をつぶって
 {頭|あたま}の{中|なか}に{自由|じゆう}な{地図|ちず}を{描|えが}いて
 
@@ -2664,11 +2664,11 @@ Alice 라라라라
 {僕|ぼく}が{君|きみ}を{連|つ}れていくよ
 {何|なに}もかも{気|き}にしなくていい
 わがまま{言|い}ったっていい
-ほら{準備|じゅんび}{出来|でき}たら{行|い}こうか{君|きみ}だけの{場所|ばしょ}
+ほら{準備|じゅんび}{出来|でき}たら{行|ゆ}こうか{君|きみ}だけの{場所|ばしょ}
 
 その{我慢|がまん}も{不安|ふあん}もいらないよ {飾|かざ}らなくていい
 {思|おも}うままに{自由|じゆう}に{飛|と}び{込|こ}んで さあ{今|いま}{目|め}を{開|ひら}いて
-{君|きみ}が{望|のぞ}む{世界|せかい}を{僕|ぼく}と{一緒|いっしょ}に{見|み}に{行|い}こう
+{君|きみ}が{望|のぞ}む{世界|せかい}を{僕|ぼく}と{一緒|いっしょ}に{見|み}に{行|ゆ}こう
 {遠回|とおまわ}りも{何度|なんど}も{付|つ}き{合|あ}うよ {何|なに}も{怖|こわ}くはないさ
 
 (Na na na na na na na)
@@ -2698,7 +2698,7 @@ Yokeina mono wa ima wa iranai sa
 Fumajimesa datte toki ni wa daiji
 Onegai boku ni makasete
 
-Kimi ga nozomu sekai o boku to issho ni mi ni ikō
+Kimi ga nozomu sekai o boku to issho ni mi ni yukō
 Tōmawari mo nando mo tsukiau yo nani mo kowaku wa nai sa
 (Na na na na na na na)
 Marumeta sono senaka nobashite sā
@@ -2710,7 +2710,7 @@ Machigai nanka janaikedo
 Sore wa hontōni kimi ga eranda michidatta no?
 
 Hitorija kowakute susumenainara
-Futari de ikō yo
+Futari de yukō yo
 Hora me o tsubutte
 Atama no naka ni jiyūna chizu o egaite
 
@@ -2721,11 +2721,11 @@ Kono mama dare mo shiranai tōku no basho made
 Boku ga kimi o tsurete iku yo
 Nanimokamo ki ni shinakute ī
 Wagamama ittatte ī
-Hora junbi dekitara ikō ka kimi dake no basho
+Hora junbi dekitara yukō ka kimi dake no basho
 
 Sono gaman mo fuan mo iranai yo kazaranakute ī
 Omou mama ni jiyū ni tobikonde sā ima me o hiraite
-Kimi ga nozomu sekai o boku to issho ni mi ni ikō
+Kimi ga nozomu sekai o boku to issho ni mi ni yukō
 Tōmawari mo nando mo tsukiau yo nani mo kowaku wa nai sa
 
 (Na na na na na na na)
@@ -2755,7 +2755,7 @@ Atarashī jibun o mite goran
 후마지메사 닷테 토키니와 다이지
 오네가이 보쿠니 마카세테
 
-키미가 노조무 세카이오 보쿠토 잇쇼니 미니 이코-
+키미가 노조무 세카이오 보쿠토 잇쇼니 미니 유코-
 토-마와리모 난도모 츠키아우요 나니모 코와쿠와 나이사
 (Na na na na na na na)
 마루메타 소노 세나카 노바시테 사-
@@ -2767,7 +2767,7 @@ Atarashī jibun o mite goran
 소레와 혼토-니 키미가 에란다 미치닷타노?
 
 히토리자 코와쿠테 스스메나이나라
-후타리데 이코-요
+후타리데 유코-요
 호라 메오 츠붓테
 아타마노 나카니 지유-나 치즈오 에가이테
 
@@ -2778,11 +2778,11 @@ Atarashī jibun o mite goran
 보쿠가 키미오 츠레테 이쿠요
 나니모카모 키니 시나쿠테 이-
 와가마마 잇탓테 이-
-호라 준비 데키타라 이코-카 키미다케노 바쇼
+호라 준비 데키타라 유코-카 키미다케노 바쇼
 
 소노 가만모 후안모 이라나이요 카자라나쿠테 이-
 오모우 마마니 지유-니 토비콘데 사- 이마 메오 히라이테
-키미가 노조무 세카이오 보쿠토 잇쇼니 미니 이코-
+키미가 노조무 세카이오 보쿠토 잇쇼니 미니 유코-
 토-마와리모 난도모 츠키아우요 나니모 코와쿠와 나이사
 
 (Na na na na na na na)
@@ -2820,7 +2820,7 @@ Atarashī jibun o mite goran
 새로운 세계를 봐보렴
 
 지금까지 네가 걸어온 길은
-틀린 건 아니지만
+틀린 것은 아니지만
 그게 정말 네가 선택한 길이었을까?
 
 혼자서는 무서워서 나아갈 수 없다면
@@ -3091,7 +3091,7 @@ Atarashī jibun o mite goran
   일본어 | 뜻
   {学校|がっこう}に{行|い}く | 학교에 가다 (가는 곳)
   {見|み}に{行|い}く | 보러 가다 (가는 목적)
-{行|い}こう - 가자
+{行|ゆ}こう - 가자
   >> merry-go-round 11 行こう
 
 18
@@ -3195,7 +3195,7 @@ Atarashī jibun o mite goran
   - ひとりで → 혼자서
   - みんなで → 다 같이
   - {三人|さんにん}で → 셋이서
-{行|い}こうよ - 가자, 응?
+{行|ゆ}こうよ - 가자, 응?
   >> 17 行こう
   >> Re 17 ～よう ②
 
@@ -3506,11 +3506,11 @@ Soshite hashiridashita
 흘러나오는 라디오, 시끄럽네
 
 앞뒤 가리지 않고 손을 잡았어
-부족한 건 앞뒤로 맞춰가며
+부족한 것은 앞뒤로 맞춰가며
 차에 탔으니 자, 가볼까
 
 정신없이, 정신없이 숨을 쉬어
-무서운 건 지금으로선 보이지 않아
+무서운 것은 지금으로선 보이지 않아
 정신없이, 정신없이 숨을 쉬어
 여기까지 오는 데 시간은 걸리지 않았어
 믿어줘, 믿고 있어, 믿었어
@@ -3524,7 +3524,7 @@ Soshite hashiridashita
 
 지금밖에 없는 부풀어 오른 설렘을
 어째서 포기해야 해?
-'왠지 모르게'라는 건 이유가 안 되는 거야?
+'왠지 모르게'라는 것은 이유가 안 되는 거야?
 쓸데없는 룰, 지루해, 부숴버려
 
 정신없이, 정신없이 숨을 쉬어
