@@ -35,6 +35,12 @@ check.ps1 -File <작업한 가사 파일> -Backup <작업 전 가사 파일>
   곡별 칸 줄 수, 후리가나와 로마자가 같은 소리인지, 읽기가 빠진 한자, 한글발음에 남은 로마자, 원문이 바뀐 줄, 해석·공부·메모 변화를 보여 준다.
   차이로 나오는 줄 중 ティ·ファ·ウォ 같은 작은 글자와 いい/ī 표기 차이는 오류가 아니다. 작업 전 파일에 이미 후리가나가 있으면 그 줄은 '바뀐 줄'로 나온다.
 
+jlpt\update-jlpt.ps1 [-NihongoIndex <broco Nihongo index.html>]
+  새 해석·[공부]를 넣은 뒤 돌리면 사이트 맨 위의 jlpt.js(퀴즈 단어의 JLPT 급수표)를 다시 만든다. 사이트를 열어 [공부] 단어(문법 제외)를 모으고 처음 보는 단어만 찾는다.
+  순서: 네이버 일본어사전(naver-cache.json) → broco Nihongo Anki 덱(anki-v.json) → 공개 JLPT 단어 목록(jlpt-list.json, open-anki-jlpt-decks) → Jisho 사전(jisho-cache.json) → 손으로 분류한 표(manual.tsv).
+  끝에 '아직 분류하지 않은 단어'가 나오면 manual.tsv 맨 아래에 한 줄씩(글자<TAB>방법) 적고 다시 돌린다. 방법은 =같은 낱말, +이어진 낱말들, ~어림한 급수, -(급수 안 붙임)이고 manual.tsv 맨 위에 설명이 있다.
+  '+'와 '~'로 정한 급수는 화면에 'N3 (추정)'처럼 나온다. 급수 고르는 규칙은 jlpt\resolve.js, jlpt.js 맨 위 설명은 jlpt\jlpt-head.txt. 바뀌었으면 jlpt.js를 GitHub에 올린다.
+  -NihongoIndex를 주면 Anki 덱(anki-v.json)도 새로 뽑는다. -Root <사이트 폴더>로 작업 복사본에서 먼저 돌려 볼 수 있다.
 test-server.ps1 -Port 8767 -Root <사이트 폴더> -NoBrowser
   사이트를 이 컴퓨터의 웹 주소(http://localhost:8767/)로 연다. 유튜브 재생기처럼 웹 주소에서만 되는 기능을 시험할 때 쓴다. 시험이 끝나면 꺼야 한다.
   headless Chrome 사진은 재생기가 그려지기 전에 찍혀 검게 나올 때가 있다. 그때는 다시 찍어 본다.

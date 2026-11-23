@@ -368,7 +368,7 @@ rt { font-size: .5em; font-weight: 400; color: var(--muted); }
 .snip { display: block; margin-top: 4px; font-family: var(--font-jp); font-size: 14px; }
 mark { background: var(--yolk); color: var(--on-yolk); border-radius: 3px; padding: 0 2px; }
 
-/* 가사 퀴즈(#/quiz): 곡 목록 → 문제 카드 → 결과. 해석과 [공부]가 있는 곡으로 단어 뜻·가사 해석·읽기 문제를 낸다 */
+/* 가사 퀴즈(#/quiz): 곡·JLPT 급수 목록 → 문제 카드 → 결과. [공부]가 있는 곡으로 단어·문법·읽기 문제를 낸다 */
 .quiz-head { padding-block: 18px 2px; }
 .quiz-head h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 6vw, 40px); line-height: 1.2; margin: 0 0 8px; }
 .quiz-head .lede { max-width: 62ch; margin: 0; color: var(--muted); }
@@ -382,21 +382,29 @@ mark { background: var(--yolk); color: var(--on-yolk); border-radius: 3px; paddi
 .quiz-songs { display: grid; margin-top: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 8px; }
 .quiz-song { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; padding: 10px 14px; color: var(--ink); text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
 .quiz-song:hover { border-color: var(--leaf); }
+/* JLPT 급수별: 급수 카드 6칸(N5~N1, 급수 없음). 폭과 상관없이 한 줄에 3칸 */
+.quiz-note { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+.quiz-lvs { display: grid; margin-top: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.quiz-lv { display: grid; align-content: start; justify-items: start; gap: 2px; padding: 10px 14px; color: var(--ink); text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.quiz-lv:hover { border-color: var(--leaf); }
+.quiz-lv b { font-size: clamp(15px, 4.6vw, 20px); line-height: 1.35; white-space: nowrap; color: var(--leaf); }
+.quiz-lv span { font-size: 12px; white-space: nowrap; color: var(--muted); font-variant-numeric: tabular-nums; }
+.quiz-lv .lv-n { display: flex; flex-wrap: wrap; gap: 0 8px; }
+.quiz-lv .lv-best { margin-top: 4px; padding: 1px 9px; font-weight: 800; white-space: nowrap; color: var(--on-yolk); background: var(--yolk); border-radius: 999px; }
 .qs-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; min-width: 0; }
 .qs-t { font-family: var(--font-mix); font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
 .qs-ko { font-size: 13px; color: var(--muted); }
 .qs-meta { grid-column: 1; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .qs-best { grid-column: 2; grid-row: 1 / span 2; padding: 2px 10px; font-size: 12px; font-weight: 800; white-space: nowrap; color: var(--on-yolk); background: var(--yolk); border-radius: 999px; font-variant-numeric: tabular-nums; }
 .quiz-prog { display: flex; align-items: center; gap: 10px; margin-top: 16px; font-size: 13px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
-.quiz-prog .bar { flex: 1; height: 6px; overflow: hidden; background: var(--line); border-radius: 999px; }
-.quiz-prog .bar i { display: block; height: 100%; background: var(--leaf); border-radius: 999px; }
+.quiz-prog .qbar { flex: 1; height: 6px; overflow: hidden; background: var(--line); border-radius: 999px; }
+.quiz-prog .qbar i { display: block; height: 100%; background: var(--leaf); border-radius: 999px; }
 .quiz-card { display: grid; gap: 14px; margin-top: 14px; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
 .quiz-kind { font-size: 12px; font-weight: 800; color: var(--leaf); }
 .quiz-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .qz-lv { flex: none; padding: 1px 9px; font-size: 11.5px; font-weight: 800; white-space: nowrap; color: var(--leaf); border: 1.5px solid var(--leaf); border-radius: 999px; }
 .quiz-q { display: grid; gap: 6px; margin: 0; }
 .qz-term { font-family: var(--font-mix); font-size: clamp(24px, 6vw, 32px); font-weight: 800; line-height: 1.6; }
-.qz-line { font-family: var(--font-mix); font-size: clamp(18px, 4.6vw, 22px); font-weight: 700; line-height: 1.9; }
 .qz-ask, .qz-hint { font-size: 13px; color: var(--muted); }
 .quiz-q rt, .qz-src rt, .qz-m rt { font-size: .5em; }
 .quiz-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
@@ -919,15 +927,14 @@ const COPYRIGHT = copyright.innerHTML;
 
 /* ---------- 가사 퀴즈 ---------- */
 
-/* 녹황색사회 가사 퀴즈: 곡의 원문·해석·[공부]로 문제를 만든다. 가사 노트(ryokulyrics)와 broco Nihongo가 같은 코드를 쓴다.
-   곡 = { id, title, ko, lines: [{ jp, ko }], items: [{ line, term, mean, gram }] }  (line은 0부터 센 가사 줄 번호)
-   문제 = { key, kind: "word" | "line" | "read", q, c: [정답, 오답, 오답, 오답], e, line, term, mean, song }  (c의 첫 번째가 정답) */
+/* 녹황색사회 가사 퀴즈: 곡의 [공부](단어·문법)로 문제를 만든다. 가사 노트(ryokulyrics)와 broco Nihongo가 같은 코드를 쓴다.
+   곡 = { id, title, ko, lines: [{ jp }], items: [{ line, term, mean, gram }] }  (line은 0부터 센 가사 줄 번호)
+   문제 = { key, kind: "word" | "gram" | "read", q, c: [정답, 오답, 오답, 오답], e, line, term, mean, lv, song }  (c의 첫 번째가 정답) */
 const RQ = (() => {
   const FURI = /\{([^{}|]+)\|([^{}|]+)(?:\|N[1-5])?\}/g;
   const plain = s => String(s).replace(FURI, "$1");
   const reading = s => String(s).replace(FURI, "$2");
   const KANJI = /[㐀-鿿々]/;
-  const JAPANESE = /[぀-ヿ㐀-鿿々]/;
   const HIRA = /^[ぁ-ゟー]+$/;
   const same = s => plain(s).normalize("NFKC").replace(/[\s、。,.!?！？「」'"‘’“”]/g, "");
   const hash = s => { let h = 2166136261; for (const ch of s) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36); };
@@ -1011,7 +1018,6 @@ const RQ = (() => {
     for (const k in frames) frames[k] = lenIndex(frames[k]);
     return {
       means: { true: lenIndex(items.filter(it => it.gram).map(it => entry(it.mean, it.term))), false: lenIndex(items.filter(it => !it.gram).map(it => entry(it.mean, it.term))) },
-      lines: lenIndex(songs.flatMap(s => s.lines.filter(l => l.ko).map(l => entry(l.ko, l.jp)))),
       reads: lenIndex(rd.map(it => entry(reading(it.term), it.term))),
       frames,
       levels: levels || {},
@@ -1021,29 +1027,21 @@ const RQ = (() => {
 
   function bank(song, all) {
     const qs = [], done = new Set();
-    const add = (kind, id, q) => { const key = `${song.id}:${kind[0]}${hash(id)}`; if (done.has(key)) return; done.add(key); qs.push({ key, kind, song, ...q }); };
+    // 열쇠 글자: 단어와 문법은 w, 읽기는 r (문법을 따로 나누기 전에 모인 틀린 문제도 이어지게 문법도 w를 쓴다)
+    const add = (kind, id, q) => { const key = `${song.id}:${kind === "read" ? "r" : "w"}${hash(id)}`; if (done.has(key)) return; done.add(key); qs.push({ key, kind, song, ...q }); };
     const lineOf = i => song.lines[i] || null;
     const items = song.items.filter(it => it.term && it.mean);
-    // 1. 단어 뜻 고르기: [공부]의 '낱말 - 뜻'. 오답은 같은 곡의 낱말(문법이면 문법) 뜻에서 먼저 고른다.
+    // 1. 단어·문법 뜻 고르기: [공부]의 '낱말 - 뜻'. 오답은 같은 곡의 낱말(문법이면 문법) 뜻에서 먼저 고른다.
     const kin = { true: lenIndex(items.filter(it => it.gram).map(it => entry(it.mean, it.term))), false: lenIndex(items.filter(it => !it.gram).map(it => entry(it.mean, it.term))) };
     for (const it of items) {
       let wrong = pickWrong(it.mean, kin[it.gram], 3, it.term);
       if (wrong.length < 3) wrong = wrong.concat(pickWrong(it.mean, all.means[it.gram], 3 - wrong.length, it.term, wrong));
       if (wrong.length < 3) continue;
       const l = lineOf(it.line);
-      add("word", same(it.term), { q: `「${it.term}」의 뜻은?`, c: [it.mean, ...wrong], term: it.term, mean: it.mean, line: it.line, lv: all.levels[lvKey(it.term)] || "",
+      add(it.gram ? "gram" : "word", same(it.term), { q: `「${it.term}」의 뜻은?`, c: [it.mean, ...wrong], term: it.term, mean: it.mean, line: it.line, lv: all.levels[lvKey(it.term)] || "",
         e: `${plain(it.term)} - ${it.mean}${l ? ` · 가사 ${it.line + 1}번째 줄: ${plain(l.jp)}` : ""}` });
     }
-    // 2. 가사 줄 해석 고르기: 원문 한 줄과 그 줄의 해석 (추임새처럼 해석이 원문과 같은 줄은 뺀다)
-    const kos = lenIndex(song.lines.filter(l => l.ko).map(l => entry(l.ko, l.jp)));
-    song.lines.forEach((l, i) => {
-      if (!l.ko || !JAPANESE.test(plain(l.jp)) || same(l.ko) === same(l.jp)) return;
-      let wrong = pickWrong(l.ko, kos, 3, l.jp);
-      if (wrong.length < 3) wrong = wrong.concat(pickWrong(l.ko, all.lines, 3 - wrong.length, l.jp, wrong));
-      if (wrong.length < 3) return;
-      add("line", same(l.jp), { q: l.jp, c: [l.ko, ...wrong], line: i, e: `${plain(l.jp)} → ${l.ko}` });
-    });
-    // 3. 읽기 맞히기: 한자가 들어간 [공부] 낱말
+    // 2. 읽기 맞히기: 한자가 들어간 [공부] 낱말
     for (const it of items) {
       if (!readable(it.term)) continue;
       const r = reading(it.term), wrong = readWrong(it.term, all);
@@ -1066,10 +1064,25 @@ const RQ = (() => {
     return shuffle(out);
   }
 
-  return { plain, reading, lvKey, readable, misreads, readWrong, pool, bank, pick, shuffle, hash };
+  // JLPT 급수별로 나누기: n = 5~1은 그 급수의 단어·읽기 문제, 0은 급수를 모르는 낱말. 문법은 급수가 없어서 넣지 않는다.
+  // 급수가 없어 Anki 덱 단계로 짐작한 b·m·a는 걸치는 급수에 모두, 어림한 e5~e1은 그 급수에 넣는다. 같은 낱말이 여러 곡에 나오면 그중 한 곡의 것만 낸다.
+  const BAND = { b: [5], m: [4, 3], a: [2, 1], e5: [5], e4: [4], e3: [3], e2: [2], e1: [1] };
+  const levelsOf = lv => BAND[lv] || (lv ? [lv] : []);
+  function byLevel(qs, n) {
+    const seen = new Set();
+    return shuffle(qs).filter(q => {
+      if (q.kind === "gram") return false;
+      const ls = levelsOf(q.lv), k = `${q.kind}|${lvKey(q.term)}`;
+      if ((n ? !ls.includes(n) : ls.length) || seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }
+
+  return { plain, reading, lvKey, readable, misreads, readWrong, pool, bank, pick, byLevel, shuffle, hash };
 })();
 
-// 퀴즈에 쓰는 곡: 해석이나 [공부]가 있는 곡. 같은 곡이 두 앨범에 실렸으면 앞 앨범 것 하나만 쓴다.
+// 퀴즈에 쓰는 곡: [공부]가 있는 곡. 같은 곡이 두 앨범에 실렸으면 앞 앨범 것 하나만 쓴다.
 let QUIZ = null;
 function quizData() {
   if (QUIZ) return QUIZ;
@@ -1080,9 +1093,9 @@ function quizData() {
     if (!d) continue;
     const L = layout(d);
     const items = Object.entries(studyNotes(d.공부).notes).flatMap(([i, list]) => list.map(it => ({ line: Number(i), term: it.term, mean: it.mean, gram: it.gram })));
-    if (!items.length && !L.ko.length) continue;
+    if (!items.length) continue;
     seen.add(norm(t.jp));
-    songs.push({ id: t.id, t, title: t.jp, ko: t.ko, lines: L.jp.map((jp, i) => ({ jp, ko: L.ko[i] || "" })), items });
+    songs.push({ id: t.id, t, title: t.jp, ko: t.ko, lines: L.jp.map(jp => ({ jp })), items });
   }
   const all = RQ.pool(songs, window.JLPT || {});
   for (const s of songs) s.bank = RQ.bank(s, all);
@@ -1092,11 +1105,18 @@ function quizData() {
 }
 const quizSongFor = t => quizData().songs.find(s => s.t === t || t.twins.includes(s.t));
 
-// 기록: 문제 종류·문제 수 설정, 곡별 최고 점수, 틀린 문제(맞히면 빠진다). 이 브라우저에만 저장된다.
-const QKIND = { word: "단어 뜻", line: "가사 해석", read: "읽기" };
-const qrec = Object.assign({ kinds: ["word", "line", "read"], n: 10, best: {}, wrong: {} }, store.get("ryokushaka-lyrics:quiz", {}));
-if (!Array.isArray(qrec.kinds) || !qrec.kinds.length) qrec.kinds = ["word", "line", "read"];
+// 기록: 문제 종류·문제 수 설정, 곡별·급수별 최고 점수, 틀린 문제(맞히면 빠진다). 이 브라우저에만 저장된다.
+const QKIND = { word: "단어", gram: "문법", read: "읽기" };
+const qrec = Object.assign({ kinds: Object.keys(QKIND), n: 10, best: {}, wrong: {} }, store.get("ryokushaka-lyrics:quiz", {}));
+// 예전 기록(v 없음)은 단어와 문법이 한 종류(word)였고 가사 해석(line)이 있었다
+if (qrec.v !== 2) { if (Array.isArray(qrec.kinds) && qrec.kinds.includes("word") && !qrec.kinds.includes("gram")) qrec.kinds.push("gram"); qrec.v = 2; }
+qrec.kinds = Object.keys(QKIND).filter(k => Array.isArray(qrec.kinds) && qrec.kinds.includes(k));
+if (!qrec.kinds.length) qrec.kinds = Object.keys(QKIND);
 const saveQuiz = () => store.set("ryokushaka-lyrics:quiz", qrec);
+// JLPT 급수별(#/quiz/n5 … n1, n0 = 급수를 모르는 낱말). 급수표(jlpt.js)를 못 읽었으면 급수 칸을 보여 주지 않는다.
+const QLEVELS = [5, 4, 3, 2, 1, 0];
+const qlvName = n => n ? `JLPT N${n}` : "급수 없음";
+const levelBank = n => RQ.byLevel(quizData().songs.flatMap(s => s.bank), n);
 let qrun = null;
 
 function renderQuizHome(msg) {
@@ -1104,11 +1124,12 @@ function renderQuizHome(msg) {
   document.title = "가사 퀴즈 · 녹황색사회 가사 노트";
   const nWrong = Object.keys(qrec.wrong).filter(k => Q.keys[k]).length;
   const count = (s, k) => s.bank.filter(q => q.kind === k).length;
+  const levels = Object.keys(window.JLPT || {}).length ? QLEVELS.map(n => ({ n, bank: levelBank(n) })).filter(l => l.bank.length) : [];
   app.innerHTML = `${topRowHTML("quiz")}
     <div class="narrow">
       <header class="quiz-head">
         <h1>가사 퀴즈</h1>
-        <p class="lede">해석과 단어·문법을 정리한 ${Q.songs.length}곡으로 문제를 내요. 곡을 고르면 그 곡에서, '전체 곡에서 섞어 풀기'를 누르면 여러 곡에서 골고루 나와요. 틀린 문제는 따로 모아 두었다가 다시 풀 수 있어요.</p>
+        <p class="lede">단어·문법을 정리한 ${Q.songs.length}곡으로 문제를 내요. 곡이나 JLPT 급수를 고르면 거기서, '전체 곡에서 섞어 풀기'를 누르면 여러 곡에서 골고루 나와요. 틀린 문제는 따로 모아 두었다가 다시 풀 수 있어요.</p>
       </header>
       ${msg ? `<p class="warn">${esc(msg)}</p>` : ""}
       <div class="quiz-set">
@@ -1121,19 +1142,29 @@ function renderQuizHome(msg) {
         <a class="quiz-go" href="#/quiz/all">전체 곡에서 섞어 풀기</a>
         ${nWrong ? `<a class="quiz-go ghost" href="#/quiz/wrong">틀린 문제 다시 풀기 · ${nWrong}</a>` : ""}
       </div>
+      ${levels.length ? `<section class="group"><h2>JLPT 급수별</h2><p class="quiz-note">모든 곡의 단어를 급수로 나눴어요. 문법은 급수가 없어서 단어와 읽기 문제만 나와요. '추정'은 사전과 JLPT 단어 목록에 급수가 없어서 어림한 것이에요.</p><div class="quiz-lvs">${levels.map(({ n, bank }) => {
+        const b = qrec.best["n" + n], c = k => bank.filter(q => q.kind === k).length;
+        return `<a class="quiz-lv" href="#/quiz/n${n}"><b>${n ? "N" + n : "급수 없음"}</b><span class="lv-n"><span>단어 ${c("word")}</span><span>읽기 ${c("read")}</span></span>${b ? `<span class="lv-best">최고 ${b.score}/${b.n}</span>` : ""}</a>`;
+      }).join("")}</div></section>` : ""}
       ${GROUPS.map(g => {
         const list = Q.songs.filter(s => s.t.album.group === g.id);
         return list.length ? `<section class="group"><h2>${g.name}</h2><div class="quiz-songs">${list.map(s => {
           const b = qrec.best[s.id];
-          return `<a class="quiz-song" href="#/quiz/${s.t.album.key}/${s.t.no}"><span class="qs-main"><span class="qs-t" lang="ja">${esc(s.title)}</span>${s.ko ? `<span class="qs-ko">${esc(s.ko)}</span>` : ""}</span><span class="qs-meta">${esc(s.t.album.label)}${isSolo(s.t.album) ? "" : ` ${s.t.no}번`} · 단어 ${count(s, "word")} · 해석 ${count(s, "line")} · 읽기 ${count(s, "read")}</span>${b ? `<span class="qs-best">최고 ${b.score}/${b.n}</span>` : ""}</a>`;
+          return `<a class="quiz-song" href="#/quiz/${s.t.album.key}/${s.t.no}"><span class="qs-main"><span class="qs-t" lang="ja">${esc(s.title)}</span>${s.ko ? `<span class="qs-ko">${esc(s.ko)}</span>` : ""}</span><span class="qs-meta">${esc(s.t.album.label)}${isSolo(s.t.album) ? "" : ` ${s.t.no}번`} · 단어 ${count(s, "word")} · 문법 ${count(s, "gram")} · 읽기 ${count(s, "read")}</span>${b ? `<span class="qs-best">최고 ${b.score}/${b.n}</span>` : ""}</a>`;
         }).join("")}</div></section>` : "";
       }).join("")}
     </div>`;
 }
 
-// #/quiz/all: 전체 곡, #/quiz/wrong: 틀린 문제, #/quiz/앨범/번호: 그 곡
+// #/quiz/all: 전체 곡, #/quiz/wrong: 틀린 문제, #/quiz/n5: JLPT 급수, #/quiz/앨범/번호: 그 곡
 function renderQuiz(key, no) {
   const Q = quizData();
+  const lv = /^n([0-5])$/.exec(key || "");
+  if (lv) {
+    // 급수별 문제는 단어와 읽기뿐이라, 문법만 골라 두었으면 둘 다 낸다
+    const kinds = qrec.kinds.filter(k => k !== "gram");
+    return startQuiz(RQ.pick(levelBank(Number(lv[1])), kinds.length ? kinds : ["word", "read"], qrec.n), qlvName(Number(lv[1])), null, key);
+  }
   if (key === "all") return startQuiz(RQ.pick(Q.songs.flatMap(s => s.bank), qrec.kinds, qrec.n), "전체 곡에서 섞어 풀기", null);
   if (key === "wrong") return startQuiz(RQ.shuffle(Object.keys(qrec.wrong).map(k => Q.keys[k]).filter(Boolean)).slice(0, 30), "틀린 문제 다시 풀기", null);
   const t = byKey[key] && byKey[key].tracks[no - 1];
@@ -1142,17 +1173,17 @@ function renderQuiz(key, no) {
   renderQuizHome();
 }
 
-function startQuiz(list, title, song) {
+// bestId: 최고 점수를 적어 둘 이름(곡이면 곡 id, 급수면 n5…). 없으면 점수를 적지 않는다.
+function startQuiz(list, title, song, bestId = song && song.id) {
   if (!list.length) return renderQuizHome("고른 문제 종류로는 낼 문제가 없어요. 문제 종류를 바꿔 보세요.");
-  qrun = { list, i: 0, score: 0, miss: [], title, song, answered: false };
+  qrun = { list, i: 0, score: 0, miss: [], title, song, bestId, answered: false };
   document.title = `${title} · 가사 퀴즈`;
   drawQuiz();
 }
 
 function quizQHTML(q) {
-  if (q.kind === "line") return `<span class="qz-line" lang="ja">${rich(q.q)}</span><span class="qz-ask">이 가사의 해석은?</span>`;
   if (q.kind === "read") return `<span class="qz-term" lang="ja">${esc(RQ.plain(q.term))}</span><span class="qz-ask">이 낱말의 읽기는?</span>${q.mean ? `<span class="qz-hint">뜻: ${rich(q.mean)}</span>` : ""}`;
-  return `<span class="qz-term" lang="ja">${rich(q.term)}</span><span class="qz-ask">이 낱말의 뜻은?</span>`;
+  return `<span class="qz-term" lang="ja">${rich(q.term)}</span><span class="qz-ask">이 ${q.kind === "gram" ? "문법" : "낱말"}의 뜻은?</span>`;
 }
 
 function drawQuiz() {
@@ -1163,7 +1194,7 @@ function drawQuiz() {
   app.innerHTML = `${topRowHTML("quiz")}
     <div class="narrow">
       <a class="back" href="#/quiz">← 가사 퀴즈</a>
-      <div class="quiz-prog"><span>${r.i + 1} / ${r.list.length}</span><div class="bar"><i style="width:${r.i / r.list.length * 100}%"></i></div><span>${r.score}점</span></div>
+      <div class="quiz-prog"><span>${r.i + 1} / ${r.list.length}</span><div class="qbar"><i style="width:${r.i / r.list.length * 100}%"></i></div><span>${r.score}점</span></div>
       <div class="quiz-card">
         ${quizKindHTML(q)}
         <p class="quiz-q">${quizQHTML(q)}</p>
@@ -1190,8 +1221,8 @@ function answerQuiz(k) {
   const l = q.song.lines[q.line];
   const fb = document.getElementById("qfb");
   fb.innerHTML = `<p class="qz-res ${ok ? "ok" : "no"}">${ok ? "정답이에요!" : "아쉬워요"}</p>
-    ${q.kind === "line" ? "" : `<p class="qz-ans"><span lang="ja">${rich(q.term)}</span>${q.kind === "read" ? ` (${esc(q.c[0])})` : ""} · ${rich(q.mean || "")}</p>`}
-    ${l ? `<a class="qz-src" href="#/s/${q.song.t.album.key}/${q.song.t.no}/${q.line}"><span lang="ja">${rich(l.jp)}</span>${l.ko ? `<span>${esc(l.ko)}</span>` : ""}<small>${q.line + 1}번째 줄 · 가사에서 보기 →</small></a>` : ""}`;
+    <p class="qz-ans"><span lang="ja">${rich(q.term)}</span>${q.kind === "read" ? ` (${esc(q.c[0])})` : ""} · ${rich(q.mean || "")}</p>
+    ${l ? `<a class="qz-src" href="#/s/${q.song.t.album.key}/${q.song.t.no}/${q.line}"><span lang="ja">${rich(l.jp)}</span><small>${q.line + 1}번째 줄 · 가사에서 보기 →</small></a>` : ""}`;
   fb.hidden = false;
   const next = app.querySelector("[data-qnext]");
   next.hidden = false;
@@ -1201,20 +1232,20 @@ function answerQuiz(k) {
 function drawQuizDone() {
   const r = qrun, n = r.list.length;
   let best = null;
-  if (r.song) {
-    const b = qrec.best[r.song.id];
-    if (!b || r.score / n > b.score / b.n || (r.score / n === b.score / b.n && n > b.n)) qrec.best[r.song.id] = { score: r.score, n };
-    best = qrec.best[r.song.id];
+  if (r.bestId) {
+    const b = qrec.best[r.bestId];
+    if (!b || r.score / n > b.score / b.n || (r.score / n === b.score / b.n && n > b.n)) qrec.best[r.bestId] = { score: r.score, n };
+    best = qrec.best[r.bestId];
     saveQuiz();
   }
-  const missQ = q => q.kind === "line" ? `<span lang="ja">${rich(q.q)}</span>` : q.kind === "read" ? `<span lang="ja">${esc(RQ.plain(q.term))}</span>의 읽기` : `<span lang="ja">${rich(q.term)}</span>의 뜻`;
+  const missQ = q => q.kind === "read" ? `<span lang="ja">${esc(RQ.plain(q.term))}</span>의 읽기` : `<span lang="ja">${rich(q.term)}</span>의 뜻`;
   app.innerHTML = `${topRowHTML("quiz")}
     <div class="narrow">
       <a class="back" href="#/quiz">← 가사 퀴즈</a>
       <div class="quiz-card">
         <span class="quiz-kind" lang="ja">${esc(r.title)}</span>
         <p class="qz-score">${r.score} / ${n}</p>
-        <p class="qz-sub">${r.score === n ? "모두 맞혔어요!" : `틀린 ${r.miss.length}문제는 '틀린 문제 다시 풀기'에 모아 두었어요.`}${best ? ` 이 곡 최고 점수는 ${best.score} / ${best.n}이에요.` : ""}</p>
+        <p class="qz-sub">${r.score === n ? "모두 맞혔어요!" : `틀린 ${r.miss.length}문제는 '틀린 문제 다시 풀기'에 모아 두었어요.`}${best ? ` ${r.song ? "이 곡" : "이 급수"} 최고 점수는 ${best.score} / ${best.n}이에요.` : ""}</p>
         <div class="qz-btns">
           <button type="button" class="quiz-go" data-qagain>다시 풀기</button>
           ${r.miss.length ? `<button type="button" class="quiz-go ghost" data-qmiss>틀린 것만 다시</button>` : ""}
@@ -1227,15 +1258,15 @@ function drawQuizDone() {
 }
 
 // 문제 위 작은 줄: 문제 종류 · 곡 제목, 단어·읽기 문제면 오른쪽에 JLPT 급수(jlpt.js)
-// 급수 글자: 1~5는 네이버 일본어사전의 JLPT 급수, b·m·a는 사전에 급수가 없어 broco Nihongo Anki 덱 단계로 짐작한 것
-const lvText = v => ({ b: "N5 (Anki)", m: "N4~N3 (Anki)", a: "N2~N1 (Anki)" })[v] || `JLPT N${v}`;
+// 급수 글자: 1~5는 사전·JLPT 단어 목록의 급수, b·m·a는 broco Nihongo Anki 덱 단계로 짐작한 것, e1~e5는 목록에 없어 어림한 것
+const lvText = v => ({ b: "N5 (Anki)", m: "N4~N3 (Anki)", a: "N2~N1 (Anki)" })[v] || (/^e\d$/.test(v) ? `N${v[1]} (추정)` : `JLPT N${v}`);
 const quizKindHTML = q => `<span class="quiz-top"><span class="quiz-kind">${QKIND[q.kind]} · <span lang="ja">${esc(q.song.title)}</span></span>${q.lv ? `<span class="qz-lv">${esc(lvText(q.lv))}</span>` : ""}</span>`;
 
-// 곡 화면의 '이 곡 퀴즈 풀기' 링크. 문제를 미리 만들지 않고 해석이나 [공부]가 있는지만 본다.
+// 곡 화면의 '이 곡 퀴즈 풀기' 링크. 문제를 미리 만들지 않고 [공부]가 있는지만 본다.
 function quizLinkHTML(t) {
   if (window.SINGLE || t.inst) return "";
   const d = lyricsFor(t).d;
-  return d && (has(d.해석) || has(d.공부)) ? `<a class="maker call-link quiz-link" href="#/quiz/${t.album.key}/${t.no}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-2h2v2zm2.1-7.1-.9.9c-.7.7-1.2 1.3-1.2 2.7h-2v-.5c0-1.1.4-2.1 1.2-2.8l1.2-1.3c.4-.3.6-.8.6-1.4a2 2 0 0 0-4 0H7a5 5 0 0 1 10 0c0 .9-.4 1.7-.9 2.4z"/></svg>이 곡 퀴즈 풀기</a>` : "";
+  return d && has(d.공부) ? `<a class="maker call-link quiz-link" href="#/quiz/${t.album.key}/${t.no}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-2h2v2zm2.1-7.1-.9.9c-.7.7-1.2 1.3-1.2 2.7h-2v-.5c0-1.1.4-2.1 1.2-2.8l1.2-1.3c.4-.3.6-.8.6-1.4a2 2 0 0 0-4 0H7a5 5 0 0 1 10 0c0 .9-.4 1.7-.9 2.4z"/></svg>이 곡 퀴즈 풀기</a>` : "";
 }
 
 // 퀴즈 버튼들. 숫자 1~4로 답하고 Enter로 다음 문제로 넘어갈 수 있다.
@@ -1254,7 +1285,7 @@ function quizClick(e) {
   if (ans) { answerQuiz(Number(ans.dataset.qa)); return true; }
   if (e.target.closest("[data-qnext]")) { qrun.i++; drawQuiz(); scrollTo(0, 0); return true; }
   if (e.target.closest("[data-qagain]")) { route(); return true; }
-  if (e.target.closest("[data-qmiss]")) { startQuiz(RQ.shuffle(qrun.miss), qrun.title, qrun.song); scrollTo(0, 0); return true; }
+  if (e.target.closest("[data-qmiss]")) { startQuiz(RQ.shuffle(qrun.miss), qrun.title, qrun.song, null); scrollTo(0, 0); return true; }
   return false;
 }
 document.addEventListener("keydown", e => {
@@ -1324,7 +1355,7 @@ function renderHome() {
      </div>
       <div class="home-banners">
         <a class="call-banner" href="call/index.html"><img src="call/119956.png" alt="" onerror="this.remove()"><span><b>콜 가이드</b><small>라이브에서 다 같이 하는 콜과 동작을 곡별로 모았어요</small></span></a>
-        <a class="call-banner" href="#/quiz"><svg class="ban-ic" viewBox="0 0 48 48" aria-hidden="true"><text x="24" y="33" text-anchor="middle">あ</text><rect x="13" y="38" width="22" height="3.5" rx="1.75"/></svg><span><b>가사로 일본어 공부</b><small>단어 뜻·가사 해석·읽기 퀴즈로 복습해요</small></span></a>
+        <a class="call-banner" href="#/quiz"><svg class="ban-ic" viewBox="0 0 48 48" aria-hidden="true"><text x="24" y="33" text-anchor="middle">あ</text><rect x="13" y="38" width="22" height="3.5" rx="1.75"/></svg><span><b>가사로 일본어 공부</b><small>단어·문법·읽기를 곡별, JLPT 급수별 퀴즈로 복습해요</small></span></a>
         <a class="call-banner" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener" title="제작자 인스타그램"><img src="Instagram_icon.png" alt="" onerror="this.remove()"><span><b>@brocoplaylist</b><small>인스타그램</small></span></a>
       </div>
       </div>

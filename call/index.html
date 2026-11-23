@@ -9,6 +9,10 @@
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f6ee">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101a13">
+<script>
+// 화면 모드: 맨 위 버튼으로 고른 값(light/dark)이 있으면 화면을 그리기 전에 먼저 적용한다. 고른 적이 없으면 기기 설정을 따른다. 가사 노트와 같은 저장 이름.
+try { var t = localStorage.getItem("ryokulyrics:theme"); if (t === "light" || t === "dark") { document.documentElement.dataset.theme = t; document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.content = t === "dark" ? "#101a13" : "#f3f6ee"; }); } } catch (e) {}
+</script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="녹황색사회 노트">
@@ -70,6 +74,15 @@ html[lang="ja"] h1 { font-size: clamp(28px, 5vw, 44px); }
 .site-nav a[aria-current="page"] { color: var(--bg); background: var(--ink); }
 .app-btn { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; font-size: 13px; font-weight: 700; color: var(--leaf); text-decoration: none; background: var(--surface); border: 1.5px solid var(--leaf); border-radius: 999px; }
 .app-btn svg { display: block; flex: none; width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+/* 화면 모드 버튼: 가사 노트와 같은 모양. 일반 모드에서는 달, 다크 모드에서는 해 */
+.theme-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; color: var(--muted); background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; cursor: pointer; }
+.theme-btn:hover { color: var(--leaf); border-color: var(--leaf); }
+/* 맨 아래 만든 사람·연락처·번역 안내(가사 노트와 같은 문구) */
+.made-by { margin-top: 32px; font-size: 11px; color: var(--muted); text-align: center; }
+.made-by a { color: inherit; }
+.theme-btn svg { display: block; width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.theme-btn .sun, .theme-btn[aria-pressed="true"] .moon { display: none; }
+.theme-btn[aria-pressed="true"] .sun { display: block; }
 
 /* links */
 .links { display: flex; flex-wrap: wrap; gap: 10px 22px; padding-block: 16px 0; font-size: 13px; }
@@ -257,9 +270,10 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 
 <div class="wrap">
   <div class="app-row">
-    <nav class="site-nav" aria-label="사이트 메뉴"><a href="../index.html" data-t="navLyrics">가사 노트</a><a href="#" aria-current="page" data-t="navCall">콜 가이드</a></nav>
+    <nav class="site-nav" aria-label="사이트 메뉴"><a href="../index.html" data-t="navLyrics">가사 노트</a><a href="../index.html#/quiz" data-t="navQuiz">퀴즈</a><a href="#" aria-current="page" data-t="navCall">콜 가이드</a></nav>
     <div class="app-tools">
       <div class="site-nav lang-switch" role="group" aria-label="언어 / 言語"><button type="button" data-lang="ko">한국어</button><button type="button" data-lang="ja">日本語</button></div>
+      <button type="button" class="theme-btn" id="themeBtn" aria-pressed="false" aria-label="다크 모드"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg></button>
       <a class="app-btn" id="appInstall" href="../index.html#/install"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 20h14"/></svg>앱 설치</a>
     </div>
   </div>
@@ -321,6 +335,7 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 
   <main class="grid" id="grid"></main>
   <p class="empty" id="empty" hidden>찾는 곡이 없어요. 검색어를 바꿔 보세요.</p>
+  <footer class="made-by">made by broco · <a href="mailto:broco05x@gmail.com">broco05x@gmail.com</a> · <span data-t="footNote">의역, 오역 있음</span></footer>
 </div>
 
 <script>
@@ -417,6 +432,8 @@ const L = (ko, ja) => (lang === "ja" ? ja : ko);
 // 고정 문구의 일본어. 키는 HTML의 data-t 값
 const JA_UI = {
   navLyrics: "歌詞ノート",
+  navQuiz: "クイズ",
+  footNote: "意訳・誤訳あり",
   navCall: "コールガイド",
   lOfficial: "公式",
   lFc: "ファンクラブ",
@@ -510,7 +527,26 @@ function applyLang() {
   // 앱 설치 안내 창은 한국어뿐이라 일본어 화면에서는 버튼을 숨김
   const install = document.getElementById("appInstall");
   if (install) install.hidden = lang === "ja";
+  syncTheme();
 }
+
+// 화면 모드(일반/다크): 버튼으로 고르면 ryokulyrics:theme에 저장해 가사 노트와 같이 쓴다. 고른 적이 없으면 기기 설정을 따른다.
+const darkQuery = matchMedia("(prefers-color-scheme: dark)");
+const isDark = () => (document.documentElement.dataset.theme || (darkQuery.matches ? "dark" : "light")) === "dark";
+function syncTheme() {
+  const dark = isDark(), b = document.getElementById("themeBtn");
+  b.setAttribute("aria-pressed", String(dark));
+  b.setAttribute("aria-label", L("다크 모드", "ダークモード"));
+  b.title = dark ? L("일반 모드로 바꾸기", "ライトモードにする") : L("다크 모드로 바꾸기", "ダークモードにする");
+  if (document.documentElement.dataset.theme) document.querySelectorAll('meta[name="theme-color"]').forEach(m => m.content = dark ? "#101a13" : "#f3f6ee");
+}
+document.getElementById("themeBtn").addEventListener("click", () => {
+  const t = isDark() ? "light" : "dark";
+  document.documentElement.dataset.theme = t;
+  try { localStorage.setItem("ryokulyrics:theme", t); } catch (e) {}
+  syncTheme();
+});
+if (darkQuery.addEventListener) darkQuery.addEventListener("change", syncTheme);
 
 const store = {
   get() { try { return JSON.parse(localStorage.getItem("rs-call-done") || "{}"); } catch (e) { return {}; } },
