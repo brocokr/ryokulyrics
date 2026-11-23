@@ -1,7 +1,7 @@
 // Runs in the browser with window.CACHE (Naver results), window.TERMS (quiz word terms), window.ANKI (broco Nihongo ANKI_V),
 // window.LIST (공개 JLPT 단어 목록 "글자|읽기" → 급수), window.JISHO (Jisho 사전 결과), window.MANUAL ([글자, 방법] 손으로 분류한 표).
 // 순서: 네이버 → Anki 덱 → 공개 목록 → Jisho → manual.tsv. 목록에 없어 어림한 급수는 "e3"처럼 앞에 e를 붙인다.
-// Returns { map: {"plain|reading": 1~5 | "b"/"m"/"a" | "e1"~"e5"}, stats, samples, need, jneed, missing, todo }.
+// Returns { map: {"plain|reading": 1~5 | "b"/"m"/"a" | "e1"~"e5" | 0(퀴즈에 내지 않는 말)}, stats, samples, need, jneed, missing, todo }.
 //   need = 네이버에서 더 찾을 말, jneed = Jisho에서 더 찾을 말, missing = manual.tsv에 적은 낱말의 급수를 못 찾은 것, todo = 아직 분류하지 않은 낱말
 (() => {
   const FURI = /\{([^{}|]+)\|([^{}|]+)(?:\|N[1-5])?\}/g;
@@ -97,7 +97,7 @@
   for (const { p, r, key } of late) {
     const spec = manual[p];
     if (!spec) { stats.todo++; todo.push(`${p}|${r}`); continue; }
-    if (spec === "-") { stats.none++; continue; }
+    if (spec === "-") { map[key] = 0; stats.none++; continue; }
     const fixed = /~([1-5])$/.exec(spec), body = spec.slice(1).replace(/~[1-5]$/, "");
     if (spec[0] === "~") { map[key] = "e" + spec[1]; stats.guess++; continue; }
     if (spec[0] === "=") {

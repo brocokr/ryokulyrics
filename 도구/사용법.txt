@@ -38,9 +38,15 @@ check.ps1 -File <작업한 가사 파일> -Backup <작업 전 가사 파일>
 jlpt\update-jlpt.ps1 [-NihongoIndex <broco Nihongo index.html>]
   새 해석·[공부]를 넣은 뒤 돌리면 사이트 맨 위의 jlpt.js(퀴즈 단어의 JLPT 급수표)를 다시 만든다. 사이트를 열어 [공부] 단어(문법 제외)를 모으고 처음 보는 단어만 찾는다.
   순서: 네이버 일본어사전(naver-cache.json) → broco Nihongo Anki 덱(anki-v.json) → 공개 JLPT 단어 목록(jlpt-list.json, open-anki-jlpt-decks) → Jisho 사전(jisho-cache.json) → 손으로 분류한 표(manual.tsv).
-  끝에 '아직 분류하지 않은 단어'가 나오면 manual.tsv 맨 아래에 한 줄씩(글자<TAB>방법) 적고 다시 돌린다. 방법은 =같은 낱말, +이어진 낱말들, ~어림한 급수, -(급수 안 붙임)이고 manual.tsv 맨 위에 설명이 있다.
-  '+'와 '~'로 정한 급수는 화면에 'N3 (추정)'처럼 나온다. 급수 고르는 규칙은 jlpt\resolve.js, jlpt.js 맨 위 설명은 jlpt\jlpt-head.txt. 바뀌었으면 jlpt.js를 GitHub에 올린다.
+  끝에 '아직 분류하지 않은 단어'가 나오면 manual.tsv 맨 아래에 한 줄씩(글자<TAB>방법) 적고 다시 돌린다. 방법은 =같은 낱말, +이어진 낱말들, ~어림한 급수, -(퀴즈에 내지 않음)이고 manual.tsv 맨 위에 설명이 있다.
+  '+'와 '~'로 정한 급수는 jlpt.js에 e3처럼 들어가지만 화면에는 다른 급수와 똑같이 나온다. 급수 고르는 규칙은 jlpt\resolve.js, jlpt.js 맨 위 설명은 jlpt\jlpt-head.txt. 바뀌었으면 jlpt.js를 GitHub에 올린다.
   -NihongoIndex를 주면 Anki 덱(anki-v.json)도 새로 뽑는다. -Root <사이트 폴더>로 작업 복사본에서 먼저 돌려 볼 수 있다.
 test-server.ps1 -Port 8767 -Root <사이트 폴더> -NoBrowser
   사이트를 이 컴퓨터의 웹 주소(http://localhost:8767/)로 연다. 유튜브 재생기처럼 웹 주소에서만 되는 기능을 시험할 때 쓴다. 시험이 끝나면 꺼야 한다.
   headless Chrome 사진은 재생기가 그려지기 전에 찍혀 검게 나올 때가 있다. 그때는 다시 찍어 본다.
+
+시험\ (2026-11-24 임시 폴더에서 옮김, GitHub에 올리지 않음)
+  test-newsong.ps1 -Album full4 -No 7 [-Title 곡 제목]: 실제 폴더를 열어 새 곡 화면의 경고, 퀴즈에 들어갔는지, 콜 가이드를 확인한다. 새 해석·[공부]를 넣은 뒤 이것부터 돌린다.
+  gen-study-index.ps1 -Dir <가사 폴더> -Out <파일>: 모든 [공부] 항목을 한 파일로 뽑는다. 연동(>>)할 원본을 찾을 때 쓴다.
+  나머지(test-seishun, test-empty, test-quiz2, test-rom, test-home6, test-theme, insert-study 등)는 -Work 폴더 안의 작업 복사본(site16·site24 같은 사이트 사본)과 cdp.ps1이 있어야 돌아간다.
+  rq-core.js는 퀴즈 문제를 만드는 코드의 원본(index.html과 broco Nihongo에 같은 것이 들어 있음), quiz-site.js는 퀴즈 화면의 처음 원본이다.

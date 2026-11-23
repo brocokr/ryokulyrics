@@ -107,13 +107,14 @@ try {
   $map = $out['map']
   $lines = New-Object System.Collections.Generic.List[string]
   foreach ($k in $map.Keys) { $v = $map[$k]; $val = if ($v -is [string]) { '"' + $v + '"' } else { "$v" }; $lines.Add('  ' + $js.Serialize([string]$k) + ': ' + $val) }
+  $nLv = @($map.Keys | Where-Object { [string]$map[$_] -ne '0' }).Count
   $head = [IO.File]::ReadAllText("$here\jlpt-head.txt", $u)
   $before = if (Test-Path "$root\jlpt.js") { [IO.File]::ReadAllText("$root\jlpt.js", $u) } else { '' }
   $body = $head + "window.JLPT = {`n" + ($lines -join ",`n") + "`n};`n"
-  if ($body -eq $before) { "jlpt.js는 바뀐 것이 없어요(급수 $($lines.Count)개)." }
-  else { [IO.File]::WriteAllText("$root\jlpt.js", $body, $u); "jlpt.js를 새로 썼어요(급수 $($lines.Count)개). GitHub에 jlpt.js를 올려 주세요." }
+  if ($body -eq $before) { "jlpt.js는 바뀐 것이 없어요(급수 $($nLv)개)." }
+  else { [IO.File]::WriteAllText("$root\jlpt.js", $body, $u); "jlpt.js를 새로 썼어요(급수 $($nLv)개). GitHub에 jlpt.js를 올려 주세요." }
   $st = $out['stats']
-  "네이버 $($st['naverLevel']) · Anki 덱 $($st['ankiOnly']['b'] + $st['ankiOnly']['m'] + $st['ankiOnly']['a']) · 공개 목록 $($st['list']) · Jisho $($st['jisho']) · 같은 낱말의 다른 모양 $($st['same']) · 이어진 표현(추정) $($st['phrase']) · 어림(추정) $($st['guess']) · 급수 안 붙임 $($st['none'])"
+  "네이버 $($st['naverLevel']) · Anki 덱 $($st['ankiOnly']['b'] + $st['ankiOnly']['m'] + $st['ankiOnly']['a']) · 공개 목록 $($st['list']) · Jisho $($st['jisho']) · 같은 낱말의 다른 모양 $($st['same']) · 이어진 표현(추정) $($st['phrase']) · 어림(추정) $($st['guess']) · 퀴즈에서 뺌 $($st['none'])"
   if ($out['missing'].Count) { "manual.tsv에 적은 낱말의 급수를 못 찾은 것 $($out['missing'].Count)개: " + ($out['missing'] -join ' / ') }
   if ($out['todo'].Count) { "아직 분류하지 않은 단어 $($out['todo'].Count)개(manual.tsv에 적어 주세요): " + ($out['todo'] -join ' / ') }
   if ($Dump) {

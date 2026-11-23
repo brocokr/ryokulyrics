@@ -18,7 +18,7 @@ try { var t = localStorage.getItem("ryokulyrics:theme"); if (t === "light" || t 
 <meta name="apple-mobile-web-app-title" content="녹황색사회 노트">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Dela+Gothic+One&family=Gothic+A1:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400..900&family=Noto+Sans+JP:wght@400..900&family=Noto+Sans+KR:wght@400..900&display=swap">
 <style>
 /* Layout: 앨범 카드 격자 → 트랙 목록 → 가사 한 단. 가사 화면은 원문·발음·해석이 한 줄씩 짝을 이룬다 */
 :root {
@@ -34,12 +34,9 @@ try { var t = localStorage.getItem("ryokulyrics:theme"); if (t === "light" || t 
   --warn-bg: #fff3d1;
   --warn-ink: #5c4300;
   --bad: #c0392b;
-  --font-display: "Dela Gothic One", "Hiragino Sans", "Yu Gothic", sans-serif;
-  --font-jp: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-  --font-head: "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --font-body: "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", "Hiragino Sans", sans-serif;
-  --font-mix: "Noto Sans JP", "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  /* 글꼴은 사이트 전체가 Noto Sans 하나. 영문·숫자·로마자 장음(ō, ā)은 Noto Sans, 가나·한자는 JP, 한글은 KR에서 찾는다.
+     순서를 바꾸지 말 것: JP가 앞에 오면 장음 줄이 글자에서 떨어지고, KR이 JP보다 앞에 오면 한자가 한국 글자 모양으로 나온다 */
+  --font: "Noto Sans", "Noto Sans JP", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Hiragino Sans", "Yu Gothic", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -54,7 +51,7 @@ try { var t = localStorage.getItem("ryokulyrics:theme"); if (t === "light" || t 
 * { box-sizing: border-box; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
-  font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+  font-family: var(--font); font-size: 15px; line-height: 1.6;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 0 56px;
@@ -63,38 +60,84 @@ body {
 .narrow { max-width: 760px; margin-inline: auto; }
 a { color: var(--leaf); }
 :focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
-code { font-family: var(--font-mono); font-size: .88em; background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 0 4px; overflow-wrap: anywhere; }
+code { font-family: inherit; font-size: .88em; background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 0 4px; overflow-wrap: anywhere; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 body:not([data-view="home"]) .home-only { display: none; }
 
 /* header */
 .top { padding-block: 36px 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; gap: 28px; }
 .top:not(:has(.hero)) { grid-template-columns: minmax(0, 1fr); }
-.top-text { display: grid; gap: 14px; }
+.top-text { display: grid; gap: 8px; }
 /* 제작자 인스타그램 링크 */
 .maker { display: inline-flex; align-items: center; gap: 8px; padding: 5px 14px 5px 6px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 700; }
 .maker:hover { border-color: var(--leaf); color: var(--leaf); }
 .maker img { display: block; width: 22px; height: 22px; border-radius: 6px; }
 .maker svg { display: block; width: 22px; height: 22px; padding: 2px; flex: none; fill: var(--leaf); }
-/* 콜 가이드로 가는 큰 배너: 첫 화면 소개글 아래. 아이콘 윤곽선이 어두운 화면에서도 보이도록 바탕은 항상 흰색 */
-.call-banner { display: flex; align-items: center; gap: 14px; min-width: 0; padding: 14px 20px 14px 14px; color: var(--bg); text-decoration: none; background: var(--leaf); border-radius: 16px; }
-.call-banner:hover { filter: brightness(1.08); }
-.call-banner img, .call-banner .ban-ic { display: block; flex: none; width: 68px; height: 68px; padding: 10px; background: #fff; border-radius: 14px; }
-/* 퀴즈 배너 그림: 흰 칸에 초록 'あ'와 노란 밑줄(앱 아이콘 '歌'와 같은 모양) */
-.call-banner .ban-ic text { font-family: var(--font-jp); font-size: 30px; font-weight: 900; fill: #1f6b35; }
-.call-banner .ban-ic rect { fill: #f2c247; }
-.call-banner span { display: grid; flex: 1; gap: 2px; min-width: 0; }
-.call-banner b { font-size: 22px; font-weight: 800; line-height: 1.25; }
-.call-banner small { font-size: 13px; line-height: 1.45; word-break: keep-all; }
-.call-banner::after { content: ""; flex: none; width: 11px; height: 11px; border-top: 2.5px solid currentColor; border-right: 2.5px solid currentColor; transform: rotate(45deg); }
-/* 왼쪽 묶음: 제목·설명과 같은 크기의 배너 2개(콜 가이드, 인스타그램) */
+/* 첫 화면 배너: 사진이 카드 전체를 채우고, 짙은 초록 그라데이션이 카드 맨 아래까지 이어진다. 제목과 버튼은 그 위에 놓인다.
+   일반·다크 모드 모두 같은 모양이다. 사진은 이미 있는 파일을 잘라 보여 주고, 파일이 없으면 초록 바탕에 글자만 남는다 */
+.home-banners { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; min-width: 0; }
+.pban {
+  --fade: linear-gradient(to bottom, rgba(14, 28, 18, 0) 0%, rgba(14, 28, 18, .05) 12%, rgba(14, 28, 18, .2) 22%, rgba(14, 28, 18, .45) 32%, rgba(14, 28, 18, .64) 42%, rgba(14, 28, 18, .79) 54%, rgba(14, 28, 18, .91) 70%, rgba(14, 28, 18, .98) 86%, rgb(14, 28, 18) 100%);
+  position: relative; container-type: inline-size; display: flex; flex-direction: column; min-width: 0; overflow: hidden; background: rgb(14, 28, 18); border: 1px solid var(--line); border-radius: 16px;
+}
+.pban.big {
+  --fade: linear-gradient(to bottom, rgba(14, 28, 18, 0) 0%, rgba(14, 28, 18, .04) 16%, rgba(14, 28, 18, .18) 28%, rgba(14, 28, 18, .42) 39%, rgba(14, 28, 18, .64) 50%, rgba(14, 28, 18, .8) 62%, rgba(14, 28, 18, .92) 76%, rgba(14, 28, 18, .98) 89%, rgb(14, 28, 18) 100%);
+  grid-column: 1 / -1;
+}
+.pban:hover { filter: brightness(1.06); }
+.pban-pic { flex: 1; display: flex; align-items: flex-end; min-height: 148px; color: #fff; text-decoration: none; }
+.pban:not(.big) .pban-pic { min-height: max(148px, 54cqi); }
+.pban.big .pban-pic { min-height: 150px; }
+@media (max-width: 760px) { .pban.big .pban-pic { aspect-ratio: 25 / 12; } }
+/* 사진(::before)과 누르는 자리(::after)는 버튼 칸까지 카드 전체를 덮는다 */
+.pban-pic::before, .pban-pic::after { content: ""; position: absolute; inset: 0; }
+.pban-pic::before { background: var(--fade), #1d3a24 50% 0 / cover no-repeat; }
+/* 라이브 사진: 아래 끝을 카드 아래 끝에 맞춰 무대가 제목 위에 보이게 한다 */
+.pic-call::before { background: var(--fade), #1d3a24 url("live.jpg") 25% 100% / max(100cqi, 500px) auto no-repeat; }
+/* 포스터 아래쪽의 공연 안내 글자가 비치지 않게 그 자리만 조금 더 일찍 어두워진다 */
+.pic-quiz::before { --s: max(112cqi, 265px); background: var(--fade), linear-gradient(to bottom, rgba(14, 28, 18, 0) calc(.42 * var(--s)), rgba(14, 28, 18, .6) calc(.53 * var(--s)), rgb(14, 28, 18) calc(.61 * var(--s))), #1d3a24 url("call/poster.jpg") 48% calc(-.285 * var(--s)) / var(--s) auto no-repeat; }
+.pic-ig::before { background: var(--fade), linear-gradient(to bottom, rgba(14, 28, 18, 0) 34cqi, rgba(14, 28, 18, .55) 46cqi, rgb(14, 28, 18) 64cqi), #1d3a24 url("brocoplaylist.jpg") 0 -26cqi / 100cqi auto no-repeat; }
+.pban-pic:focus-visible { outline: none; }
+.pban-pic:focus-visible::after { border: 2px solid #fff; border-radius: 15px; }
+.pban-t { position: relative; flex: 1; min-width: 0; display: grid; gap: 2px; padding: 0 16px 6px; text-shadow: 0 1px 6px rgba(9, 22, 13, .45); }
+.pban-t b { font-size: clamp(13px, 9.4cqi, 18px); font-weight: 800; line-height: 1.3; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.pban-t small { min-height: 2.8em; font-size: 12.5px; line-height: 1.4; color: #dcefd8; word-break: keep-all; }
+.pban.big .pban-t b { font-size: clamp(19px, 5.4vw, 23px); }
+.pban.big .pban-t small { min-height: 0; font-size: 13px; }
+.pban-go { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 16px 16px; pointer-events: none; }
+.pban-go a { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 13.5px; font-weight: 700; line-height: 19px; white-space: nowrap; color: #a8dcb1; text-decoration: none; background: rgba(14, 28, 18, .4); border: 1.5px solid rgba(255, 255, 255, .2); border-radius: 12px; pointer-events: auto; }
+.pban-go a:hover { border-color: #7cc58a; }
+.pban-go .main { color: #101a13; background: #7cc58a; border-color: #7cc58a; }
+.pban-go .main:hover { filter: brightness(1.08); }
+/* 콜 가이드의 박수 그림: 윤곽선이 검은색이라 바탕은 항상 흰색 */
+.pban-t.has-ic { grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; }
+.pban-t.has-ic:not(:has(img)) { grid-template-columns: minmax(0, 1fr); }
+.pban-t img { grid-row: 1 / span 2; align-self: center; display: block; width: 50px; height: 50px; padding: 7px; background: #fff; border-radius: 12px; }
+/* 작은 배너의 버튼은 두 개여도 한 줄에 두고, 자리가 모자라면 앞의 하나만 남긴다(옆 배너와 높이가 같도록) */
+.pban:not(.big) .pban-go { flex-wrap: nowrap; }
+.pban:not(.big) .pban-go:has(.more) a { padding-inline: 3cqi; font-size: 13px; }
+@container (max-width: 222px) { .pban-go .more { display: none; } }
+/* 작은 배너 두 장의 제목 높이가 같도록 설명 칸을 같은 줄 수로 둔다 */
+@container (max-width: 190px) {
+  .pban:not(.big) .pban-pic { min-height: 168px; }
+  .pban-t, .pban-go { padding-inline: 12px; }
+  .pban-t small { min-height: 4.2em; }
+}
+@container (max-width: 150px) {
+  .pban:not(.big) .pban-pic { min-height: 184px; }
+  .pban-t small { min-height: 5.6em; }
+}
+/* 일본어는 띄어쓰기가 없어서 낱말 묶음(문절) 단위로 줄을 바꾼다 */
+.pban-t small:lang(ja), .album-desc:lang(ja), .sheet:lang(ja) :is(h2, p, li, div) { word-break: normal; word-break: auto-phrase; }
+.pban:not(.big) .pban-go:has(.more) a:lang(ja) { font-size: 12.5px; }
+@container (min-width: 191px) and (max-width: 205px) { .pban-t small:lang(ja) { min-height: 4.2em; } }
+/* 왼쪽 묶음: 제목과 배너 3개 */
 .top-left { display: grid; gap: 18px; min-width: 0; }
-.home-banners { display: grid; gap: 8px; min-width: 0; }
 /* 밴드 사진: 원래 비율 그대로. 파일이 없으면 자리째 빠진다 */
 .hero { margin: 0; }
 .hero img { display: block; width: 100%; height: auto; aspect-ratio: 2400 / 1642; object-fit: cover; border-radius: 14px; border: 1px solid var(--line); background: var(--mask); }
 .hero figcaption { margin-top: 8px; display: grid; gap: 6px; }
-.hero .cap { font-size: 12px; color: var(--muted); }
+.hero .cap { font-size: 12px; color: var(--muted); text-spacing-trim: trim-start; }
 /* 멤버 링크: 사진 속 위치와 같은 순서로 4칸(모바일은 2칸씩) */
 .members { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .members a { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 6px 8px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-decoration: none; }
@@ -109,15 +152,20 @@ body:not([data-view="home"]) .home-only { display: none; }
 .official a { flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-decoration: none; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
 .official a:hover { border-color: var(--leaf); color: var(--leaf); }
 .official img, .official svg { display: block; width: 16px; height: 16px; border-radius: 4px; flex: none; }
+/* 좁은 화면: 마지막 줄에 하나만 남지 않도록 한 줄 개수를 고르게 나눈다(760px 이하 4개씩, 520px 이하 3개 이하) */
+@media (max-width: 760px) { .official a { min-width: 22%; } }
+@media (max-width: 520px), (min-width: 761px) and (max-width: 795px) { .official a { min-width: 27%; } }
+@media (min-width: 761px) and (max-width: 960px) { .official a:lang(ja) { min-width: 27%; } }
+@media (max-width: 340px) { .official a { min-width: 44%; } }
 @media (max-width: 760px) {
   .top { grid-template-columns: minmax(0, 1fr); gap: 18px; padding-top: 20px; }
   .hero { order: -1; }
 }
 .kicker { font-size: 12px; letter-spacing: .12em; color: var(--muted); font-weight: 700; }
-h1 { font-family: var(--font-head); font-weight: 400; font-size: clamp(34px, 7vw, 56px); line-height: 1.05; margin: 0; text-wrap: balance; }
+h1 { font-weight: 900; font-size: clamp(34px, 7vw, 56px); line-height: 1.15; letter-spacing: -.03em; margin: 0; text-wrap: balance; }
 /* 첫 화면 제목은 '녹황색사 / 회'처럼 낱말 중간에서 줄이 바뀌지 않게 띄어쓰기에서만 나눈다 */
 .top h1 { word-break: keep-all; }
-h1 .jp { font-family: var(--font-display); display: block; font-size: .42em; letter-spacing: .02em; margin-top: 10px; }
+h1 .jp { display: block; font-size: .42em; letter-spacing: .02em; margin-top: 10px; }
 h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .lede { max-width: 62ch; color: var(--muted); margin: 0; }
 
@@ -142,7 +190,7 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 
 /* album grid */
 .group { margin-top: 32px; }
-.group h2 { font-family: var(--font-head); font-weight: 400; font-size: 26px; line-height: 1.15; margin: 0; }
+.group h2 { font-weight: 800; font-size: 26px; line-height: 1.15; letter-spacing: -.02em; margin: 0; }
 .group .sub { font-size: 13px; color: var(--muted); margin: 4px 0 14px; }
 /* 한 줄 장수는 GROUPS의 cols(정규 3, 서브 4). 모바일은 아래 미디어 쿼리에서 2장씩 */
 .albums { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 14px; }
@@ -161,7 +209,9 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .cover.mini.none { display: none; }
 .album-top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .ord { font-weight: 800; color: var(--leaf); }
-.album-title { font-family: var(--font-display); font-size: 21px; line-height: 1.25; margin-top: 6px; overflow-wrap: anywhere; }
+.album-title { font-weight: 800; font-size: 21px; line-height: 1.25; margin-top: 6px; overflow-wrap: anywhere; }
+/* 일본어 제목은 정해 둔 자리(titleHTML의 <wbr>)에서만 줄을 바꾼다. 한 덩어리가 칸보다 길 때만 글자 중간에서 나뉜다 */
+.album-title, .album-name, .song-title, .tjp, .qs-t, .pager span { word-break: keep-all; overflow-wrap: anywhere; }
 .album-ko { font-size: 13px; color: var(--muted); }
 .album-desc { margin-top: 6px; font-size: 12px; line-height: 1.5; color: var(--muted); word-break: keep-all; text-wrap: balance; }
 /* 작은 카드(그 외의 곡): GROUPS의 small. PC는 cols대로, 좁은 화면은 3장씩 */
@@ -207,7 +257,7 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .year::before { content: ""; position: absolute; left: 5px; top: 10px; bottom: -10px; width: 2px; border-radius: 2px; background: var(--c); opacity: .55; }
 .year:last-child::before { display: none; }
 .year::after { content: ""; position: absolute; left: 0; top: 8px; width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px var(--surface); }
-.year-y { font-family: var(--font-head); font-weight: 400; font-size: 17px; line-height: 28px; font-variant-numeric: tabular-nums; }
+.year-y { font-weight: 800; font-size: 17px; line-height: 28px; font-variant-numeric: tabular-nums; }
 .rels { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
 .rel { display: inline-flex; align-items: center; gap: 7px; max-width: 100%; min-height: 28px; padding: 2px 10px 2px 3px; font-size: 12.5px; line-height: 1.4; color: var(--ink); text-decoration: none; background: var(--bg); border: 1px solid var(--line); border-radius: 9px; }
 .rel:hover { border-color: var(--c); }
@@ -215,20 +265,20 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .cover.thumb.none { display: none; }
 .rel:has(.cover.none) { padding-left: 10px; }
 .rel-tag { flex: none; font-size: 11.5px; font-weight: 800; white-space: nowrap; color: var(--ct); }
-.rel-title { min-width: 0; font-family: var(--font-mix); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rel-title { min-width: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* album page */
 .back { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; font-size: 14px; font-weight: 700; text-decoration: none; }
 .back:hover { text-decoration: underline; }
 .album-head { display: grid; grid-template-columns: 168px minmax(0, 1fr); align-items: end; column-gap: 20px; padding-block: 14px 4px; }
-.album-name { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 6vw, 44px); line-height: 1.15; margin: 8px 0 2px; overflow-wrap: anywhere; }
+.album-name { font-weight: 900; font-size: clamp(28px, 6vw, 44px); line-height: 1.15; margin: 8px 0 2px; overflow-wrap: anywhere; }
 .tracks { list-style: none; margin: 18px 0 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
 .tracks li + li { border-top: 1px dashed var(--line); }
 .track { display: grid; grid-template-columns: 2em minmax(0, 1fr) auto; gap: 0 10px; align-items: center; padding: 12px 16px; text-decoration: none; color: inherit; }
 .track:hover { background: var(--bg); }
 .tno { font-size: 13px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
-.tjp { font-family: var(--font-jp); font-weight: 700; font-size: 16px; overflow-wrap: anywhere; }
-.tread { font-family: var(--font-jp); font-size: 12px; color: var(--muted); margin-left: 4px; }
+.tjp { font-weight: 700; font-size: 16px; overflow-wrap: anywhere; }
+.tread { font-size: 12px; color: var(--muted); margin-left: 4px; }
 .tko { font-size: 12px; color: var(--muted); margin-left: 8px; }
 .tnote { display: block; font-size: 12px; color: var(--muted); }
 .badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
@@ -238,8 +288,8 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 
 /* song page */
 .song-head { padding-block: 14px 0; }
-.song-title { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 6vw, 42px); line-height: 1.2; margin: 8px 0 2px; overflow-wrap: anywhere; }
-.song-title .read { font-family: var(--font-jp); font-size: .42em; color: var(--muted); margin-left: 8px; }
+.song-title { font-weight: 900; font-size: clamp(28px, 6vw, 42px); line-height: 1.2; margin: 8px 0 2px; overflow-wrap: anywhere; }
+.song-title .read { font-weight: 500; font-size: .42em; color: var(--muted); margin-left: 8px; }
 .song-ko { color: var(--muted); }
 /* 곡 화면 제목 아래 작사·작곡. 한 사람(또는 같은 사람들)이 둘 다 했으면 '작사·작곡' 한 칸으로 줄인다 */
 .song-credit { display: flex; flex-wrap: wrap; gap: 2px 14px; margin-top: 6px; font-size: 13px; line-height: 1.5; }
@@ -280,9 +330,8 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .ln { font-size: 11px; font-weight: 700; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; user-select: none; }
 .row-body { min-width: 0; }
 .jp, .pr, .hg, .ko { width: fit-content; max-width: 100%; overflow-wrap: anywhere; }
-.jp { font-family: var(--font-jp); font-size: 19px; font-weight: 500; line-height: 1.9; }
-/* 발음: 로마자 장음(ō, ā)이 한 글자로 들어 있는 시스템 글꼴을 먼저 쓰고, 한글 발음은 Gothic A1로 넘어간다 */
-.pr { font-family: "Segoe UI", "Helvetica Neue", Arial, "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.jp { font-size: 19px; font-weight: 500; line-height: 1.9; }
+.pr { font-size: 13px; color: var(--muted); line-height: 1.5; }
 .hg { font-size: 13.5px; color: var(--muted); line-height: 1.5; }
 .ko { font-size: 15px; color: var(--leaf); line-height: 1.6; margin-top: 1px; }
 rt { font-size: .5em; font-weight: 400; color: var(--muted); }
@@ -316,10 +365,9 @@ rt { font-size: .5em; font-weight: 400; color: var(--muted); }
 .row:not(.open) .study { display: none; }
 .study { margin: 8px 0 4px; padding: 8px 12px; display: grid; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--yolk); border-radius: 4px 10px 10px 4px; }
 .item { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; font-size: 14px; line-height: 1.7; }
-.term { font-family: var(--font-jp); font-weight: 700; font-size: 15px; line-height: 2; }
+.term { font-weight: 700; font-size: 15px; line-height: 2; }
 .mean { color: var(--muted); }
 .tag { align-self: center; font-size: 10px; font-weight: 800; line-height: 1.5; color: var(--leaf); border: 1.5px solid var(--leaf); border-radius: 5px; padding: 0 5px; }
-.study { font-family: var(--font-mix); }
 
 /* 자세한 설명이 있는 단어: 누르면 아래로 펼쳐진다 */
 .item-d > summary { list-style: none; cursor: pointer; }
@@ -357,7 +405,7 @@ rt { font-size: .5em; font-weight: 400; color: var(--muted); }
 .pager a:hover { border-color: var(--leaf); }
 .pager .next { grid-column: 2; text-align: right; }
 .pager small { font-size: 12px; color: var(--muted); }
-.pager span { font-family: var(--font-jp); font-weight: 700; overflow-wrap: anywhere; }
+.pager span { font-weight: 700; overflow-wrap: anywhere; }
 
 /* search results */
 .count, .none { margin: 18px 0 0; font-size: 13px; color: var(--muted); }
@@ -365,12 +413,12 @@ rt { font-size: .5em; font-weight: 400; color: var(--muted); }
 .results a { display: block; text-decoration: none; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
 .results a:hover { border-color: var(--leaf); }
 .where { display: block; font-size: 12px; color: var(--muted); }
-.snip { display: block; margin-top: 4px; font-family: var(--font-jp); font-size: 14px; }
+.snip { display: block; margin-top: 4px; font-size: 14px; }
 mark { background: var(--yolk); color: var(--on-yolk); border-radius: 3px; padding: 0 2px; }
 
 /* 가사 퀴즈(#/quiz): 곡·JLPT 급수 목록 → 문제 카드 → 결과. [공부]가 있는 곡으로 단어·문법·읽기 문제를 낸다 */
 .quiz-head { padding-block: 18px 2px; }
-.quiz-head h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 6vw, 40px); line-height: 1.2; margin: 0 0 8px; }
+.quiz-head h1 { font-size: clamp(28px, 6vw, 40px); line-height: 1.2; margin: 0 0 8px; }
 .quiz-head .lede { max-width: 62ch; margin: 0; color: var(--muted); }
 .quiz-set { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 16px; }
 .qs-label { font-size: 12px; font-weight: 800; color: var(--muted); }
@@ -382,9 +430,14 @@ mark { background: var(--yolk); color: var(--on-yolk); border-radius: 3px; paddi
 .quiz-songs { display: grid; margin-top: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 8px; }
 .quiz-song { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; padding: 10px 14px; color: var(--ink); text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
 .quiz-song:hover { border-color: var(--leaf); }
-/* JLPT 급수별: 급수 카드 6칸(N5~N1, 급수 없음). 폭과 상관없이 한 줄에 3칸 */
-.quiz-note { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
-.quiz-lvs { display: grid; margin-top: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+/* JLPT 급수별: 급수 카드 5칸(N5~N1). 넓으면 한 줄에 5칸, 좁으면 위 3칸·아래 2칸으로 줄을 꽉 채운다 */
+.quiz-note { margin: 4px 0 0; font-size: 13px; word-break: keep-all; color: var(--muted); }
+.quiz-lvs { display: grid; margin-top: 12px; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 620px) {
+  .quiz-lvs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .quiz-lv { grid-column: span 2; }
+  .quiz-lv:nth-child(n + 4) { grid-column: span 3; }
+}
 .quiz-lv { display: grid; align-content: start; justify-items: start; gap: 2px; padding: 10px 14px; color: var(--ink); text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
 .quiz-lv:hover { border-color: var(--leaf); }
 .quiz-lv b { font-size: clamp(15px, 4.6vw, 20px); line-height: 1.35; white-space: nowrap; color: var(--leaf); }
@@ -392,7 +445,7 @@ mark { background: var(--yolk); color: var(--on-yolk); border-radius: 3px; paddi
 .quiz-lv .lv-n { display: flex; flex-wrap: wrap; gap: 0 8px; }
 .quiz-lv .lv-best { margin-top: 4px; padding: 1px 9px; font-weight: 800; white-space: nowrap; color: var(--on-yolk); background: var(--yolk); border-radius: 999px; }
 .qs-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; min-width: 0; }
-.qs-t { font-family: var(--font-mix); font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
+.qs-t { font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
 .qs-ko { font-size: 13px; color: var(--muted); }
 .qs-meta { grid-column: 1; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .qs-best { grid-column: 2; grid-row: 1 / span 2; padding: 2px 10px; font-size: 12px; font-weight: 800; white-space: nowrap; color: var(--on-yolk); background: var(--yolk); border-radius: 999px; font-variant-numeric: tabular-nums; }
@@ -404,13 +457,22 @@ mark { background: var(--yolk); color: var(--on-yolk); border-radius: 3px; paddi
 .quiz-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .qz-lv { flex: none; padding: 1px 9px; font-size: 11.5px; font-weight: 800; white-space: nowrap; color: var(--leaf); border: 1.5px solid var(--leaf); border-radius: 999px; }
 .quiz-q { display: grid; gap: 6px; margin: 0; }
-.qz-term { font-family: var(--font-mix); font-size: clamp(24px, 6vw, 32px); font-weight: 800; line-height: 1.6; }
+/* N5·N4 급수 퀴즈의 영어 발음(로마자): 처음에는 숨기고, 켜면(.rom-on) 낱말과 읽기 보기 아래에 나온다 */
+.quiz-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 22px; }
+.quiz-bar .back { margin-top: 0; }
+.quiz-rom { padding: 5px 12px; font: inherit; font-size: 12.5px; font-weight: 700; color: var(--muted); background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; cursor: pointer; }
+.quiz-rom:hover { border-color: var(--leaf); }
+.quiz-rom[aria-pressed="true"] { color: var(--leaf); border-color: var(--leaf); }
+.qz-rom { display: none; font-size: 13px; font-weight: 500; line-height: 1.4; letter-spacing: .02em; color: var(--muted); }
+.rom-on .qz-rom { display: block; }
+.quiz-opt .qz-rom { padding-left: 18px; font-size: 12.5px; }
+.qz-term { font-size: clamp(24px, 6vw, 32px); font-weight: 800; line-height: 1.6; }
 .qz-ask, .qz-hint { font-size: 13px; color: var(--muted); }
 .quiz-q rt, .qz-src rt, .qz-m rt { font-size: .5em; }
 .quiz-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .quiz-opts.col { grid-template-columns: minmax(0, 1fr); }
 .quiz-opt { padding: 12px 14px; font: inherit; font-size: 15px; line-height: 1.5; text-align: left; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 12px; cursor: pointer; }
-.quiz-opt[lang="ja"] { font-family: var(--font-mix); font-size: 17px; }
+.quiz-opt[lang="ja"] { font-size: 17px; }
 .quiz-opt:hover:not(:disabled) { border-color: var(--leaf); }
 .quiz-opt:disabled { cursor: default; }
 .quiz-opt.ok { border-color: var(--leaf); background: color-mix(in srgb, var(--leaf) 14%, var(--surface)); }
@@ -422,19 +484,17 @@ mark { background: var(--yolk); color: var(--on-yolk); border-radius: 3px; paddi
 .qz-res.ok { color: var(--leaf); }
 .qz-res.no { color: var(--bad); }
 .qz-ans { margin: 0; font-size: 14px; line-height: 2; }
-.qz-ans [lang="ja"] { font-family: var(--font-mix); }
 .qz-src { display: grid; gap: 2px; padding: 10px 12px; font-size: 14px; color: var(--ink); text-decoration: none; background: var(--bg); border-radius: 10px; }
-.qz-src [lang="ja"] { font-family: var(--font-mix); font-size: 15px; line-height: 1.8; }
+.qz-src [lang="ja"] { font-size: 15px; line-height: 1.8; }
 .qz-src small { font-size: 12px; font-weight: 700; color: var(--leaf); }
 .quiz-card .quiz-go[hidden] { display: none; }
 .quiz-card > .quiz-go { justify-self: end; }
-.qz-score { margin: 0; font-family: var(--font-display); font-size: 44px; line-height: 1.1; }
+.qz-score { margin: 0; font-weight: 900; font-size: 44px; line-height: 1.1; }
 .qz-sub { margin: 0; font-size: 14px; color: var(--muted); }
 .qz-miss { display: grid; gap: 8px; }
 .qz-miss h2 { margin: 6px 0 0; font-size: 15px; }
 .qz-m { display: grid; gap: 4px; padding: 10px 12px; background: var(--bg); border-radius: 10px; }
 .qz-m p { margin: 0; line-height: 2; }
-.qz-m [lang="ja"] { font-family: var(--font-mix); }
 .song-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .song-links .call-link { margin-top: 0; }
 @media (max-width: 420px) { .quiz-opts { grid-template-columns: minmax(0, 1fr); } }
@@ -461,15 +521,18 @@ body:not([data-view="home"]) .made-by { text-align: center; }
 .lang-switch button { padding: 4px 12px; font: inherit; font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--muted); background: none; border: 0; border-radius: 999px; cursor: pointer; }
 .lang-switch button:hover { color: var(--leaf); }
 .lang-switch button[aria-pressed="true"] { color: var(--bg); background: var(--ink); }
-h1.ja { font-family: var(--font-display); font-size: clamp(28px, 5vw, 44px); }
-.lede:lang(ja) { font-family: var(--font-jp); }
+h1.ja { font-size: clamp(28px, 5vw, 44px); }
 .app-row + .top { padding-top: 12px; }
-/* 넓은 화면: 왼쪽 묶음(제목·배너 3개)을 아래쪽에 모아서, 배너는 공식 링크 아랫선에 맞추고 제목은 배너 바로 위에 둔다 */
+/* 넓은 화면: 왼쪽 묶음은 오른쪽(사진·멤버·공식 링크)과 윗선·아랫선을 맞춘다. 제목은 한 줄로 배너 바로 위에 두고, 큰 배너의 사진이 남는 높이를 채운다.
+   폭이 좁아 왼쪽이 더 길어지면 오른쪽 사진이 그만큼 길어진다 */
 @media (min-width: 761px) {
-  .top:has(.hero) { grid-template-rows: auto 1fr; row-gap: 8px; }
-  .top:has(.hero) .top-left { grid-column: 1; grid-row: 1 / span 2; align-self: end; gap: 28px; }
+  .top:has(.hero) { grid-template-rows: 1fr auto; row-gap: 8px; }
+  .top:has(.hero) .top-left { grid-column: 1; grid-row: 1 / span 2; align-self: stretch; grid-template-rows: auto 1fr; gap: 20px; }
+  .top:has(.hero) .home-banners { grid-template-rows: 1fr auto; }
+  .top:has(.hero) h1 { font-size: min(56px, 5.5vw - 3px); }
+  .top:has(.hero) h1.ja { font-size: min(44px, 4.6vw - 3px); }
   .hero { display: contents; }
-  .hero img { grid-column: 2; grid-row: 1; align-self: start; }
+  .hero img { grid-column: 2; grid-row: 1; align-self: stretch; }
   .hero figcaption { grid-column: 2; grid-row: 2; align-self: start; margin-top: 0; }
 }
 .app-btn { display: inline-flex; align-items: center; gap: 6px; border-color: var(--leaf); color: var(--leaf); }
@@ -621,10 +684,10 @@ const ALBUMS = /*ALBUMS*/[
 ]/*END*/;
 
 const GROUPS = [
-  { id: "full", name: "정규 앨범", sub: "정규 1집부터 6집까지", cols: 3 },
-  { id: "sub", name: "서브 앨범", sub: "미니 앨범 1~3집과 EP", cols: 4 },
-  { id: "single", name: "싱글", sub: "싱글 1~11집 · 통상판 수록곡", cols: 4 },
-  { id: "etc", name: "그 외의 곡", sub: "위 앨범과 싱글의 통상판에 없는 곡", cols: 5, small: true },
+  { id: "full", name: "정규 앨범", sub: "정규 1집부터 6집까지", nameJa: "アルバム", subJa: "1stから6thまで", cols: 3 },
+  { id: "sub", name: "서브 앨범", sub: "미니 앨범 1~3집과 EP", nameJa: "ミニアルバム・EP", subJa: "ミニアルバム1st〜3rdとEP", cols: 4 },
+  { id: "single", name: "싱글", sub: "싱글 1~11집 · 통상판 수록곡", nameJa: "シングル", subJa: "1st〜11th · 通常盤の収録曲", cols: 4 },
+  { id: "etc", name: "그 외의 곡", sub: "위 앨범과 싱글의 통상판에 없는 곡", nameJa: "その他の曲", subJa: "上のアルバムとシングルの通常盤に入っていない曲", cols: 5, small: true },
 ];
 
 // 제목의 로마자. 앨범 제목과 곡 제목이 같이 쓴다. 영어로 된 제목은 적지 않는다.
@@ -940,6 +1003,8 @@ const RQ = (() => {
   const hash = s => { let h = 2166136261; for (const ch of s) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36); };
   // JLPT 급수표(jlpt.js)의 열쇠: "후리가나를 뺀 글자|읽기"
   const lvKey = term => `${plain(term)}|${reading(term)}`;
+  // 퀴즈에 쓰는 [공부] 항목: 낱말과 뜻이 있는 것. 급수표에 0으로 적힌 말(영어, 노랫말 소리, 이름, 지어낸 말)은 문제로 내지 않는다.
+  const usable = (it, levels) => it.term && it.mean && (it.gram || levels[lvKey(it.term)] !== 0);
   const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
   // 오답 후보: t = 보기 글, k = 그 글이 풀이하는 낱말이나 가사 줄. 같은 낱말·같은 줄의 다른 풀이는 정답과 뜻이 같을 수 있어서 오답으로 쓰지 않는다.
@@ -1013,7 +1078,7 @@ const RQ = (() => {
 
   // 모든 곡에서 모은 오답 후보: 한 곡 안에서 오답이 모자랄 때 쓴다
   function pool(songs, levels) {
-    const items = songs.flatMap(s => s.items.filter(it => it.term && it.mean)), rd = items.filter(it => readable(it.term)), frames = {};
+    const items = songs.flatMap(s => s.items.filter(it => usable(it, levels || {}))), rd = items.filter(it => readable(it.term)), frames = {};
     for (const it of rd) (frames[frame(segs(it.term))] ||= []).push(entry(reading(it.term), it.term));
     for (const k in frames) frames[k] = lenIndex(frames[k]);
     return {
@@ -1030,7 +1095,7 @@ const RQ = (() => {
     // 열쇠 글자: 단어와 문법은 w, 읽기는 r (문법을 따로 나누기 전에 모인 틀린 문제도 이어지게 문법도 w를 쓴다)
     const add = (kind, id, q) => { const key = `${song.id}:${kind === "read" ? "r" : "w"}${hash(id)}`; if (done.has(key)) return; done.add(key); qs.push({ key, kind, song, ...q }); };
     const lineOf = i => song.lines[i] || null;
-    const items = song.items.filter(it => it.term && it.mean);
+    const items = song.items.filter(it => usable(it, all.levels));
     // 1. 단어·문법 뜻 고르기: [공부]의 '낱말 - 뜻'. 오답은 같은 곡의 낱말(문법이면 문법) 뜻에서 먼저 고른다.
     const kin = { true: lenIndex(items.filter(it => it.gram).map(it => entry(it.mean, it.term))), false: lenIndex(items.filter(it => !it.gram).map(it => entry(it.mean, it.term))) };
     for (const it of items) {
@@ -1064,7 +1129,7 @@ const RQ = (() => {
     return shuffle(out);
   }
 
-  // JLPT 급수별로 나누기: n = 5~1은 그 급수의 단어·읽기 문제, 0은 급수를 모르는 낱말. 문법은 급수가 없어서 넣지 않는다.
+  // JLPT 급수별로 나누기: n = 5~1, 그 급수의 단어·읽기 문제. 문법은 급수가 없어서 넣지 않는다.
   // 급수가 없어 Anki 덱 단계로 짐작한 b·m·a는 걸치는 급수에 모두, 어림한 e5~e1은 그 급수에 넣는다. 같은 낱말이 여러 곡에 나오면 그중 한 곡의 것만 낸다.
   const BAND = { b: [5], m: [4, 3], a: [2, 1], e5: [5], e4: [4], e3: [3], e2: [2], e1: [1] };
   const levelsOf = lv => BAND[lv] || (lv ? [lv] : []);
@@ -1072,14 +1137,78 @@ const RQ = (() => {
     const seen = new Set();
     return shuffle(qs).filter(q => {
       if (q.kind === "gram") return false;
-      const ls = levelsOf(q.lv), k = `${q.kind}|${lvKey(q.term)}`;
-      if ((n ? !ls.includes(n) : ls.length) || seen.has(k)) return false;
+      const k = `${q.kind}|${lvKey(q.term)}`;
+      if (!levelsOf(q.lv).includes(n) || seen.has(k)) return false;
       seen.add(k);
       return true;
     });
   }
 
-  return { plain, reading, lvKey, readable, misreads, readWrong, pool, bank, pick, byLevel, shuffle, hash };
+  // 읽기 문제의 보기(가나)를 그 낱말의 {한자|읽기} 모양으로 되돌린다(로마자를 조사·送り仮名에 맞게 붙이려고). 붙어 있는 한자 칸은 하나로 본다.
+  function markRead(term, kana) {
+    const ss = [];
+    for (const s of segs(term)) { const p = ss[ss.length - 1]; if (s.kana == null && p && p.kana == null) p.kanji += s.kanji; else ss.push({ ...s }); }
+    const m = new RegExp("^" + ss.map(s => s.kana == null ? "(.+?)" : s.kana.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("") + "$").exec(kana);
+    if (!m) return kana;
+    let i = 0;
+    return ss.map(s => s.kana == null ? `{${s.kanji}|${m[++i]}}` : s.kana).join("");
+  }
+
+  // 영어 발음(로마자): [공부] 낱말 하나를 헵번식으로 바꾼다. 긴 소리는 ou, uu처럼 소리 나는 글자로 풀어 쓰고, 조사 앞뒤는 띄운다(雨が降る → ame ga furu).
+  const ROMA = { あ: "a", い: "i", う: "u", え: "e", お: "o", か: "ka", き: "ki", く: "ku", け: "ke", こ: "ko", さ: "sa", し: "shi", す: "su", せ: "se", そ: "so", た: "ta", ち: "chi", つ: "tsu", て: "te", と: "to", な: "na", に: "ni", ぬ: "nu", ね: "ne", の: "no", は: "ha", ひ: "hi", ふ: "fu", へ: "he", ほ: "ho", ま: "ma", み: "mi", む: "mu", め: "me", も: "mo", や: "ya", ゆ: "yu", よ: "yo", ら: "ra", り: "ri", る: "ru", れ: "re", ろ: "ro", わ: "wa", を: "o", が: "ga", ぎ: "gi", ぐ: "gu", げ: "ge", ご: "go", ざ: "za", じ: "ji", ず: "zu", ぜ: "ze", ぞ: "zo", だ: "da", ぢ: "ji", づ: "zu", で: "de", ど: "do", ば: "ba", び: "bi", ぶ: "bu", べ: "be", ぼ: "bo", ぱ: "pa", ぴ: "pi", ぷ: "pu", ぺ: "pe", ぽ: "po", ゔ: "vu", ぁ: "a", ぃ: "i", ぅ: "u", ぇ: "e", ぉ: "o" };
+  const hira = s => s.replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+  function kanaRom(s) {
+    s = hira(s);
+    let out = "";
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i], n = s[i + 1] || "", r = ROMA[c];
+      if (c === "ー") { const m = /[aeiou](?=[^aeiou]*$)/.exec(out); out += m ? m[0] : ""; }
+      else if (c === "っ") { const x = kanaRom(s.slice(i + 1, i + 3)); out += x.startsWith("ch") ? "t" : /^[^aeiou]/.test(x) ? x[0] : ""; }
+      else if (c === "ん") out += "n" + (/^[aeiouy]/.test(n && kanaRom(n)) ? "'" : "");
+      else if (r === undefined) out += c === "？" ? "?" : c === "！" ? "!" : c;
+      else if (n && "ゃゅょ".includes(n)) { const y = { ゃ: "a", ゅ: "u", ょ: "o" }[n]; out += /^(sh|ch|j)/.test(r) ? r.slice(0, -1) + y : r.slice(0, -1) + "y" + y; i++; }
+      else if (n && "ぁぃぅぇぉ".includes(n) && r.length > 1 && !r.endsWith(ROMA[n])) { out += r.slice(0, -1) + ROMA[n]; i++; }
+      else out += r;
+    }
+    return out;
+  }
+  // 낱말로만 봐서는 어디서 끊는지 알 수 없는 말(가나로만 적은 표현, は·へ가 조사인 말). 왼쪽은 후리가나를 뺀 글자.
+  const ROM_FIX = { いいよね: "ii yo ne", いいさ: "ii sa", あのね: "ano ne", だね: "da ne", だよ: "da yo", よね: "yo ne", またね: "mata ne", ごめんね: "gomen ne", でもね: "demo ne", ほらね: "hora ne", ここはもう: "koko wa mou", ここから: "koko kara", ここまで: "koko made", これから: "kore kara", これまで: "kore made", これが: "kore ga", それが: "sore ga", それも: "sore mo", それでいい: "sore de ii", それだけ: "sore dake", それだけで: "sore dake de", それだけでいい: "sore dake de ii", それだけなの: "sore dake na no", それだけのこと: "sore dake no koto", それって: "sore tte", それもいいね: "sore mo ii ne", そうです: "sou desu", そうだ: "sou da", そんなの: "sonna no", そんなはずない: "sonna hazu nai", そんなふうに: "sonna fuu ni", こんなの: "konna no", このまま: "kono mama", すぐそこ: "sugu soko", どうかな: "dou kana", どうしたの: "doushita no", どうしてかな: "doushite kana", どうだろう: "dou darou", どうやったか: "dou yatta ka", どうでもいい: "dou demo ii", どうしようもない: "dou shiyou mo nai", どこへ: "doko e", どこまで: "doko made", どこまでも: "doko made mo", どちらも: "dochira mo", どれも: "dore mo", そのどちらも: "sono dochira mo", いつから: "itsu kara", いつかは: "itsuka wa", たまには: "tama ni wa", なんでもいい: "nandemo ii", もうない: "mou nai", もんね: "mon ne", あなたがいれば: "anata ga ireba", あれもこれも: "are mo kore mo", ひとつだけ: "hitotsu dake", ひとつずつ: "hitotsu zutsu", ひとりで: "hitori de", ほんとの: "honto no", みんなで: "minna de", じゃないの: "ja nai no", 私のもの: "watashi no mono", その代わりに: "sono kawari ni" };
+  const PART = { は: "わ", へ: "え", を: "お", には: "に わ", では: "で わ", とは: "と わ", にも: "に も" };
+  function spaced(term) {
+    const ss = segs(term), kj = s => !!s && s.kana == null;
+    let out = "";
+    ss.forEach((s, i) => {
+      if (kj(s)) { out += s.read; return; }
+      const prev = kj(ss[i - 1]), next = kj(ss[i + 1]);
+      let k = hira(s.kana).replace(/くはない/g, "く わ ない").replace(/ではない/g, "で わ ない");
+      const m = prev && /^(ら|たち)?(から|まで|だけ|でも|なら|ならば|すぐ|こそ|さえ|より|には|では|とは|にも|が|を|に|は|も|の|と|で|へ|な)$/.exec(k);
+      if (m && !(m[2] === "な" && !next)) k = `${m[1] || ""} ${PART[m[2]] || m[2]}${next ? " " : ""}`;
+      else if (prev) {
+        k = k.replace(/^(ら|たち|つ)(が|を|に|は|も|の|と|で)$/, (x, a, b) => `${a} ${PART[b] || b}`)
+          .replace(/^を(?=.)/, " お ")
+          .replace(/^(が|に|は|も|の|と)(?=(する|した|して|しな|され|させ|なる|なっ|なれ|なら|ない|ある|いる|いれ|いい|かか|でる|でき|わか|つく|くる|いう))/, (x, a) => ` ${PART[a] || a} `)
+          .replace(/^(しか)(ない|できない)$/, " $1 $2").replace(/^じゃない/, " じゃ ない")
+          .replace(/く(なる|なって|なった|させる|する)$/, "く $1")
+          .replace(/([うくぐすつぬぶむるいた])かな$/, "$1 かな").replace(/([うくぐすつぬぶむるいたて])([ねよ])$/, "$1 $2").replace(/(.)(だけ|ずつ)$/, "$1 $2").replace(/([うくぐすつぬぶむる])まま$/, "$1 まま");
+        if (next) k = k.replace(/^([^\s]{1,3})([にをがはも])$/, (x, a, b) => `${a} ${PART[b] || b} `);
+        if (next && !k.endsWith(" ") && /(しい|たい|ない|きい|るい|ろい|な|た|たり|だり|[うくぐすつぬぶむる])$/.test(k)) k += " ";
+      }
+      else if (next && /^(この|その|あの|どの|もう|あと|そう|こう|どう|まだ|また|ただ|これ|それ|あれ|ずっと|とても|おもちゃ|ガラス|がらす|こんな|そんな|どんな)$/.test(k)) k += " ";
+      out += k;
+    });
+    return out;
+  }
+  function romaji(term) {
+    const p = plain(term);
+    if (ROM_FIX[p]) return ROM_FIX[p];
+    if (/～/.test(term)) return term.split("～").map(x => romaji(x)).join(" ~ ").trim();
+    if (/・/.test(term)) return term.split("・").map(x => romaji(x)).join(" / ");
+    if (segs(term).some(s => s.kana != null && KANJI.test(s.kana))) return "";
+    return spaced(term.replace(/[(（]を[)）]/g, "を")).split(/\s+/).filter(Boolean).map(kanaRom).join(" ");
+  }
+
+  return { plain, reading, lvKey, readable, misreads, readWrong, pool, bank, pick, byLevel, markRead, romaji, shuffle, hash };
 })();
 
 // 퀴즈에 쓰는 곡: [공부]가 있는 곡. 같은 곡이 두 앨범에 실렸으면 앞 앨범 것 하나만 쓴다.
@@ -1113,11 +1242,14 @@ if (qrec.v !== 2) { if (Array.isArray(qrec.kinds) && qrec.kinds.includes("word")
 qrec.kinds = Object.keys(QKIND).filter(k => Array.isArray(qrec.kinds) && qrec.kinds.includes(k));
 if (!qrec.kinds.length) qrec.kinds = Object.keys(QKIND);
 const saveQuiz = () => store.set("ryokushaka-lyrics:quiz", qrec);
-// JLPT 급수별(#/quiz/n5 … n1, n0 = 급수를 모르는 낱말). 급수표(jlpt.js)를 못 읽었으면 급수 칸을 보여 주지 않는다.
-const QLEVELS = [5, 4, 3, 2, 1, 0];
-const qlvName = n => n ? `JLPT N${n}` : "급수 없음";
+// JLPT 급수별(#/quiz/n5 … n1). 급수표(jlpt.js)를 못 읽었으면 급수 칸을 보여 주지 않는다.
+const QLEVELS = [5, 4, 3, 2, 1];
 const levelBank = n => RQ.byLevel(quizData().songs.flatMap(s => s.bank), n);
 let qrun = null;
+// 영어 발음(로마자)은 N5·N4 급수 퀴즈에서만. qrec.rom = 켰는지(처음에는 꺼짐). 켜고 끌 때 화면을 다시 그리지 않게 늘 넣어 두고 CSS로 숨긴다.
+const ROM_LEVELS = [5, 4];
+const romHTML = x => qrun && qrun.rom && x ? `<span class="qz-rom" lang="ja-Latn">${esc(x)}</span>` : "";
+const romBtnHTML = () => `<button type="button" class="quiz-rom" data-qrom aria-pressed="${!!qrec.rom}">영어 발음 ${qrec.rom ? "끄기" : "켜기"}</button>`;
 
 function renderQuizHome(msg) {
   const Q = quizData();
@@ -1142,15 +1274,15 @@ function renderQuizHome(msg) {
         <a class="quiz-go" href="#/quiz/all">전체 곡에서 섞어 풀기</a>
         ${nWrong ? `<a class="quiz-go ghost" href="#/quiz/wrong">틀린 문제 다시 풀기 · ${nWrong}</a>` : ""}
       </div>
-      ${levels.length ? `<section class="group"><h2>JLPT 급수별</h2><p class="quiz-note">모든 곡의 단어를 급수로 나눴어요. 문법은 급수가 없어서 단어와 읽기 문제만 나와요. '추정'은 사전과 JLPT 단어 목록에 급수가 없어서 어림한 것이에요.</p><div class="quiz-lvs">${levels.map(({ n, bank }) => {
+      ${levels.length ? `<section class="group"><h2>JLPT 급수별</h2><p class="quiz-note">모든 곡의 단어를 급수로 나눴어요. 문법은 급수가 없어서 단어와 읽기 문제만 나와요. N5와 N4에서는 영어 발음을 켜고 끌 수 있어요.</p><div class="quiz-lvs">${levels.map(({ n, bank }) => {
         const b = qrec.best["n" + n], c = k => bank.filter(q => q.kind === k).length;
-        return `<a class="quiz-lv" href="#/quiz/n${n}"><b>${n ? "N" + n : "급수 없음"}</b><span class="lv-n"><span>단어 ${c("word")}</span><span>읽기 ${c("read")}</span></span>${b ? `<span class="lv-best">최고 ${b.score}/${b.n}</span>` : ""}</a>`;
+        return `<a class="quiz-lv" href="#/quiz/n${n}"><b>N${n}</b><span class="lv-n"><span>단어 ${c("word")}</span><span>읽기 ${c("read")}</span></span>${b ? `<span class="lv-best">최고 ${b.score}/${b.n}</span>` : ""}</a>`;
       }).join("")}</div></section>` : ""}
       ${GROUPS.map(g => {
         const list = Q.songs.filter(s => s.t.album.group === g.id);
         return list.length ? `<section class="group"><h2>${g.name}</h2><div class="quiz-songs">${list.map(s => {
           const b = qrec.best[s.id];
-          return `<a class="quiz-song" href="#/quiz/${s.t.album.key}/${s.t.no}"><span class="qs-main"><span class="qs-t" lang="ja">${esc(s.title)}</span>${s.ko ? `<span class="qs-ko">${esc(s.ko)}</span>` : ""}</span><span class="qs-meta">${esc(s.t.album.label)}${isSolo(s.t.album) ? "" : ` ${s.t.no}번`} · 단어 ${count(s, "word")} · 문법 ${count(s, "gram")} · 읽기 ${count(s, "read")}</span>${b ? `<span class="qs-best">최고 ${b.score}/${b.n}</span>` : ""}</a>`;
+          return `<a class="quiz-song" href="#/quiz/${s.t.album.key}/${s.t.no}"><span class="qs-main"><span class="qs-t" lang="ja">${titleHTML(s.title)}</span>${s.ko ? `<span class="qs-ko">${esc(s.ko)}</span>` : ""}</span><span class="qs-meta">${esc(s.t.album.label)}${isSolo(s.t.album) ? "" : ` ${s.t.no}번`} · 단어 ${count(s, "word")} · 문법 ${count(s, "gram")} · 읽기 ${count(s, "read")}</span>${b ? `<span class="qs-best">최고 ${b.score}/${b.n}</span>` : ""}</a>`;
         }).join("")}</div></section>` : "";
       }).join("")}
     </div>`;
@@ -1159,11 +1291,11 @@ function renderQuizHome(msg) {
 // #/quiz/all: 전체 곡, #/quiz/wrong: 틀린 문제, #/quiz/n5: JLPT 급수, #/quiz/앨범/번호: 그 곡
 function renderQuiz(key, no) {
   const Q = quizData();
-  const lv = /^n([0-5])$/.exec(key || "");
+  const lv = /^n([1-5])$/.exec(key || "");
   if (lv) {
     // 급수별 문제는 단어와 읽기뿐이라, 문법만 골라 두었으면 둘 다 낸다
     const kinds = qrec.kinds.filter(k => k !== "gram");
-    return startQuiz(RQ.pick(levelBank(Number(lv[1])), kinds.length ? kinds : ["word", "read"], qrec.n), qlvName(Number(lv[1])), null, key);
+    return startQuiz(RQ.pick(levelBank(Number(lv[1])), kinds.length ? kinds : ["word", "read"], qrec.n), `JLPT N${lv[1]}`, null, key, ROM_LEVELS.includes(Number(lv[1])));
   }
   if (key === "all") return startQuiz(RQ.pick(Q.songs.flatMap(s => s.bank), qrec.kinds, qrec.n), "전체 곡에서 섞어 풀기", null);
   if (key === "wrong") return startQuiz(RQ.shuffle(Object.keys(qrec.wrong).map(k => Q.keys[k]).filter(Boolean)).slice(0, 30), "틀린 문제 다시 풀기", null);
@@ -1173,17 +1305,17 @@ function renderQuiz(key, no) {
   renderQuizHome();
 }
 
-// bestId: 최고 점수를 적어 둘 이름(곡이면 곡 id, 급수면 n5…). 없으면 점수를 적지 않는다.
-function startQuiz(list, title, song, bestId = song && song.id) {
+// bestId: 최고 점수를 적어 둘 이름(곡이면 곡 id, 급수면 n5…). 없으면 점수를 적지 않는다. rom: 영어 발음 버튼이 있는 퀴즈인지.
+function startQuiz(list, title, song, bestId = song && song.id, rom = false) {
   if (!list.length) return renderQuizHome("고른 문제 종류로는 낼 문제가 없어요. 문제 종류를 바꿔 보세요.");
-  qrun = { list, i: 0, score: 0, miss: [], title, song, bestId, answered: false };
+  qrun = { list, i: 0, score: 0, miss: [], title, song, bestId, rom, answered: false };
   document.title = `${title} · 가사 퀴즈`;
   drawQuiz();
 }
 
 function quizQHTML(q) {
   if (q.kind === "read") return `<span class="qz-term" lang="ja">${esc(RQ.plain(q.term))}</span><span class="qz-ask">이 낱말의 읽기는?</span>${q.mean ? `<span class="qz-hint">뜻: ${rich(q.mean)}</span>` : ""}`;
-  return `<span class="qz-term" lang="ja">${rich(q.term)}</span><span class="qz-ask">이 ${q.kind === "gram" ? "문법" : "낱말"}의 뜻은?</span>`;
+  return `<span class="qz-term" lang="ja">${rich(q.term)}</span>${romHTML(RQ.romaji(q.term))}<span class="qz-ask">이 ${q.kind === "gram" ? "문법" : "낱말"}의 뜻은?</span>`;
 }
 
 function drawQuiz() {
@@ -1192,13 +1324,13 @@ function drawQuiz() {
   r.answered = false;
   r.opts = RQ.shuffle(q.c.map((t, k) => ({ t, ok: k === 0 })));
   app.innerHTML = `${topRowHTML("quiz")}
-    <div class="narrow">
-      <a class="back" href="#/quiz">← 가사 퀴즈</a>
+    <div class="narrow${r.rom && qrec.rom ? " rom-on" : ""}">
+      <div class="quiz-bar"><a class="back" href="#/quiz">← 가사 퀴즈</a>${r.rom ? romBtnHTML() : ""}</div>
       <div class="quiz-prog"><span>${r.i + 1} / ${r.list.length}</span><div class="qbar"><i style="width:${r.i / r.list.length * 100}%"></i></div><span>${r.score}점</span></div>
       <div class="quiz-card">
         ${quizKindHTML(q)}
         <p class="quiz-q">${quizQHTML(q)}</p>
-        <div class="quiz-opts${q.kind === "read" ? "" : " col"}">${r.opts.map((o, k) => `<button type="button" class="quiz-opt" data-qa="${k}"${q.kind === "read" ? ' lang="ja"' : ""}><span class="n">${k + 1}</span>${rich(o.t)}</button>`).join("")}</div>
+        <div class="quiz-opts${q.kind === "read" ? "" : " col"}">${r.opts.map((o, k) => `<button type="button" class="quiz-opt" data-qa="${k}"${q.kind === "read" ? ' lang="ja"' : ""}><span class="n">${k + 1}</span>${rich(o.t)}${q.kind === "read" ? romHTML(RQ.romaji(RQ.markRead(q.term, o.t))) : ""}</button>`).join("")}</div>
         <div class="quiz-fb" id="qfb" hidden></div>
         <button type="button" class="quiz-go" data-qnext hidden>${r.i + 1 < r.list.length ? "다음 문제" : "결과 보기"}</button>
       </div>
@@ -1221,7 +1353,7 @@ function answerQuiz(k) {
   const l = q.song.lines[q.line];
   const fb = document.getElementById("qfb");
   fb.innerHTML = `<p class="qz-res ${ok ? "ok" : "no"}">${ok ? "정답이에요!" : "아쉬워요"}</p>
-    <p class="qz-ans"><span lang="ja">${rich(q.term)}</span>${q.kind === "read" ? ` (${esc(q.c[0])})` : ""} · ${rich(q.mean || "")}</p>
+    <p class="qz-ans"><span lang="ja">${rich(q.term)}</span>${q.kind === "read" ? ` (${esc(q.c[0])})` : ""} · ${rich(q.mean || "")}${romHTML(RQ.romaji(q.term))}</p>
     ${l ? `<a class="qz-src" href="#/s/${q.song.t.album.key}/${q.song.t.no}/${q.line}"><span lang="ja">${rich(l.jp)}</span><small>${q.line + 1}번째 줄 · 가사에서 보기 →</small></a>` : ""}`;
   fb.hidden = false;
   const next = app.querySelector("[data-qnext]");
@@ -1259,7 +1391,7 @@ function drawQuizDone() {
 
 // 문제 위 작은 줄: 문제 종류 · 곡 제목, 단어·읽기 문제면 오른쪽에 JLPT 급수(jlpt.js)
 // 급수 글자: 1~5는 사전·JLPT 단어 목록의 급수, b·m·a는 broco Nihongo Anki 덱 단계로 짐작한 것, e1~e5는 목록에 없어 어림한 것
-const lvText = v => ({ b: "N5 (Anki)", m: "N4~N3 (Anki)", a: "N2~N1 (Anki)" })[v] || (/^e\d$/.test(v) ? `N${v[1]} (추정)` : `JLPT N${v}`);
+const lvText = v => ({ b: "N5 (Anki)", m: "N4~N3 (Anki)", a: "N2~N1 (Anki)" })[v] || (/^e\d$/.test(v) ? `JLPT N${v[1]}` : `JLPT N${v}`);
 const quizKindHTML = q => `<span class="quiz-top"><span class="quiz-kind">${QKIND[q.kind]} · <span lang="ja">${esc(q.song.title)}</span></span>${q.lv ? `<span class="qz-lv">${esc(lvText(q.lv))}</span>` : ""}</span>`;
 
 // 곡 화면의 '이 곡 퀴즈 풀기' 링크. 문제를 미리 만들지 않고 [공부]가 있는지만 본다.
@@ -1285,7 +1417,16 @@ function quizClick(e) {
   if (ans) { answerQuiz(Number(ans.dataset.qa)); return true; }
   if (e.target.closest("[data-qnext]")) { qrun.i++; drawQuiz(); scrollTo(0, 0); return true; }
   if (e.target.closest("[data-qagain]")) { route(); return true; }
-  if (e.target.closest("[data-qmiss]")) { startQuiz(RQ.shuffle(qrun.miss), qrun.title, qrun.song, null); scrollTo(0, 0); return true; }
+  if (e.target.closest("[data-qmiss]")) { startQuiz(RQ.shuffle(qrun.miss), qrun.title, qrun.song, null, qrun.rom); scrollTo(0, 0); return true; }
+  const rom = e.target.closest("[data-qrom]");
+  if (rom) {
+    qrec.rom = !qrec.rom;
+    saveQuiz();
+    rom.closest(".narrow").classList.toggle("rom-on", qrec.rom);
+    rom.outerHTML = romBtnHTML();
+    app.querySelector("[data-qrom]").focus({ preventScroll: true });
+    return true;
+  }
   return false;
 }
 document.addEventListener("keydown", e => {
@@ -1322,10 +1463,10 @@ function route() {
     openInstallSheet();
     return;
   }
-  if (view === "quiz") { document.body.dataset.view = "quiz"; renderQuiz(key, Number(no)); scrollTo(0, 0); return; }
+  if (view === "quiz") { document.body.dataset.view = "quiz"; syncLang(); renderQuiz(key, Number(no)); scrollTo(0, 0); return; }
   qrun = null;
-  if (view === "s" && t) { document.body.dataset.view = "song"; renderSong(t, line); }
-  else if (view === "a" && al) { document.body.dataset.view = "album"; renderAlbum(al); }
+  if (view === "s" && t) { document.body.dataset.view = "song"; syncLang(); renderSong(t, line); }
+  else if (view === "a" && al) { document.body.dataset.view = "album"; syncLang(); renderAlbum(al); }
   else { document.body.dataset.view = "home"; renderHome(); }
 }
 
@@ -1341,7 +1482,8 @@ function problems(only) {
 }
 
 function renderHome() {
-  document.title = homeLang === "ja" ? "緑黄色社会 歌詞ノート" : "녹황색사회 가사 노트";
+  document.title = HL("녹황색사회 가사 노트", "緑黄色社会 歌詞ノート");
+  syncLang();
   const total = ALL.filter(t => !t.inst).length;
   const filled = ALL.filter(hasLyrics).length;
   const translated = ALL.filter(hasTranslation).length;
@@ -1354,24 +1496,27 @@ function renderHome() {
         <h1${homeLang === "ja" ? ' class="ja"' : ""}>${homeLang === "ja" ? `<span class="g" lang="ja">緑黄色</span><span class="y" lang="ja">社会</span> <span lang="ja">歌詞ノート</span>` : `<span class="g">녹황색</span><span class="y">사회</span> 가사 노트`}</h1>
      </div>
       <div class="home-banners">
-        <a class="call-banner" href="call/index.html"><img src="call/119956.png" alt="" onerror="this.remove()"><span><b>콜 가이드</b><small>라이브에서 다 같이 하는 콜과 동작을 곡별로 모았어요</small></span></a>
-        <a class="call-banner" href="#/quiz"><svg class="ban-ic" viewBox="0 0 48 48" aria-hidden="true"><text x="24" y="33" text-anchor="middle">あ</text><rect x="13" y="38" width="22" height="3.5" rx="1.75"/></svg><span><b>가사로 일본어 공부</b><small>단어·문법·읽기를 곡별, JLPT 급수별 퀴즈로 복습해요</small></span></a>
-        <a class="call-banner" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener" title="제작자 인스타그램"><img src="Instagram_icon.png" alt="" onerror="this.remove()"><span><b>@brocoplaylist</b><small>인스타그램</small></span></a>
+        <div class="pban big"><a class="pban-pic pic-call" href="call/index.html"><span class="pban-t has-ic"><img src="call/119956.png" alt="" onerror="this.remove()"><b>${HL("콜 가이드", "コールガイド")}</b><small>${HL("라이브에서 다 같이 하는 콜과 동작을 곡별로 모았어요", "ライブでみんなでするコールや動きを曲ごとにまとめました")}</small></span></a>
+          <div class="pban-go"><a class="main" href="call/index.html">${HL("곡별 콜 보기", "曲ごとのコールを見る")}</a></div></div>
+        <div class="pban"><a class="pban-pic pic-quiz" href="#/quiz"><span class="pban-t"><b>${HL("가사로 일본어 공부", "歌詞で学ぶ日本語")}</b><small>${HL("단어·문법·읽기를 곡별, JLPT 급수별 퀴즈로 복습해요", "単語・文法・読みを曲別、JLPTレベル別のクイズで復習")}</small></span></a>
+          <div class="pban-go"><a class="main" href="#/quiz">${HL("곡·급수 고르기", "曲・級を選ぶ")}</a><a class="more" href="#/quiz/all">${HL(`섞어서 ${qrec.n}문제`, `ランダム${qrec.n}問`)}</a></div></div>
+        <div class="pban"><a class="pban-pic pic-ig" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener" title="${HL("제작자 인스타그램", "制作者のInstagram")}"><span class="pban-t"><b>@brocoplaylist</b><small>${HL("인스타그램", "Instagram")}</small></span></a>
+          <div class="pban-go"><a class="main" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener">${HL("프로필 보기", "プロフィール")}</a></div></div>
       </div>
       </div>
       <figure class="hero">
-        <img src="${encodeURI(PROFILE_PHOTO)}" alt="녹황색사회 멤버 네 명의 2026년 프로필 사진" onerror="this.closest('figure').remove()">
+        <img src="${encodeURI(PROFILE_PHOTO)}" alt="${HL("녹황색사회 멤버 네 명의 2026년 프로필 사진", "緑黄色社会メンバー4人の2026年プロフィール写真")}" onerror="this.closest('figure').remove()">
         <figcaption>
-          <span class="cap">『あたまご』 아티스트 사진 · 왼쪽부터</span>
-          <span class="members">${MEMBERS.map(m => `<a href="https://www.instagram.com/${m.ig}/" target="_blank" rel="noopener" title="${m.name} 인스타그램"><img src="Instagram_icon.png" alt="" onerror="this.remove()"><span><b>${m.name}</b><small>${m.part}</small></span></a>`).join("")}</span>
-          <span class="cap">공식 링크</span>
-          <span class="official">${OFFICIAL.map(o => `<a href="${o.url}" target="_blank" rel="noopener" title="녹황색사회 ${o.name}">${o.img ? `<img src="${o.img}" alt="" onerror="this.remove()">` : `<svg viewBox="0 0 24 24" fill="${o.color}" aria-hidden="true"><path d="${o.path}"/></svg>`}${o.name}</a>`).join("")}</span>
+          <span class="cap">${HL("『あたまご』 아티스트 사진 · 왼쪽부터", "『あたまご』アーティスト写真 · 左から")}</span>
+          <span class="members">${MEMBERS.map(m => `<a href="https://www.instagram.com/${m.ig}/" target="_blank" rel="noopener" title="${HL(`${m.name} 인스타그램`, `${m.ja}のInstagram`)}"><img src="Instagram_icon.png" alt="" onerror="this.remove()"><span><b>${HL(m.name, m.ja)}</b><small>${HL(m.part, m.partJa)}</small></span></a>`).join("")}</span>
+          <span class="cap">${HL("공식 링크", "公式リンク")}</span>
+          <span class="official">${OFFICIAL.map(o => `<a href="${o.url}" target="_blank" rel="noopener" title="${HL(`녹황색사회 ${o.name}`, `緑黄色社会 ${o.ja || o.name}`)}">${o.img ? `<img src="${o.img}" alt="" onerror="this.remove()">` : `<svg viewBox="0 0 24 24" fill="${o.color}" aria-hidden="true"><path d="${o.path}"/></svg>`}${HL(o.name, o.ja || o.name)}</a>`).join("")}</span>
         </figcaption>
       </figure>
     </header>
     <div class="bar">
-      <label class="search"><span class="sr">곡 찾기</span><input id="q" type="search" placeholder="곡 제목이나 가사로 찾기" value="${esc(query)}" autocomplete="off"></label>
-      <div class="stat">가사 <b>${filled}</b>/${total}곡 · 해석 <b>${translated}</b>/${total}곡</div>
+      <label class="search"><span class="sr">${HL("곡 찾기", "曲を探す")}</span><input id="q" type="search" placeholder="${HL("곡 제목이나 가사로 찾기", "曲名や歌詞で探す")}" value="${esc(query)}" autocomplete="off"></label>
+      <div class="stat">${HL(`가사 <b>${filled}</b>/${total}곡 · 해석 <b>${translated}</b>/${total}곡`, `歌詞 <b>${filled}</b>/${total}曲 · 韓国語訳 <b>${translated}</b>/${total}曲`)}</div>
     </div>
     ${problems()}
     <div id="homeBody"></div>`;
@@ -1387,8 +1532,8 @@ function renderHomeBody() {
   if (needle) { body.innerHTML = resultsHTML(search(needle), needle); return; }
   body.innerHTML = timelineHTML() + GROUPS.map(g => `
     <section class="group">
-      <h2>${g.name}</h2>
-      <p class="sub">${g.sub}</p>
+      <h2>${HL(g.name, g.nameJa)}</h2>
+      <p class="sub">${HL(g.sub, g.subJa)}</p>
       <div class="albums${g.small ? " small" : ""}" style="--cols: ${g.cols}">${ALBUMS.filter(al => al.group === g.id).map(albumCard).join("")}</div>
     </section>`).join("");
   // 연도별 디스코그래피를 펴 두었는지 기억한다
@@ -1402,11 +1547,11 @@ function timelineHTML() {
   const rels = [...ALBUMS].sort((a, b) => a.date.localeCompare(b.date));
   const years = [...new Set(rels.map(yearOf))];
   return `<details class="tl"${prefs.tl ? " open" : ""}>
-    <summary>연도별 디스코그래피<small>${years[0]}~${years[years.length - 1]} · 발매 ${rels.length}</small></summary>
+    <summary>${HL("연도별 디스코그래피", "年別ディスコグラフィー")}<small>${years[0]}~${years[years.length - 1]} · ${HL("발매", "リリース")} ${rels.length}</small></summary>
     <div class="tl-body">${years.map((y, i) => `
       <div class="year${i % 2 ? " alt" : ""}">
         <b class="year-y">${y}</b>
-        <div class="rels">${rels.filter(al => yearOf(al) === y).map(al => `<a class="rel" href="${isSolo(al) ? `#/s/${al.key}/1` : `#/a/${al.key}`}" title="${al.date} · ${al.tracks.length}곡">${coverHTML(al, " thumb")}<span class="rel-tag">${al.label}</span><span class="rel-title" lang="ja">${esc(al.title)}</span></a>`).join("")}</div>
+        <div class="rels">${rels.filter(al => yearOf(al) === y).map(al => `<a class="rel" href="${isSolo(al) ? `#/s/${al.key}/1` : `#/a/${al.key}`}" title="${al.date} · ${al.tracks.length}${HL("곡", "曲")}">${coverHTML(al, " thumb")}<span class="rel-tag">${homeLabel(al)}</span><span class="rel-title" lang="ja">${esc(al.title)}</span></a>`).join("")}</div>
       </div>`).join("")}
     </div>
   </details>`;
@@ -1416,24 +1561,39 @@ function timelineHTML() {
 const PROFILE_PHOTO = "녹황색사회 2026 프로필.jpg";
 // 사진 아래 멤버 링크. 사진 속 왼쪽부터 순서. 주소는 나무위키 멤버 문서 기준.
 const MEMBERS = [
-  { name: "peppe", part: "키보드", ig: "peppe1206" },
-  { name: "아나미 싱고", part: "베이스", ig: "shingoanami" },
-  { name: "나가야 하루코", part: "보컬", ig: "haruyama_555" },
-  { name: "코바야시 잇세이", part: "기타", ig: "isseyman" },
+  { name: "peppe", part: "키보드", ja: "peppe", partJa: "キーボード", ig: "peppe1206" },
+  { name: "아나미 싱고", part: "베이스", ja: "穴見真吾", partJa: "ベース", ig: "shingoanami" },
+  { name: "나가야 하루코", part: "보컬", ja: "長屋晴子", partJa: "ボーカル", ig: "haruyama_555" },
+  { name: "코바야시 잇세이", part: "기타", ja: "小林壱誓", partJa: "ギター", ig: "isseyman" },
 ];
-// 사진 아래 공식 링크. 주소는 나무위키 녹황색사회 문서 기준, 팬클럽은 사용자가 알려 준 주소.
+// 사진 아래 공식 링크. 주소는 나무위키 녹황색사회 문서 기준, 팬클럽·굿즈샵은 사용자가 알려 준 주소.
 const OFFICIAL = [
-  { name: "공식 홈페이지", url: "https://www.ryokushaka.com", color: "var(--leaf)", path: "M12 3 2 11.5h3V21h5.5v-6h3v6H19v-9.5h3z" },
+  { name: "공식 홈페이지", ja: "公式サイト", url: "https://www.ryokushaka.com", color: "var(--leaf)", path: "M12 3 2 11.5h3V21h5.5v-6h3v6H19v-9.5h3z" },
   { name: "LINE", url: "https://line.me/R/ti/p/%40ryokushaka", color: "#06C755", path: "M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" },
   { name: "Instagram", url: "https://www.instagram.com/ryokushaka_official/", img: "Instagram_icon.png" },
   { name: "X", url: "https://x.com/ryokushaka", color: "currentColor", path: "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" },
   { name: "TikTok", url: "https://www.tiktok.com/@ryokushaka", color: "currentColor", path: "M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" },
   { name: "YouTube", url: "https://www.youtube.com/channel/UC_1GPhYlXI2ka2ji5gnqWFQ", color: "#FF0000", path: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" },
-  { name: "팬클럽", url: "https://ryokushaka-fc.com", color: "var(--leaf)", path: "M12 21s-7.5-4.6-10-9.3C.4 8.6 2.1 4.8 5.7 4.3c2.2-.3 4.6.7 6.3 3.2 1.7-2.5 4.1-3.5 6.3-3.2 3.6.5 5.3 4.3 3.7 7.4C19.5 16.4 12 21 12 21z" },
+  { name: "팬클럽", ja: "ファンクラブ", url: "https://ryokushaka-fc.com", color: "var(--leaf)", path: "M12 21s-7.5-4.6-10-9.3C.4 8.6 2.1 4.8 5.7 4.3c2.2-.3 4.6.7 6.3 3.2 1.7-2.5 4.1-3.5 6.3-3.2 3.6.5 5.3 4.3 3.7 7.4C19.5 16.4 12 21 12 21z" },
+  { name: "굿즈샵", ja: "グッズショップ", url: "https://ryokushaka.official.ec/", color: "var(--leaf)", path: "M7 8V7a5 5 0 0 1 10 0v1h3l1 13H3L4 8h3zm2 0h6V7a3 3 0 0 0-6 0v1z" },
 ];
 
 // 앨범 커버: index.html 옆의 「파일 이름.webp」(예: 정규1집.webp). 이름이 다르면 ALBUMS에 "cover"를 적는다.
 const coverHTML = (al, cls = "") => `<span class="cover${cls}"><img src="${(window.EMBED_COVERS || {})[al.key] || encodeURI(al.cover || `${al.file}.webp`)}" alt="" loading="lazy" onerror="this.parentNode.classList.add('none')"></span>`;
+
+// 일본어 제목이 두 줄이 될 때 나눌 자리(|). サマータイムシンデレ/ラ처럼 낱말 중간에서 나뉘지 않게 합니다.
+// 여기 없는 제목은 한 덩어리로 두므로, 긴 제목의 곡을 추가하면 여기도 추가합니다. 콜 가이드(call/index.html)에도 같은 목록이 있습니다.
+const TITLE_BREAK = Object.fromEntries([
+  "緑黄色|社会", "溢れた|水の|行方", "陽は|また|昇るから", "ミチヲ|ユケ", "サマータイム|シンデレラ", "花に|なって", "風に|乗る", "マイル|ストーンの|種", "夏を|生きる", "夜祭|音頭", "透明だった|世界",
+  "始まりの|歌", "大人|ごっこ", "君が|望む|世界", "真夜中|ドライブ", "愛の|かたち", "あのころ|見た光", "これからのこと、|それからのこと", "安心|してね", "ずっと|ずっと|ずっと", "たとえ|たとえ",
+  "アラモードに|ワルツ", "スクリーンと|横顔", "ピンク|ブルー", "ジブン|セイフク", "湿気って|いる", "さもなくば|誰がやる", "恥ずかしいか|青春は", "ナイス|アイディア！", "マジック|アワー", "僕らは|いきもの|だから",
+  "馬鹿の|一つ覚え", "コーヒーと|ましゅまろ", "オーロラを|探しに", "誰かの|国", "分かり|にくい", "レジス|ダンス", "アウト|サイダー", "丘と|小さな|パラダイム", "それなりの|生活", "リトル|シンガー",
+  "空に|歌えば", "アーユー|レディー", "時の|いたずら", "夢と|悪魔と|ファンタジー",
+].map(s => [s.replace(/\|/g, ""), s]));
+function titleHTML(s) {
+  const [, name, rest = ""] = /^(.+?)( [(-].*)?$/.exec(s) || [s, s];
+  return esc(TITLE_BREAK[name] || name).replace(/\|/g, "<wbr>") + esc(rest);
+}
 
 // 곡이 하나뿐인 카드(그 외의 곡)는 곡 목록을 거치지 않고 바로 가사 화면을 엽니다.
 const isSolo = al => al.tracks.length === 1;
@@ -1444,18 +1604,19 @@ function albumCard(al) {
   const translated = al.tracks.filter(hasTranslation).length;
   const kinds = {};
   for (const t of al.tracks) if (t.inst) kinds[t.inst] = (kinds[t.inst] || 0) + 1;
-  const extra = Object.entries(kinds).map(([k, c]) => `${k} ${c}`).join(", ");
+  const extra = Object.entries(kinds).map(([k, c]) => `${HL(k, JA_KIND[k] || k)} ${c}`).join(", ");
+  const desc = al.desc && HL(al.desc, JA_DESC[al.key] || al.desc);
   return `<a class="album" href="${isSolo(al) ? `#/s/${al.key}/1` : `#/a/${al.key}`}">
     ${coverHTML(al)}
     <div class="album-body">
-    <div class="album-top"><span class="ord">${al.label}</span><span>${al.date}</span></div>
-    <div class="album-title" lang="ja">${esc(al.title)}</div>
-    ${al.ko ? `<div class="album-ko">${esc(al.ko)}</div>` : ""}${al.en ? `<div class="album-ko">${esc(al.en)}</div>` : ""}
-    ${al.desc ? `<div class="album-desc">${esc(al.desc)}</div>` : ""}
+    <div class="album-top"><span class="ord">${homeLabel(al)}</span><span>${al.date}</span></div>
+    <div class="album-title" lang="ja">${titleHTML(al.title)}</div>
+    ${HL(al.ko, "") ? `<div class="album-ko">${esc(al.ko)}</div>` : ""}${al.en ? `<div class="album-ko">${esc(al.en)}</div>` : ""}
+    ${desc ? `<div class="album-desc">${esc(desc)}</div>` : ""}
     <div class="album-foot">
-      <div class="meter" role="img" aria-label="${n}곡 중 가사 ${filled}곡"><i class="m-fill" style="width:${filled / n * 100}%"></i></div>
-      <div class="meter m-second" role="img" aria-label="${n}곡 중 해석 ${translated}곡"><i class="m-ko" style="width:${translated / n * 100}%"></i></div>
-      <div class="meter-text"><span class="nw">${all}곡${extra ? ` (${extra})` : ""} ·</span> <span class="nw"><i class="dot leaf"></i>가사 ${filled}</span> <span class="nw"><i class="dot yolk"></i>해석 ${translated}</span></div>
+      <div class="meter" role="img" aria-label="${HL(`${n}곡 중 가사 ${filled}곡`, `${n}曲中、歌詞${filled}曲`)}"><i class="m-fill" style="width:${filled / n * 100}%"></i></div>
+      <div class="meter m-second" role="img" aria-label="${HL(`${n}곡 중 해석 ${translated}곡`, `${n}曲中、韓国語訳${translated}曲`)}"><i class="m-ko" style="width:${translated / n * 100}%"></i></div>
+      <div class="meter-text"><span class="nw">${all}${HL("곡", "曲")}${extra ? ` (${extra})` : ""} ·</span> <span class="nw"><i class="dot leaf"></i>${HL("가사", "歌詞")} ${filled}</span> <span class="nw"><i class="dot yolk"></i>${HL("해석", "訳")} ${translated}</span></div>
     </div>
     </div>
   </a>`;
@@ -1489,17 +1650,17 @@ function search(needle) {
 }
 
 function resultsHTML(hits, needle) {
-  if (!hits.length) return `<p class="none">찾는 곡이나 가사가 없어요.</p>`;
+  if (!hits.length) return `<p class="none">${HL("찾는 곡이나 가사가 없어요.", "該当する曲や歌詞が見つかりません。")}</p>`;
   const q = fold(needle);
   const mark = raw => {
     const s = raw.normalize("NFC");
     const i = fold(s).indexOf(q);
     return i < 0 ? esc(s) : esc(s.slice(0, i)) + `<mark>${esc(s.slice(i, i + q.length))}</mark>` + esc(s.slice(i + q.length));
   };
-  return `<p class="count">${hits.length}곡</p><ul class="results">${hits.map(({ t, row, text }) => `
+  return `<p class="count">${hits.length}${HL("곡", "曲")}</p><ul class="results">${hits.map(({ t, row, text }) => `
     <li><a href="#/s/${t.album.key}/${t.no}${row >= 0 ? `/${row}` : ""}">
-      <span class="where">${isSolo(t.album) ? `${t.album.label} · ${t.album.date}` : `${t.album.label} 『${esc(t.album.title)}』 · ${t.no}번`}</span>
-      <span class="tjp" lang="ja">${mark(t.jp)}</span>${t.ko ? `<span class="tko">${mark(t.ko)}</span>` : ""}${t.en ? `<span class="tko">${mark(t.en)}</span>` : ""}
+      <span class="where">${isSolo(t.album) ? `${homeLabel(t.album)} · ${t.album.date}` : `${homeLabel(t.album)} 『${esc(t.album.title)}』 · ${t.no}${HL("번", "曲目")}`}</span>
+      <span class="tjp" lang="ja">${mark(t.jp)}</span>${t.ko && (HL(true, false) || fold(t.ko).includes(q)) ? `<span class="tko">${mark(t.ko)}</span>` : ""}${t.en ? `<span class="tko">${mark(t.en)}</span>` : ""}
       ${row >= 0 ? `<span class="snip">${mark(text)}</span>` : ""}
     </a></li>`).join("")}</ul>`;
 }
@@ -1513,7 +1674,7 @@ function renderAlbum(al) {
       ${coverHTML(al)}
       <div>
         <div class="album-top"><span class="ord">${al.label}</span><span>${al.date}${al.note ? ` · ${al.note}` : ""}</span></div>
-        <h1 class="album-name" lang="ja">${esc(al.title)}</h1>
+        <h1 class="album-name" lang="ja">${titleHTML(al.title)}</h1>
         ${al.ko ? `<div class="album-ko">${esc(al.ko)}</div>` : ""}${al.en ? `<div class="album-ko">${esc(al.en)}</div>` : ""}
       </div>
     </header>
@@ -1528,7 +1689,7 @@ function trackRow(t) {
   const { d } = lyricsFor(t);
   return `<a class="track" href="#/s/${t.album.key}/${t.no}">
     <span class="tno">${pad(t.no)}</span>
-    <span><span class="tjp" lang="ja">${esc(t.jp)}</span>${t.read ? `<span class="tread">${esc(t.read)}</span>` : ""}${t.ko ? `<span class="tko">${esc(t.ko)}</span>` : ""}${t.en ? `<span class="tko">${esc(t.en)}</span>` : ""}
+    <span><span class="tjp" lang="ja">${titleHTML(t.jp)}</span>${t.read ? `<span class="tread">${esc(t.read)}</span>` : ""}${t.ko ? `<span class="tko">${esc(t.ko)}</span>` : ""}${t.en ? `<span class="tko">${esc(t.en)}</span>` : ""}
       ${t.twins.length ? `<span class="tnote">${t.twins.map(o => `${o.album.label} ${o.no}번`).join(", ")}에도 실린 곡</span>` : ""}</span>
     <span class="badges">${has(d?.원문) ? `<span class="marks"><span><i class="dot leaf"></i>가사</span>${has(d?.해석) ? `<span><i class="dot yolk"></i>해석</span>` : ""}</span>` : `<span class="badge">${t.inst ? `${t.inst} · 가사 없음` : "비어 있음"}</span>`}</span>
   </a>`;
@@ -1708,7 +1869,7 @@ function renderSong(t, line) {
     ${isSolo(al) && !window.SINGLE ? `<a class="back" href="#/">← 전체 앨범</a>` : `<a class="back" href="#/a/${al.key}">${window.SINGLE ? "" : "← "}${coverHTML(al, " mini")}${al.label} 『${esc(al.title)}』</a>`}
     <header class="song-head">
       <div class="album-top">${isSolo(al) ? `<span class="ord">${al.label}</span><span>${al.date}</span>` : `<span class="ord">${pad(t.no)}번 트랙</span>`}</div>
-      <h1 class="song-title" lang="ja">${esc(t.jp)}${t.read ? `<span class="read">${esc(t.read)}</span>` : ""}</h1>
+      <h1 class="song-title" lang="ja">${titleHTML(t.jp)}${t.read ? `<span class="read">${esc(t.read)}</span>` : ""}</h1>
       ${t.ko || t.en ? `<div class="song-ko">${[t.ko, t.en].filter(Boolean).map(esc).join(" · ")}</div>` : ""}
       ${creditHTML(t)}
       ${al.desc ? `<div class="album-desc">${esc(al.desc)}</div>` : ""}
@@ -1719,8 +1880,8 @@ function renderSong(t, line) {
     ${body}
     ${memo.length ? `<section class="memo"><h2>메모</h2><div class="memo-body">${memo.map(rich).join("\n")}</div></section>` : ""}
     <nav class="pager" aria-label="곡 이동">
-      ${prev ? `<a class="prev" href="#/s/${al.key}/${prev.no}"><small>← 이전 곡</small><span lang="ja">${esc(prev.jp)}</span></a>` : ""}
-      ${next ? `<a class="next" href="#/s/${al.key}/${next.no}"><small>다음 곡 →</small><span lang="ja">${esc(next.jp)}</span></a>` : ""}
+      ${prev ? `<a class="prev" href="#/s/${al.key}/${prev.no}"><small>← 이전 곡</small><span lang="ja">${titleHTML(prev.jp)}</span></a>` : ""}
+      ${next ? `<a class="next" href="#/s/${al.key}/${next.no}"><small>다음 곡 →</small><span lang="ja">${titleHTML(next.jp)}</span></a>` : ""}
     </nav>
   </div>`;
   applyPrefs();
@@ -1826,27 +1987,44 @@ const INSTALL_TABS = [
     "주소창 오른쪽의 <b>⋮</b> 메뉴를 눌러요",
     "<b>‘홈 화면에 추가’</b> 또는 <b>‘앱 설치’</b>를 눌러요",
     "<b>‘설치’</b>를 눌러요",
+  ], nameJa: "Android（Chrome）", stepsJa: [
+    "アドレスバーの右にある<b>⋮</b>メニューを押します",
+    "<b>「ホーム画面に追加」</b>または<b>「アプリをインストール」</b>を押します",
+    "<b>「インストール」</b>を押します",
   ] },
   { id: "samsung", name: "갤럭시 (삼성 인터넷)", steps: [
     "오른쪽 아래의 <b>≡</b> 메뉴를 눌러요",
     "<b>‘현재 페이지 추가’</b> → <b>‘홈 화면’</b>을 눌러요",
     "<b>‘추가’</b>를 눌러요",
+  ], nameJa: "Galaxy（Samsung Internet）", stepsJa: [
+    "右下の<b>≡</b>メニューを押します",
+    "<b>「現在のページを追加」</b> → <b>「ホーム画面」</b>を押します",
+    "<b>「追加」</b>を押します",
   ] },
   { id: "ios", name: "아이폰 / 아이패드", steps: [
     "공유 버튼(네모에 위쪽 화살표)을 눌러요. 안 보이면 주소창 옆 <b>⋯</b> → <b>‘공유’</b>를 눌러요",
     "목록을 내려서 <b>‘홈 화면에 추가’</b>를 눌러요",
     "<b>‘웹 앱으로 열기’</b>가 보이면 켜 두고 <b>‘추가’</b>를 눌러요",
+  ], nameJa: "iPhone / iPad", stepsJa: [
+    "共有ボタン（四角に上向きの矢印）を押します。見当たらないときはアドレスバーの横の<b>⋯</b> → <b>「共有」</b>を押します",
+    "リストを下にスクロールして<b>「ホーム画面に追加」</b>を押します",
+    "<b>「Webアプリとして開く」</b>が表示されたらオンにして、<b>「追加」</b>を押します",
   ] },
   { id: "pc", name: "PC (크롬 / 엣지)", steps: [
     "주소창 오른쪽 끝의 설치 아이콘을 눌러요",
     "안 보이면 <b>⋮</b>(엣지는 <b>⋯</b>) 메뉴 → <b>‘전송, 저장 및 공유’</b> 또는 <b>‘앱’</b> → <b>‘앱으로 설치’</b>를 눌러요",
     "<b>‘설치’</b>를 눌러요",
+  ], nameJa: "PC（Chrome / Edge）", stepsJa: [
+    "アドレスバー右端のインストールアイコンを押します",
+    "見当たらないときは<b>⋮</b>（Edgeは<b>⋯</b>）メニュー → <b>「キャスト、保存、共有」</b>または<b>「アプリ」</b> → <b>「アプリとしてインストール」</b>を押します",
+    "<b>「インストール」</b>を押します",
   ] },
 ];
 let installTab = IS_IOS ? "ios" : /SamsungBrowser/.test(USER_AGENT) ? "samsung" : /Android/.test(USER_AGENT) ? "android" : "pc";
 let installPrompt = null; // 브라우저가 바로 설치를 허락하면 담기는 이벤트. 있으면 '지금 설치하기' 버튼이 보입니다.
 
-// 첫 화면의 한국어/日本語 버튼: 첫 화면의 제목과 설명만 바뀝니다. 가사·해석·문법 설명과 다른 화면은 한국어 그대로입니다.
+// 첫 화면의 한국어/日本語 버튼: 첫 화면의 문구(메뉴·배너·링크·앨범 카드·검색·맨 아래 문구)와 거기서 여는 설치 안내 창이 바뀝니다.
+// 가사·해석·문법 설명과 다른 화면(앨범·곡·퀴즈)은 한국어 그대로입니다. 첫 화면에 문구를 추가할 때는 HL(한국어, 일본어)로 적습니다.
 // 콜 가이드와 같은 선택을 씁니다(ryokulyrics:lang). 브라우저 언어와 상관없이 처음에는 한국어로 열립니다.
 let homeLang = (() => {
   const asked = new URLSearchParams(location.search).get("lang");
@@ -1854,6 +2032,27 @@ let homeLang = (() => {
   try { const saved = localStorage.getItem("ryokulyrics:lang"); if (saved === "ja" || saved === "ko") return saved; } catch {}
   return "ko";
 })();
+const HL = (ko, ja) => (homeLang === "ja" && document.body.dataset.view === "home" ? ja : ko);
+// 앨범 이름표의 일본어(정규 1집 → 1stアルバム), 연주곡 종류, 카드 설명. 없으면 한국어 그대로 나옵니다.
+const JA_LABEL = { "정규": "アルバム", "미니": "ミニアルバム", "싱글": "シングル", "초기곡": "初期の曲", "디지털 발매": "配信リリース", "커버": "カバー" };
+const JA_KIND = { "인트로": "イントロ", "트랜지션": "トランジション", "인스트": "インスト" };
+const JA_DESC = { etc1: "2013年、高校時代に「閃光ライオット」で準グランプリを受賞した曲", etc4: "秦 基博トリビュートのカバー" };
+const ordinal = n => n + (n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th");
+function homeLabel(al) {
+  const m = /^(정규|미니|싱글) (\d+)집$/.exec(al.label);
+  return HL(al.label, m ? ordinal(Number(m[2])) + JA_LABEL[m[1]] : JA_LABEL[al.label] || al.label);
+}
+// 화면의 언어 표시와 맨 아래 문구 세 줄. 일본어로 보는 첫 화면에서만 일본어이고 다른 화면에서는 한국어로 돌아옵니다.
+const FOOT = [
+  [".home-only", "曲目はナムウィキ「緑黄色社会／ディスコグラフィー」（韓国語）の通常盤を基準にしています（2026.10.18版）。その他の曲は別に追加しました。"],
+  [".copyright", "すべての著作権は緑黄色社会に帰属します。copyright 2019 緑黄色社会"],
+  [".made-by", `made by broco · <a href="mailto:broco05x@gmail.com">broco05x@gmail.com</a> · 意訳・誤訳あり`],
+].map(([sel, ja]) => ({ el: document.querySelector(`footer${sel}`), ja })).filter(f => f.el).map(f => ({ ...f, ko: f.el.innerHTML }));
+function syncLang() {
+  const ja = HL(false, true);
+  for (const el of [app, ...FOOT.map(f => f.el)]) { if (ja) el.lang = "ja"; else el.removeAttribute("lang"); }
+  for (const f of FOOT) f.el.innerHTML = ja ? f.ja : f.ko;
+}
 // 첫 화면 맨 위 줄: 사이트 메뉴, 언어 버튼, 앱 설치 버튼. 이미 앱으로 열었으면 설치 버튼만 빠집니다.
 const isInstalled = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 // 화면 모드(일반/다크): 버튼으로 고르면 ryokulyrics:theme에 저장해 가사 노트·퀴즈·콜 가이드가 같이 쓴다. 고른 적이 없으면 기기 설정을 따른다.
@@ -1875,24 +2074,25 @@ if (darkQuery.addEventListener) darkQuery.addEventListener("change", syncTheme);
 const themeBtnHTML = ja => `<button type="button" class="ghost-btn theme-btn" data-theme-btn${ja ? " data-ja" : ""} aria-pressed="${isDark()}" aria-label="${ja ? "ダークモード" : "다크 모드"}" title="${themeTitle(isDark(), ja)}"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg></button>`;
 
 // 맨 위 메뉴. 언어 버튼은 첫 화면에만 둔다(퀴즈 화면은 한국어뿐이다)
-const topRowHTML = (cur = "home") => `<div class="app-row"><nav class="site-nav" aria-label="사이트 메뉴"><a href="#/"${cur === "home" ? ' aria-current="page"' : ""}>가사 노트</a><a href="#/quiz"${cur === "quiz" ? ' aria-current="page"' : ""}>퀴즈</a><a href="call/index.html">콜 가이드</a></nav><div class="app-tools">${cur === "home" ? `<div class="site-nav lang-switch" role="group" aria-label="언어 / 言語"><button type="button" data-lang="ko" aria-pressed="${homeLang === "ko"}">한국어</button><button type="button" data-lang="ja" aria-pressed="${homeLang === "ja"}">日本語</button></div>` : ""}${themeBtnHTML(cur === "home" && homeLang === "ja")}${isInstalled() ? "" : `<button type="button" class="ghost-btn app-btn" data-install-open><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 20h14"/></svg>앱 설치</button>`}</div></div>`;
-const installStepsHTML = () => INSTALL_TABS.find(t => t.id === installTab).steps.map(s => `<li><span>${s}</span></li>`).join("");
+const topRowHTML = (cur = "home") => `<div class="app-row"><nav class="site-nav" aria-label="${HL("사이트 메뉴", "サイトメニュー")}"><a href="#/"${cur === "home" ? ' aria-current="page"' : ""}>${HL("가사 노트", "歌詞ノート")}</a><a href="#/quiz"${cur === "quiz" ? ' aria-current="page"' : ""}>${HL("퀴즈", "クイズ")}</a><a href="call/index.html">${HL("콜 가이드", "コールガイド")}</a></nav><div class="app-tools">${cur === "home" ? `<div class="site-nav lang-switch" role="group" aria-label="언어 / 言語"><button type="button" data-lang="ko" aria-pressed="${homeLang === "ko"}">한국어</button><button type="button" data-lang="ja" aria-pressed="${homeLang === "ja"}">日本語</button></div>` : ""}${themeBtnHTML(cur === "home" && homeLang === "ja")}${isInstalled() ? "" : `<button type="button" class="ghost-btn app-btn" data-install-open><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 20h14"/></svg>${HL("앱 설치", "インストール")}</button>`}</div></div>`;
+const installStepsHTML = () => { const t = INSTALL_TABS.find(t => t.id === installTab); return HL(t.steps, t.stepsJa); };
+const installListHTML = () => installStepsHTML().map(s => `<li><span>${s}</span></li>`).join("");
 
 function installSheetHTML() {
   return `
     <div class="sheet-head">
-      <h2 id="sheetTitle">홈 화면에 추가해서 앱처럼 쓰기</h2>
-      <button type="button" class="sheet-x" data-sheet="close" aria-label="닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <h2 id="sheetTitle">${HL("홈 화면에 추가해서 앱처럼 쓰기", "ホーム画面に追加してアプリのように使う")}</h2>
+      <button type="button" class="sheet-x" data-sheet="close" aria-label="${HL("닫기", "閉じる")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
     <div class="sheet-app">
       <img src="icon-192.png" alt="">
-      <div><b>녹황색사회 노트</b><p>아이콘을 누르면 주소창 없이 전체 화면으로 열려요. 한 번 열어 둔 뒤에는 지하철처럼 인터넷이 끊겨도 가사와 콜을 볼 수 있어요.</p></div>
+      <div><b lang="ko">녹황색사회 노트</b><p>${HL("아이콘을 누르면 주소창 없이 전체 화면으로 열려요. 한 번 열어 둔 뒤에는 지하철처럼 인터넷이 끊겨도 가사와 콜을 볼 수 있어요.", "アイコンを押すとアドレスバーのない全画面で開きます（アプリ名は韓国語で表示されます）。一度開いておけば、地下鉄などインターネットがつながらない場所でも歌詞とコールを見られます。")}</p></div>
     </div>
-    ${CANNOT_INSTALL ? `<div class="sheet-warn"><p>여기서는 설치가 안 돼요. 휴대폰 브라우저에서 <b>${APP_URL.replace(/^https:\/\/|\/$/g, "")}</b>를 열고 아래 순서대로 해 주세요.</p><button type="button" class="ghost-btn" data-sheet="copy">주소 복사</button></div>` : ""}
-    ${installPrompt && !CANNOT_INSTALL ? `<button type="button" class="sheet-go" data-sheet="install">지금 설치하기</button>` : ""}
-    <div class="sheet-tabs">${INSTALL_TABS.map(t => `<button type="button" data-tab="${t.id}" aria-pressed="${t.id === installTab}">${t.name}</button>`).join("")}</div>
-    <ol class="sheet-steps">${installStepsHTML()}</ol>
-    <p class="sheet-foot">새로 추가된 가사와 해석은 앱을 열 때 자동으로 들어와요. 영상은 인터넷이 연결되어 있을 때만 나와요. 아이콘을 지우고 싶으면 다른 앱처럼 길게 눌러서 삭제하면 돼요.</p>`;
+    ${CANNOT_INSTALL ? `<div class="sheet-warn"><p>${HL(`여기서는 설치가 안 돼요. 휴대폰 브라우저에서 <b>${APP_URL.replace(/^https:\/\/|\/$/g, "")}</b>를 열고 아래 순서대로 해 주세요.`, `ここではインストールできません。スマートフォンのブラウザで<b>${APP_URL.replace(/^https:\/\/|\/$/g, "")}</b>を開いて、下の手順で進めてください。`)}</p><button type="button" class="ghost-btn" data-sheet="copy">${HL("주소 복사", "アドレスをコピー")}</button></div>` : ""}
+    ${installPrompt && !CANNOT_INSTALL ? `<button type="button" class="sheet-go" data-sheet="install">${HL("지금 설치하기", "今すぐインストール")}</button>` : ""}
+    <div class="sheet-tabs">${INSTALL_TABS.map(t => `<button type="button" data-tab="${t.id}" aria-pressed="${t.id === installTab}">${HL(t.name, t.nameJa)}</button>`).join("")}</div>
+    <ol class="sheet-steps">${installListHTML()}</ol>
+    <p class="sheet-foot">${HL("새로 추가된 가사와 해석은 앱을 열 때 자동으로 들어와요. 영상은 인터넷이 연결되어 있을 때만 나와요. 아이콘을 지우고 싶으면 다른 앱처럼 길게 눌러서 삭제하면 돼요.", "新しく追加された歌詞や訳は、アプリを開くと自動で反映されます。動画はインターネットにつながっているときだけ表示されます。アイコンを削除したいときは、ほかのアプリと同じように長押しして削除してください。")}</p>`;
 }
 
 function openInstallSheet() {
@@ -1905,6 +2105,7 @@ function openInstallSheet() {
     sheet.addEventListener("click", onSheetClick);
     document.body.append(sheet);
   }
+  sheet.lang = HL("ko", "ja");
   sheet.innerHTML = installSheetHTML();
   sheet.showModal();
 }
@@ -1921,7 +2122,7 @@ function onSheetClick(e) {
   if (tab) {
     installTab = tab.dataset.tab;
     sheet.querySelectorAll("[data-tab]").forEach(b => b.setAttribute("aria-pressed", String(b === tab)));
-    sheet.querySelector(".sheet-steps").innerHTML = installStepsHTML();
+    sheet.querySelector(".sheet-steps").innerHTML = installListHTML();
     return;
   }
   const button = e.target.closest("[data-sheet]");
@@ -1950,7 +2151,7 @@ async function copyAppUrl(button) {
     try { ok = document.execCommand("copy"); } catch {}
     box.remove();
   }
-  button.textContent = ok ? "복사했어요" : "복사가 안 돼요. 주소를 길게 눌러 복사할 수 있어요";
+  button.textContent = ok ? HL("복사했어요", "コピーしました") : HL("복사가 안 돼요. 주소를 길게 눌러 복사할 수 있어요", "コピーできませんでした。アドレスを長押しするとコピーできます");
 }
 
 document.addEventListener("click", e => {
@@ -1983,7 +2184,7 @@ addEventListener("appinstalled", () => {
 if ("serviceWorker" in navigator && location.protocol !== "file:" && !window.SINGLE) {
   addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(reg => {
-      const files = new Set(["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "Instagram_icon.png", encodeURI(PROFILE_PHOTO), "call/", "call/index.html", "call/poster.jpg", "call/zone.jpg", "call/119956.png", "jlpt.js"]);
+      const files = new Set(["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "Instagram_icon.png", "brocoplaylist.jpg", "live.jpg", encodeURI(PROFILE_PHOTO), "call/", "call/index.html", "call/poster.jpg", "call/zone.jpg", "call/119956.png", "jlpt.js"]);
       for (const al of ALBUMS) {
         files.add(encodeURI(`가사/${al.file}.js`));
         files.add(encodeURI(al.cover || `${al.file}.webp`));

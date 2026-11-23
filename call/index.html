@@ -18,7 +18,7 @@ try { var t = localStorage.getItem("ryokulyrics:theme"); if (t === "light" || t 
 <meta name="apple-mobile-web-app-title" content="녹황색사회 노트">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Dela+Gothic+One&family=Gothic+A1:wght@400;500;700;800&family=M+PLUS+Rounded+1c:wght@800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400..900&family=Noto+Sans+JP:wght@400..900&family=Noto+Sans+KR:wght@400..900&display=swap">
 <style>
 /* Layout: 채소밭 이랑처럼 곡 카드가 두 줄로 놓이고, 위에 붙는 검색 바가 전체를 다룬다 */
 :root {
@@ -30,10 +30,8 @@ try { var t = localStorage.getItem("ryokulyrics:theme"); if (t === "light" || t 
   --leaf: #2f7a3e;
   --yolk: #e8a910;
   --on-yolk: #1f1a08;
-  --font-jp: "Dela Gothic One", "Hiragino Sans", "Yu Gothic", sans-serif;
-  --font-call: "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Gothic A1", sans-serif;
-  --font-head: "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --font-body: "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", "Hiragino Sans", sans-serif;
+  /* 글꼴은 가사 노트와 같이 Noto Sans 하나. 영문·숫자는 Noto Sans, 가나·한자는 JP, 한글은 KR에서 찾는다(순서를 바꾸면 한자 모양이 달라진다) */
+  --font: "Noto Sans", "Noto Sans JP", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Hiragino Sans", "Yu Gothic", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -48,7 +46,7 @@ try { var t = localStorage.getItem("ryokulyrics:theme"); if (t === "light" || t 
 * { box-sizing: border-box; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
-  font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+  font-family: var(--font); font-size: 15px; line-height: 1.6;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 0 48px;
@@ -58,13 +56,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 a { color: var(--leaf); }
 :focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
 
-/* 언어 전환 버튼과 앱 설치 버튼. 일본어 화면은 일본어 글꼴을 쓰고, 긴 제목이 한 줄에 들어가도록 조금 작게 한다 */
+/* 언어 전환 버튼과 앱 설치 버튼. 일본어 화면은 긴 제목이 한 줄에 들어가도록 조금 작게 한다 */
 .app-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: auto; }
 .lang-switch button { padding: 4px 12px; font: inherit; font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--muted); background: none; border: 0; border-radius: 999px; cursor: pointer; }
 .lang-switch button:hover { color: var(--leaf); }
 .lang-switch button[aria-pressed="true"] { color: var(--bg); background: var(--ink); }
 .app-btn[hidden] { display: none; }
-html[lang="ja"] { --font-head: "Dela Gothic One", "Hiragino Sans", "Yu Gothic", sans-serif; --font-body: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif; }
 html[lang="ja"] h1 { font-size: clamp(28px, 5vw, 44px); }
 /* 사이트 메뉴: 가사 노트(../index.html)와 같은 모양 */
 .app-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-top: 12px; }
@@ -95,8 +92,8 @@ html[lang="ja"] h1 { font-size: clamp(28px, 5vw, 44px); }
 /* header */
 header { padding-block: 28px 20px; display: grid; gap: 14px; }
 .kicker { font-size: 12px; letter-spacing: .12em; color: var(--muted); font-weight: 700; }
-h1 { font-family: var(--font-head); font-weight: 400; font-size: clamp(34px, 7vw, 56px); line-height: 1.05; margin: 0; text-wrap: balance; }
-h1 .jp { font-family: var(--font-jp); display: block; font-size: .42em; letter-spacing: .02em; margin-top: 10px; }
+h1 { font-weight: 900; font-size: clamp(34px, 7vw, 56px); line-height: 1.05; letter-spacing: -.03em; margin: 0; text-wrap: balance; }
+h1 .jp { display: block; font-weight: 800; font-size: .42em; letter-spacing: .02em; margin-top: 10px; }
 h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .lede { max-width: 62ch; color: var(--muted); margin: 0; }
 
@@ -105,7 +102,7 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .sl-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 12px; align-items: end; padding: 18px; cursor: pointer; list-style: none; border-radius: 12px; }
 .sl-head::-webkit-details-marker { display: none; }
 .setlist[open] .sl-head { padding-bottom: 0; }
-.sl-title { grid-column: 1; font-family: var(--font-head); font-weight: 400; font-size: 26px; line-height: 1.15; margin: 0; }
+.sl-title { grid-column: 1; font-weight: 800; font-size: 26px; line-height: 1.15; letter-spacing: -.02em; margin: 0; }
 .sl-meta { grid-column: 1; grid-row: 2; font-size: 13px; color: var(--muted); margin-top: 4px; }
 .days { grid-column: 2; grid-row: 1 / span 2; display: flex; gap: 6px; cursor: default; }
 .setlist:not([open]) .days { display: none; }
@@ -126,7 +123,9 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .sl-list li { break-inside: avoid; display: grid; grid-template-columns: 2em 1fr auto; gap: 0 8px; align-items: baseline; padding: 7px 0; border-top: 1px dashed var(--line); }
 .sl-no { font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 700; font-size: 13px; }
 .sl-name { min-width: 0; }
-.sl-jp { font-family: var(--font-jp); font-size: 16px; overflow-wrap: anywhere; }
+.sl-jp { font-weight: 700; font-size: 16px; overflow-wrap: anywhere; }
+/* 일본어 제목은 정해 둔 자리(titleHTML의 <wbr>)에서만 줄을 바꾼다 */
+.sl-jp, .song-title { word-break: keep-all; }
 .sl-ko { font-size: 12px; color: var(--muted); margin-left: 6px; }
 .only { display: inline-block; font-size: 11px; font-weight: 800; background: var(--yolk); color: var(--on-yolk); border-radius: 5px; padding: 0 6px; margin-left: 6px; vertical-align: 2px; }
 .jump { font-size: 12px; font-weight: 700; text-decoration: none; color: var(--leaf); border: 1px solid var(--leaf); border-radius: 999px; padding: 1px 9px; white-space: nowrap; }
@@ -186,7 +185,7 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .song.key { border: 2px solid var(--yolk); }
 .star { color: var(--yolk); margin-right: 6px; }
 .must { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 800; background: var(--yolk); color: var(--on-yolk); border-radius: 6px; padding: 1px 8px; }
-.group-label { grid-column: 1 / -1; font-family: var(--font-head); font-weight: 400; font-size: 22px; margin: 18px 0 -4px; }
+.group-label { grid-column: 1 / -1; font-weight: 800; font-size: 22px; letter-spacing: -.02em; margin: 18px 0 -4px; }
 .group-label:first-child { margin-top: 0; }
 .group-head { grid-column: 1 / -1; margin: 18px 0 -4px; }
 .group-head:first-child { margin-top: 0; }
@@ -196,7 +195,7 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .moves:empty { display: none; }
 .badges .must { margin-top: 0; }
 .tag { display: inline-block; font-size: 12px; font-weight: 800; color: var(--leaf); border: 1.5px solid var(--leaf); border-radius: 6px; padding: 0 7px; }
-.group-label .jp-inline { font-family: var(--font-jp); font-size: .8em; }
+.group-label .jp-inline { font-size: .8em; }
 .found { margin-top: 6px; font-size: 13px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
 .found mark { color: var(--on-yolk); background: var(--yolk); border-radius: 3px; padding: 0 2px; }
 .song.flash { box-shadow: 0 0 0 3px var(--yolk); }
@@ -232,7 +231,7 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .song[open] .song-head { padding-bottom: 0; }
 .song[open] .chev { transform: rotate(-135deg); margin-top: 12px; }
 .song-body { padding: 0 18px 8px; }
-.song-title { font-family: var(--font-jp); font-weight: 400; font-size: 22px; line-height: 1.25; margin: 0; overflow-wrap: anywhere; }
+.song-title { font-weight: 800; font-size: 22px; line-height: 1.25; margin: 0; overflow-wrap: anywhere; }
 .song-ko { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
 .en { margin-left: 4px; }
 .en::before { content: "· "; }
@@ -244,12 +243,12 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .when { font-size: 13px; font-weight: 700; color: var(--leaf); }
 .what { margin-top: 2px; }
 .call {
-  display: inline-block; margin-top: 6px; font-family: var(--font-call); font-weight: 800; font-size: 17px;
+  display: inline-block; margin-top: 6px; font-weight: 800; font-size: 17px;
   background: var(--bg); border: 1.5px solid var(--ink); border-radius: 10px 10px 10px 2px;
   padding: 4px 10px; overflow-wrap: anywhere;
 }
 .call .ln { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; }
-.call small { font-family: var(--font-body); font-size: 12px; color: var(--muted); font-weight: 500; }
+.call small { font-size: 12px; color: var(--muted); font-weight: 500; }
 .note { font-size: 13px; color: var(--muted); margin-top: 4px; }
 .hit { font-style: normal; background: var(--yolk); color: var(--on-yolk); border-radius: 4px; padding: 0 3px; margin: 0 1px; }
 .shot { margin: 10px 0 2px; max-width: 220px; }
@@ -560,6 +559,15 @@ const moveKey = (s, m, i) => m.k || s.id + ":" + i;
 const allKeys = SONGS.flatMap(s => s.m.map((m, i) => moveKey(s, m, i)));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 // [글자] 로 감싼 부분을 강조 표시
+// 일본어 제목이 두 줄이 될 때 나눌 자리(|). 가사 노트(../index.html)의 TITLE_BREAK와 같은 목록
+const TITLE_BREAK = Object.fromEntries([
+  "緑黄色|社会", "溢れた|水の|行方", "陽は|また|昇るから", "ミチヲ|ユケ", "サマータイム|シンデレラ", "花に|なって", "風に|乗る", "マイル|ストーンの|種", "夏を|生きる", "夜祭|音頭", "透明だった|世界",
+  "始まりの|歌", "大人|ごっこ", "君が|望む|世界", "真夜中|ドライブ", "愛の|かたち", "あのころ|見た光", "これからのこと、|それからのこと", "安心|してね", "ずっと|ずっと|ずっと", "たとえ|たとえ",
+  "アラモードに|ワルツ", "スクリーンと|横顔", "ピンク|ブルー", "ジブン|セイフク", "湿気って|いる", "さもなくば|誰がやる", "恥ずかしいか|青春は", "ナイス|アイディア！", "ナイス|アイディア!", "マジック|アワー", "僕らは|いきもの|だから",
+  "馬鹿の|一つ覚え", "コーヒーと|ましゅまろ", "オーロラを|探しに", "誰かの|国", "分かり|にくい", "レジス|ダンス", "アウト|サイダー", "丘と|小さな|パラダイム", "それなりの|生活", "リトル|シンガー",
+  "空に|歌えば", "アーユー|レディー", "時の|いたずら", "夢と|悪魔と|ファンタジー",
+].map(s => [s.replace(/\|/g, ""), s]));
+const titleHTML = s => esc(TITLE_BREAK[s] || s).replace(/\|/g, "<wbr>");
 const hl = s => esc(s).replace(/\[(.+?)\]/g, '<em class="hit">$1</em>');
 // " / " 로 나눈 콜은 줄을 바꿔 보여 주고, 발음은 같은 줄 옆에 붙이되 자리가 모자라면 통째로 밑으로 내림
 const callHtml = (call, ko) => {
@@ -645,7 +653,7 @@ function render() {  const q = fold(state.q.trim());
     const nDone = s.m.filter((m, i) => done[moveKey(s, m, i)]).length;
     return `<details class="song${sl ? " key" : ""}" id="song-${s.id}" data-id="${s.id}"${opened.has(s.id) ? " open" : ""}>
       <summary class="song-head">
-        <h3 class="song-title" lang="ja">${sl ? `<span class="star" aria-label="${L("중요", "重要")}">★</span>` : ""}${esc(s.t)}</h3>
+        <h3 class="song-title" lang="ja">${sl ? `<span class="star" aria-label="${L("중요", "重要")}">★</span>` : ""}${titleHTML(s.t)}</h3>
         ${lang === "ja" ? "" : `<span class="song-ko">${esc(s.ko)}${s.en ? `<span class="en">${esc(s.en)}</span>` : ""}</span>`}
         ${badge || tag ? `<span class="badges">${badge}${tag}</span>` : ""}
         ${found ? `<span class="found">${markHit(found, q)}</span>` : ""}
@@ -751,7 +759,7 @@ function renderSetlist() {
     const n = i + 1;
     const [t, ko, id, en] = row || d[n];
     return `<li><span class="sl-no">${String(n).padStart(2, "0")}</span>
-      <span class="sl-name"><span class="sl-jp" lang="ja">${esc(t)}</span>${ko && lang !== "ja" ? `<span class="sl-ko">${esc(ko)}${en ? `<span class="en">${esc(en)}</span>` : ""}</span>` : ""}${row ? "" : `<span class="only">${L("이 날만", "この日のみ")}</span>`}</span>
+      <span class="sl-name"><span class="sl-jp" lang="ja">${titleHTML(t)}</span>${ko && lang !== "ja" ? `<span class="sl-ko">${esc(ko)}${en ? `<span class="en">${esc(en)}</span>` : ""}</span>` : ""}${row ? "" : `<span class="only">${L("이 날만", "この日のみ")}</span>`}</span>
       ${id ? `<a class="jump" href="#song-${id}" data-id="${id}">${L("콜 보기", "コールを見る")}</a>` : "<span></span>"}</li>`;
   }).join("");
 }
