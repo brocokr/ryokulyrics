@@ -34,6 +34,8 @@ try { var t = localStorage.getItem("ryokulyrics:theme"); if (t === "light" || t 
   --warn-bg: #fff3d1;
   --warn-ink: #5c4300;
   --bad: #c0392b;
+  /* JLPT 급수 색: N1 빨강, N2 주황, N3 노랑, N4 초록, N5 파랑. t는 글자 색 */
+  --n1: #e5484d; --n1t: #b3261e; --n2: #f07d1a; --n2t: #a84a00; --n3: #e3b000; --n3t: #7a5c00; --n4: #3f9b52; --n4t: #226b33; --n5: #2f7fe0; --n5t: #1c5cb0;
   /* 글꼴은 사이트 전체가 Noto Sans 하나. 영문·숫자·로마자 장음(ō, ā)은 Noto Sans, 가나·한자는 JP, 한글은 KR에서 찾는다.
      순서를 바꾸지 말 것: JP가 앞에 오면 장음 줄이 글자에서 떨어지고, KR이 JP보다 앞에 오면 한자가 한국 글자 모양으로 나온다 */
   --font: "Noto Sans", "Noto Sans JP", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Hiragino Sans", "Yu Gothic", sans-serif;
@@ -41,12 +43,12 @@ try { var t = localStorage.getItem("ryokulyrics:theme"); if (t === "light" || t 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #101a13; --surface: #17241b; --ink: #e6efe3; --muted: #9db0a1; --line: #2b3d30;
-    --leaf: #7cc58a; --yolk: #f2c247; --mask: #2b3d30; --warn-bg: #3a2f0f; --warn-ink: #f4d58a; --bad: #ff8f80; color-scheme: dark;
+    --leaf: #7cc58a; --yolk: #f2c247; --mask: #2b3d30; --warn-bg: #3a2f0f; --warn-ink: #f4d58a; --bad: #ff8f80; --n1: #ff6b6b; --n1t: #ff8f8a; --n2: #ff9a3d; --n2t: #ffad5e; --n3: #f2c247; --n3t: #f5cf60; --n4: #7cc58a; --n4t: #8bd299; --n5: #5aa9ff; --n5t: #82bdff; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #101a13; --surface: #17241b; --ink: #e6efe3; --muted: #9db0a1; --line: #2b3d30;
-  --leaf: #7cc58a; --yolk: #f2c247; --mask: #2b3d30; --warn-bg: #3a2f0f; --warn-ink: #f4d58a; --bad: #ff8f80; color-scheme: dark;
+  --leaf: #7cc58a; --yolk: #f2c247; --mask: #2b3d30; --warn-bg: #3a2f0f; --warn-ink: #f4d58a; --bad: #ff8f80; --n1: #ff6b6b; --n1t: #ff8f8a; --n2: #ff9a3d; --n2t: #ffad5e; --n3: #f2c247; --n3t: #f5cf60; --n4: #7cc58a; --n4t: #8bd299; --n5: #5aa9ff; --n5t: #82bdff; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body {
@@ -113,6 +115,18 @@ body:not([data-view="home"]) .home-only { display: none; }
 .pban-t.has-ic { grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; }
 .pban-t.has-ic:not(:has(img)) { grid-template-columns: minmax(0, 1fr); }
 .pban-t img { grid-row: 1 / span 2; align-self: center; display: block; width: 50px; height: 50px; padding: 7px; background: #fff; border-radius: 12px; }
+/* 인스타그램 로고: 칸이 넓으면 글자 왼쪽에 크게, 좁으면 아이디 앞에 작게 */
+.pban-t.ig-t { column-gap: 11px; }
+.pban-t.ig-t img { align-self: start; width: 42px; height: 42px; padding: 0; background: none; border-radius: 11px; }
+@container (max-width: 215px) {
+  .pban-t.ig-t { column-gap: 6px; }
+  .pban-t.ig-t img { grid-row: 1; align-self: center; width: 18px; height: 18px; border-radius: 5px; }
+  .pban-t.ig-t small { grid-column: 1 / -1; }
+}
+@container (max-width: 150px) {
+  .pban-t.ig-t { column-gap: 4px; }
+  .pban-t.ig-t img { width: 14px; height: 14px; border-radius: 4px; }
+}
 /* 작은 배너의 버튼은 두 개여도 한 줄에 두고, 자리가 모자라면 앞의 하나만 남긴다(옆 배너와 높이가 같도록) */
 .pban:not(.big) .pban-go { flex-wrap: nowrap; }
 .pban:not(.big) .pban-go:has(.more) a { padding-inline: 3cqi; font-size: 13px; }
@@ -211,7 +225,7 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .ord { font-weight: 800; color: var(--leaf); }
 .album-title { font-weight: 800; font-size: 21px; line-height: 1.25; margin-top: 6px; overflow-wrap: anywhere; }
 /* 일본어 제목은 정해 둔 자리(titleHTML의 <wbr>)에서만 줄을 바꾼다. 한 덩어리가 칸보다 길 때만 글자 중간에서 나뉜다 */
-.album-title, .album-name, .song-title, .tjp, .qs-t, .pager span { word-break: keep-all; overflow-wrap: anywhere; }
+.album-title, .album-name, .song-title, .tjp, .qs-t, .pop-jp, .pager span { word-break: keep-all; overflow-wrap: anywhere; }
 .album-ko { font-size: 13px; color: var(--muted); }
 .album-desc { margin-top: 6px; font-size: 12px; line-height: 1.5; color: var(--muted); word-break: keep-all; text-wrap: balance; }
 /* 작은 카드(그 외의 곡): GROUPS의 small. PC는 cols대로, 좁은 화면은 3장씩 */
@@ -266,6 +280,49 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .rel:has(.cover.none) { padding-left: 10px; }
 .rel-tag { flex: none; font-size: 11.5px; font-weight: 800; white-space: nowrap; color: var(--ct); }
 .rel-title { min-width: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* 인기곡 순위(첫 화면): 연도별 디스코그래피와 같은 접는 칸. 넓으면 두 줄로 나눠 위에서 아래로 읽는다(--rows: 한 줄의 곡 수) */
+.tl + .tl { margin-top: 8px; }
+.pop-body { padding: 4px 16px 14px; }
+.pop-list { display: grid; grid-auto-flow: column; grid-template-rows: repeat(var(--rows), auto); grid-auto-columns: minmax(0, 1fr); gap: 0 28px; margin: 10px 0 0; padding: 0; list-style: none; }
+.pop-list + .pop-list { margin-top: 16px; }
+.pop-list li { display: grid; border-top: 1px dashed var(--line); }
+.pop { display: grid; grid-template-columns: 1.9em 42px minmax(0, 1fr) auto; align-items: center; gap: 0 10px; padding: 7px 0; color: inherit; text-decoration: none; }
+.pop:hover .pop-jp { color: var(--leaf); }
+.pop-n { font-size: 15px; font-weight: 800; text-align: center; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pop-n.best { font-size: 19px; font-weight: 900; color: var(--leaf); }
+.pop .cover { border-radius: 8px; }
+.pop-t { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; min-width: 0; }
+.pop-jp { font-size: 15px; font-weight: 800; line-height: 1.35; }
+.pop-t small { font-size: 12px; color: var(--muted); }
+.pop-c { text-align: right; line-height: 1.35; font-variant-numeric: tabular-nums; }
+.pop-c b { display: block; font-size: 15px; font-weight: 800; white-space: nowrap; }
+.pop-c small { display: block; font-size: 11.5px; white-space: nowrap; color: var(--muted); }
+.pop-more { display: flex; justify-content: center; padding-top: 12px; border-top: 1px dashed var(--line); }
+.pop-note { margin: 12px 0 0; font-size: 12px; word-break: keep-all; color: var(--muted); }
+/* 실시간으로 올라가는 수 옆의 점 */
+.live-dot { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--leaf); animation: live 1.6s ease-in-out infinite; }
+@keyframes live { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+@media (max-width: 860px) { .pop-list { grid-auto-flow: row; grid-auto-columns: auto; grid-template-rows: none; } .pop-list + .pop-list { margin-top: 0; } }
+@media (max-width: 480px) {
+  .pop { grid-template-columns: 1.7em 42px minmax(0, 1fr); }
+  .pop-n { grid-row: 1 / span 2; }
+  .pop .cover { grid-row: 1 / span 2; }
+  .pop-c { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; text-align: left; }
+}
+/* 곡 화면의 스트리밍 수 */
+.song-plays { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; margin-top: 6px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.song-plays b { font-size: 15px; font-weight: 800; color: var(--ink); }
+/* 공부·퀴즈 곡 목록의 순서 고르기와 인기순 목록 */
+.song-sort { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 32px 0 -14px; }
+.quiz-note + .song-sort { margin-top: 26px; }
+.qs-rank { margin-right: 4px; font-size: 13px; font-weight: 800; color: var(--leaf); }
+/* 이웃한 카드의 제목이 두 줄이어도 아래 줄(곡 정보·외운 것)끼리 높이가 맞게 남는 자리는 제목 칸이 가져간다 */
+.quiz-song { grid-template-rows: minmax(min-content, 1fr); }
+.quiz-song .qs-main { align-self: start; }
+.qs-plays { grid-column: 1; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.qs-plays b { font-size: 13px; color: var(--ink); }
 
 /* album page */
 .back { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; font-size: 14px; font-weight: 700; text-decoration: none; }
@@ -507,6 +564,17 @@ mark { background: var(--yolk); color: var(--on-yolk); border-radius: 3px; paddi
 .st-head { padding-block: 14px 0; }
 .st-head h1 { font-size: clamp(26px, 5.4vw, 36px); line-height: 1.25; margin: 0; overflow-wrap: anywhere; }
 .st-head p { margin: 2px 0 10px; font-size: 14px; color: var(--muted); }
+/* 곡 제목 옆의 평균 JLPT 급수 */
+.st-title { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.st-avg { align-self: start; padding: 1px 9px; font-size: 11.5px; font-weight: 800; line-height: 1.6; white-space: nowrap; color: var(--lt); background: color-mix(in srgb, var(--lc) 15%, transparent); border: 1.5px solid var(--lc); border-radius: 999px; font-variant-numeric: tabular-nums; }
+.st-avg.n1 { --lc: var(--n1); --lt: var(--n1t); }
+.st-avg.n2 { --lc: var(--n2); --lt: var(--n2t); }
+.st-avg.n3 { --lc: var(--n3); --lt: var(--n3t); }
+.st-avg.n4 { --lc: var(--n4); --lt: var(--n4t); }
+.st-avg.n5 { --lc: var(--n5); --lt: var(--n5t); }
+.st-avg.big { align-self: center; padding: 2px 12px; font-size: 13.5px; }
+.quiz-song .st-avg { grid-column: 2; grid-row: 1; margin-top: 1px; }
+.st-avg-note { margin: 22px 0 -14px; }
 .st-set { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 14px; }
 .st-card { gap: 12px; }
 .st-face { display: grid; justify-items: center; align-content: center; gap: 8px; min-height: 148px; padding: 12px 8px; text-align: center; cursor: pointer; background: var(--bg); border-radius: 12px; }
@@ -838,7 +906,14 @@ function loadLyrics() {
     s.onload = s.onerror = () => resolve();
     document.head.append(s);
   });
-  return Promise.all([jlpt, ...ALBUMS.map(al => new Promise(resolve => {
+  // streams.js: 곡별 스트리밍 수(window.STREAMS_DATA). 없거나 깨져도 인기곡 순위만 빠지고 사이트는 그대로 열린다.
+  const streams = new Promise(resolve => {
+    const s = document.createElement("script");
+    s.src = "streams.js";
+    s.onload = s.onerror = () => resolve();
+    document.head.append(s);
+  });
+  return Promise.all([jlpt, streams, ...ALBUMS.map(al => new Promise(resolve => {
     const s = document.createElement("script");
     s.src = `가사/${al.file}.js`;
     s.onload = () => { fileState[al.file] = LYRICS[al.file] ? "ok" : "broken"; resolve(); };
@@ -860,6 +935,69 @@ function lyricsFor(t) {
 }
 const hasLyrics = t => has(lyricsFor(t).d?.원문);
 const hasTranslation = t => has(lyricsFor(t).d?.해석);
+
+/* ---------- 인기곡 (스트리밍 수) ---------- */
+
+/* streams.js는 kworb.net에 정리된 Spotify 재생 수입니다: 기준 날짜, 모든 곡의 합계, 곡마다 [제목, 누적, 하루].
+   Spotify는 지금 이 순간의 수를 알려 주지 않으므로, 기준 날짜부터 흐른 시간만큼 하루 재생 수를 더해 지금 수를 어림합니다.
+   도구/streams/update-streams.ps1이나 깃허브의 streams 작업(.github/workflows/streams.yml, 하루 한 번)이 새로 씁니다. */
+const STREAMS_URL = "https://raw.githubusercontent.com/brocokr/ryokulyrics/main/streams.js";
+// 제목이 사이트와 다르게 적힌 곡. TV Edit 같은 다른 버전은 사이트에 없는 트랙이라 순위에 넣지 않는다.
+const STREAM_NAMES = { "花になって - Be a flower": "花になって", "Alice -Album version-": "Alice" };
+let STREAMS = null; // { updated, base, all: { n, d }, by: { 제목: 곡 }, list: [곡] }, 곡 = { key, n, d, t }
+function setStreams(data) {
+  const base = data && Date.parse(data.updated);
+  if (!base || !Array.isArray(data.tracks) || !Array.isArray(data.total) || (STREAMS && data.updated <= STREAMS.updated)) return;
+  const by = Object.create(null);
+  for (const [name, n, d] of data.tracks) {
+    const key = norm(STREAM_NAMES[name] || name);
+    const same = ALL.filter(t => norm(t.jp) === key);
+    if (same.length && !by[key]) by[key] = { key, n, d, t: same.find(t => has(own(t)?.원문)) || same[0] };
+  }
+  STREAMS = { updated: data.updated, base, all: { n: data.total[0], d: data.total[1] }, by, list: Object.values(by) };
+}
+const streamNow = s => Math.floor(s.n + s.d * Math.max(0, Date.now() - STREAMS.base) / 864e5);
+const streamOf = t => (STREAMS && STREAMS.by[norm(t.jp)]) || null;
+const numText = n => n.toLocaleString("ko");
+// 저절로 올라가는 수. 열쇠가 "*"이면 모든 곡의 합계
+const liveHTML = s => `<span data-live="${s === STREAMS.all ? "*" : esc(s.key)}">${numText(streamNow(s))}</span>`;
+const ranking = daily => [...STREAMS.list].sort((a, b) => (daily ? b.d - a.d : streamNow(b) - streamNow(a)) || b.n - a.n);
+setInterval(() => {
+  if (!STREAMS || document.hidden) return;
+  for (const el of document.querySelectorAll("[data-live]")) {
+    const s = el.dataset.live === "*" ? STREAMS.all : STREAMS.by[el.dataset.live];
+    const text = s && numText(streamNow(s));
+    if (text && el.textContent !== text) el.textContent = text;
+  }
+}, 500);
+// 깃허브 작업이 streams.js를 새로 썼어도 사이트에는 늦게 올라올 수 있어서, 저장소의 파일을 한 번 더 확인한다.
+const refreshStreams = () => fetch(STREAMS_URL, { cache: "no-cache" }).then(r => (r.ok ? r.text() : "")).then(s => {
+  const m = /STREAMS_DATA = (\{[\s\S]*\});/.exec(s);
+  if (m) setStreams(JSON.parse(m[1]));
+}).catch(() => {});
+
+// 곡 화면: 제목 아래의 스트리밍 수
+function playsHTML(t) {
+  const s = streamOf(t);
+  if (!s) return "";
+  return `<div class="song-plays" title="Spotify 스트리밍 수(${STREAMS.updated} 기준)에 그 뒤로 흐른 시간만큼 하루 스트리밍 수를 더해 어림한 수예요."><span><i class="live-dot"></i>스트리밍 <b>${liveHTML(s)}</b>회</span><span>인기 ${ranking().indexOf(s) + 1}위</span>${s.d ? `<span>하루 +${numText(s.d)}</span>` : ""}<span>Spotify · 실시간 어림</span></div>`;
+}
+
+// 공부·퀴즈의 곡 목록: 앨범순(앨범 묶음별)이나 인기순(한 묶음). list는 곡 카드의 자료, trackOf는 그 곡, card(x, 순위·스트리밍 줄)는 카드 HTML
+const bySong = () => STREAMS && prefs.songSort === "pop";
+const songSortHTML = () => (STREAMS ? `<div class="song-sort"><span class="qs-label">곡 순서</span>${segHTML("곡 순서", "data-song-sort", [["album", "앨범순"], ["pop", "인기순"]], bySong() ? "pop" : "album")}</div>` : "");
+function songListHTML(list, trackOf, card) {
+  if (!bySong()) return GROUPS.map(g => {
+    const part = list.filter(x => trackOf(x).album.group === g.id);
+    return part.length ? `<section class="group"><h2>${g.name}</h2><div class="quiz-songs">${part.map(x => card(x, "")).join("")}</div></section>` : "";
+  }).join("");
+  const order = ranking(), place = x => { const i = order.indexOf(streamOf(trackOf(x))); return i < 0 ? Infinity : i; };
+  const sorted = list.map(x => ({ x, i: place(x) })).sort((a, b) => (a.i === b.i ? 0 : a.i - b.i));
+  return `<section class="group"><h2>인기순</h2><p class="quiz-note">Spotify 스트리밍 수(실시간 어림)가 많은 곡부터 나와요. 순위는 녹황색사회의 모든 곡 가운데서 매긴 거예요.</p><div class="quiz-songs">${sorted.map(({ x, i }) => {
+    const s = streamOf(trackOf(x));
+    return s ? card(x, `<span class="qs-plays"><span class="qs-rank">${i + 1}위</span> 스트리밍 <b>${liveHTML(s)}</b>회</span>`) : card(x, "");
+  }).join("")}</div></section>`;
+}
 
 // 빈 줄을 빼고 원문·발음·해석을 줄 번호로 짝짓는다. 절 나눔은 원문의 빈 줄을 따른다.
 function layout(d) {
@@ -1031,7 +1169,7 @@ const store = {
   get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
   set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
 };
-const prefs = Object.assign({ mode: "all", pr: true, hg: true, furi: true, studyOpen: false, tl: false }, store.get("ryokushaka-lyrics:prefs", {}));
+const prefs = Object.assign({ mode: "all", pr: true, hg: true, furi: true, studyOpen: false, tl: false, pop: false, popSort: "total", songSort: "album" }, store.get("ryokushaka-lyrics:prefs", {}));
 if (!["all", "ko", "jp"].includes(prefs.mode)) prefs.mode = "all";
 const savePrefs = () => store.set("ryokushaka-lyrics:prefs", prefs);
 
@@ -1334,13 +1472,11 @@ function renderQuizHome(msg) {
         const b = qrec.best["n" + n], c = k => bank.filter(q => q.kind === k).length;
         return `<a class="quiz-lv" href="#/quiz/n${n}"><b>N${n}</b><span class="lv-n"><span>단어 ${c("word")}</span><span>읽기 ${c("read")}</span></span>${b ? `<span class="lv-best">최고 ${b.score}/${b.n}</span>` : ""}</a>`;
       }).join("")}</div></section>` : ""}
-      ${GROUPS.map(g => {
-        const list = Q.songs.filter(s => s.t.album.group === g.id);
-        return list.length ? `<section class="group"><h2>${g.name}</h2><div class="quiz-songs">${list.map(s => {
-          const b = qrec.best[s.id];
-          return `<a class="quiz-song" href="#/quiz/${s.t.album.key}/${s.t.no}"><span class="qs-main"><span class="qs-t" lang="ja">${titleHTML(s.title)}</span>${s.ko ? `<span class="qs-ko">${esc(s.ko)}</span>` : ""}</span><span class="qs-meta">${esc(s.t.album.label)}${isSolo(s.t.album) ? "" : ` ${s.t.no}번`} · 단어 ${count(s, "word")} · 문법 ${count(s, "gram")} · 읽기 ${count(s, "read")}</span>${b ? `<span class="qs-best">최고 ${b.score}/${b.n}</span>` : ""}</a>`;
-        }).join("")}</div></section>` : "";
-      }).join("")}
+      ${songSortHTML()}
+      ${songListHTML(Q.songs, s => s.t, (s, plays) => {
+        const b = qrec.best[s.id];
+        return `<a class="quiz-song" href="#/quiz/${s.t.album.key}/${s.t.no}"><span class="qs-main"><span class="qs-t" lang="ja">${titleHTML(s.title)}</span>${s.ko ? `<span class="qs-ko">${esc(s.ko)}</span>` : ""}</span>${plays}<span class="qs-meta">${esc(s.t.album.label)}${isSolo(s.t.album) ? "" : ` ${s.t.no}번`} · 단어 ${count(s, "word")} · 문법 ${count(s, "gram")} · 읽기 ${count(s, "read")}</span>${b ? `<span class="qs-best">최고 ${b.score}/${b.n}</span>` : ""}</a>`;
+      })}
     </div>`;
 }
 
@@ -1518,7 +1654,7 @@ function studyData() {
 }
 
 // 기록: 외운 것(known), '아직이에요'를 누른 것(again), 보기 설정. 이 브라우저에만 저장된다.
-const srec = Object.assign({ known: {}, again: {}, n: 10, view: "card", kind: "all", furi: true, hide: false, left: false, last: "" }, store.get("ryokushaka-lyrics:study", {}));
+const srec = Object.assign({ known: {}, again: {}, n: 10, view: "card", order: "random", kind: "all", furi: true, hide: false, left: false, last: "" }, store.get("ryokushaka-lyrics:study", {}));
 const saveStudy = () => store.set("ryokushaka-lyrics:study", srec);
 const isKnown = x => !!srec.known[x.id];
 function setKnown(x, on) {
@@ -1545,6 +1681,15 @@ function studyDeck(key, no) {
   return x && { path: `${s.t.album.key}/${s.t.no}`, title: s.title, ja: true, sub: [s.ko, s.t.en].filter(Boolean).join(" · "), items: x.items, song: s, quiz: `#/quiz/${s.t.album.key}/${s.t.no}`, kinds: true };
 }
 
+// 곡 단어의 평균 JLPT 급수. 문법은 급수가 없어서 빼고, Anki 덱 단계로 짐작한 b·m·a는 걸치는 급수의 가운데 값으로 셈한다. 평균은 소수 한 자리에서 반올림하고, 딱 가운데(N2.5)면 어려운 쪽(N2)으로 올린다. 2.6도 N2로 올리고 4.2부터는 N5로 내린다(사용자 결정, 3.6은 N4 그대로). 숫자가 클수록 쉽다.
+const LV_MID = { b: 5, m: 3.5, a: 1.5 };
+const lvNum = v => LV_MID[v] || Number(String(v).replace(/^e/, "")) || 0;
+function avgLevelHTML(items, big) {
+  const n = items.filter(x => x.kind === "word").map(x => lvNum(x.lv)).filter(Boolean);
+  const a = n.length ? Math.round(n.reduce((a, b) => a + b, 0) / n.length * 10) / 10 : 0;
+  const lv = a >= 4.2 ? 5 : a > 2 && a <= 2.6 ? 2 : Math.ceil(a - .5);
+  return a ? `<span class="st-avg n${lv}${big ? " big" : ""}" title="이 곡에 나오는 단어들의 급수를 모아서 정했어요. 숫자가 클수록 쉬워요.">JLPT N${lv}</span>` : "";
+}
 const meterHTML = items => {
   const k = items.filter(isKnown).length;
   return `<span class="st-prog"><span class="meter"><i class="m-fill" style="width:${items.length ? k / items.length * 100 : 0}%"></i></span><small>외운 것 ${k} / ${items.length}</small></span>`;
@@ -1574,11 +1719,10 @@ function renderStudyHome(msg) {
         ${again ? `<a class="quiz-go ghost" href="#/study/again">아직 못 외운 것 · ${again}</a>` : ""}
         ${wrong ? `<a class="quiz-go ghost" href="#/study/wrong">퀴즈에서 틀린 것 · ${wrong}</a>` : ""}
       </div>
-      ${S.levels.length ? `<section class="group"><h2>JLPT 급수별</h2><p class="quiz-note">모든 곡의 단어를 급수로 나눴어요. 문법은 급수가 없어서 곡별 공부에서만 나와요. N5와 N4에서는 영어 발음을 켜고 끌 수 있어요.</p><div class="quiz-lvs">${S.levels.map(({ n, items }) => `<a class="quiz-lv" href="#/study/n${n}"><b>N${n}</b><span>단어 ${items.length}</span>${meterHTML(items)}</a>`).join("")}</div></section>` : ""}
-      ${GROUPS.map(g => {
-        const list = S.songs.filter(x => x.s.t.album.group === g.id);
-        return list.length ? `<section class="group"><h2>${g.name}</h2><div class="quiz-songs">${list.map(({ s, items }) => `<a class="quiz-song" href="#/study/${s.t.album.key}/${s.t.no}"><span class="qs-main"><span class="qs-t" lang="ja">${titleHTML(s.title)}</span>${s.ko ? `<span class="qs-ko">${esc(s.ko)}</span>` : ""}</span><span class="qs-meta">${esc(s.t.album.label)}${isSolo(s.t.album) ? "" : ` ${s.t.no}번`} · 단어 ${count(items, "word")} · 문법 ${count(items, "gram")}</span>${meterHTML(items)}</a>`).join("")}</div></section>` : "";
-      }).join("")}
+      ${S.levels.length ? `<section class="group"><h2>JLPT 급수별</h2><p class="quiz-note">모든 곡의 단어를 급수로 나눴어요. 문법은 급수가 없어서 곡별 공부에서만 나와요. N5와 N4에서는 영어 발음을 켜고 끌 수 있어요.</p><div class="quiz-lvs">${S.levels.map(({ n, items }) => `<a class="quiz-lv" href="#/study/n${n}"><b>N${n}</b><span>단어 ${items.length}</span>${meterHTML(items)}</a>`).join("")}</div></section>
+      <p class="quiz-note st-avg-note">곡 제목 옆의 'JLPT N3'은 그 곡에 나오는 단어들의 급수를 모아서 정한 거예요. 숫자가 클수록 쉬운 곡이에요(N5가 가장 쉬워요).</p>` : ""}
+      ${songSortHTML()}
+      ${songListHTML(S.songs, x => x.s.t, ({ s, items }, plays) => `<a class="quiz-song" href="#/study/${s.t.album.key}/${s.t.no}"><span class="qs-main"><span class="qs-t" lang="ja">${titleHTML(s.title)}</span>${s.ko ? `<span class="qs-ko">${esc(s.ko)}</span>` : ""}</span>${avgLevelHTML(items)}${plays}<span class="qs-meta">${esc(s.t.album.label)}${isSolo(s.t.album) ? "" : ` ${s.t.no}번`} · 단어 ${count(items, "word")} · 문법 ${count(items, "gram")}</span>${meterHTML(items)}</a>`)}
     </div>`;
 }
 
@@ -1590,14 +1734,15 @@ function renderStudy(key, no) {
   startStudy(deck);
 }
 
-// 카드는 아직 외우지 않은 것부터 고른 장수만큼 나온다. 다 외웠으면 처음부터 다시 나온다.
+// 카드는 아직 외우지 않은 것 가운데 고른 장수만큼 나온다. 다 외웠으면 처음부터 다시 나온다. 순서는 랜덤이나 순서대로(가사에 나온 순서)를 고른다.
 function startStudy(deck, again) {
   const kind = deck.kinds ? srec.kind : "all";
   let items = deck.items.filter(x => kind === "all" || x.kind === kind);
   const left = deck.every ? items : items.filter(x => !isKnown(x));
   let pool = left.length ? left : items;
-  if (deck.mix) pool = RQ.shuffle(pool);
-  srun = { deck, items, list: again || (srec.n ? pool.slice(0, srec.n) : pool), i: 0, open: false, marks: [], review: !left.length };
+  const random = deck.mix || srec.order !== "order";
+  if (random) pool = RQ.shuffle(pool);
+  srun = { deck, items, list: again ? (random ? RQ.shuffle(again) : again) : srec.n ? pool.slice(0, srec.n) : pool, i: 0, open: false, marks: [], review: !left.length };
   document.title = `${deck.title} · 가사 공부`;
   drawStudy();
 }
@@ -1614,13 +1759,14 @@ function drawStudy() {
     <div class="narrow${d.rom && qrec.rom ? " rom-on" : ""}">
       <div class="quiz-bar"><a class="back" href="#/study">← 가사 공부</a>${d.rom ? romBtnHTML() : ""}</div>
       <header class="st-head">
-        <h1${d.ja ? ' lang="ja"' : ""}>${d.ja ? titleHTML(d.title) : esc(d.title)}</h1>
+        <div class="st-title"><h1${d.ja ? ' lang="ja"' : ""}>${d.ja ? titleHTML(d.title) : esc(d.title)}</h1>${d.song ? avgLevelHTML(d.items, true) : ""}</div>
         ${d.sub ? `<p>${esc(d.sub)}</p>` : ""}
         <div id="stMeter">${meterHTML(d.items)}</div>
       </header>
       <div class="st-set">
         ${d.cardOnly ? "" : segHTML("보기", "data-st-view", [["card", "카드"], ["list", "목록"]], srec.view)}
         ${d.kinds ? segHTML("종류", "data-st-kind", [["all", "모두"], ["word", "단어"], ["gram", "문법"]], srec.kind) : ""}
+        ${list || d.mix ? "" : segHTML("카드 순서", "data-st-order", [["random", "랜덤"], ["order", "순서대로"]], srec.order === "order" ? "order" : "random")}
         ${list ? "" : countSeg()}
         <label class="check"><input type="checkbox" data-st-opt="furi"${srec.furi ? " checked" : ""}> 후리가나</label>
         ${list ? `<label class="check"><input type="checkbox" data-st-opt="hide"${srec.hide ? " checked" : ""}> 뜻 가리기</label><label class="check"><input type="checkbox" data-st-opt="left"${srec.left ? " checked" : ""}> 안 외운 것만</label>` : ""}
@@ -1713,6 +1859,7 @@ function studyClick(e) {
   if ((b = at("[data-st-n]"))) { srec.n = Number(b.dataset.stN); saveStudy(); srun ? startStudy(srun.deck) : renderStudyHome(); return true; }
   if (!srun) return false;
   if ((b = at("[data-st-view]"))) { srec.view = b.dataset.stView; saveStudy(); startStudy(srun.deck); return true; }
+  if ((b = at("[data-st-order]"))) { srec.order = b.dataset.stOrder; saveStudy(); startStudy(srun.deck); return true; }
   if ((b = at("[data-st-kind]"))) { srec.kind = b.dataset.stKind; saveStudy(); startStudy(srun.deck); return true; }
   if (at("[data-st-open]")) { srun.open = true; drawStudyMain(true); return true; }
   if (at("[data-st-yes]")) { studyMark(true); return true; }
@@ -1842,7 +1989,7 @@ function renderHome() {
           <div class="pban-go"><a class="main" href="call/index.html">${HL("곡별 콜 보기", "曲ごとのコールを見る")}</a></div></div>
         <div class="pban"><a class="pban-pic pic-quiz" href="#/study"><span class="pban-t"><b>${HL("가사로 일본어 공부", "歌詞で学ぶ日本語")}</b><small>${HL("단어·문법을 곡별, 급수별로 공부하고 퀴즈로 복습해요", "単語・文法を曲別に学んでクイズで復習")}</small></span></a>
           <div class="pban-go"><a class="main" href="#/study">${HL("공부하기", "学習する")}</a><a class="more" href="#/quiz">${HL("퀴즈 풀기", "クイズ")}</a></div></div>
-        <div class="pban"><a class="pban-pic pic-ig" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener" title="${HL("제작자 인스타그램", "制作者のInstagram")}"><span class="pban-t"><b>@brocoplaylist</b><small>${HL("인스타그램", "Instagram")}</small></span></a>
+        <div class="pban"><a class="pban-pic pic-ig" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener" title="${HL("제작자의 인스타그램", "制作者のInstagram")}"><span class="pban-t has-ic ig-t"><img src="Instagram_icon.png" alt="" onerror="this.remove()"><b>@brocoplaylist</b><small>${HL("제작자의 인스타그램", "制作者のInstagram")}</small></span></a>
           <div class="pban-go"><a class="main" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener">${HL("프로필 보기", "プロフィール")}</a></div></div>
       </div>
       </div>
@@ -1872,15 +2019,38 @@ function renderHomeBody() {
   const body = document.getElementById("homeBody");
   const needle = query.trim().toLowerCase();
   if (needle) { body.innerHTML = resultsHTML(search(needle), needle); return; }
-  body.innerHTML = timelineHTML() + GROUPS.map(g => `
+  body.innerHTML = popularHTML() + timelineHTML() + GROUPS.map(g => `
     <section class="group">
       <h2>${HL(g.name, g.nameJa)}</h2>
       <p class="sub">${HL(g.sub, g.subJa)}</p>
       <div class="albums${g.small ? " small" : ""}" style="--cols: ${g.cols}">${ALBUMS.filter(al => al.group === g.id).map(albumCard).join("")}</div>
     </section>`).join("");
-  // 연도별 디스코그래피를 펴 두었는지 기억한다
-  const tl = body.querySelector(".tl");
-  tl.addEventListener("toggle", () => { prefs.tl = tl.open; savePrefs(); });
+  // 인기곡 순위와 연도별 디스코그래피를 펴 두었는지 기억한다
+  body.querySelectorAll("[data-fold]").forEach(el => el.addEventListener("toggle", () => { prefs[el.dataset.fold] = el.open; savePrefs(); }));
+}
+
+// 인기곡 순위: 접어 두는 칸. 누적이나 하루 스트리밍이 많은 순서로 10곡을 보여 주고, 버튼을 누르면 전부 보여 준다.
+let popAll = false;
+const POP_TOP = 10;
+function popularHTML() {
+  if (!STREAMS) return "";
+  return `<details class="tl" data-fold="pop"${prefs.pop ? " open" : ""}>
+    <summary>${HL("인기곡 순위", "人気曲ランキング")}<small><i class="live-dot"></i>${HL("모든 곡 스트리밍", "全曲の再生数")} ${liveHTML(STREAMS.all)}${HL("회", "回")}</small></summary>
+    <div class="pop-body">${popBodyHTML()}</div>
+  </details>`;
+}
+function popBodyHTML() {
+  const daily = prefs.popSort === "day", order = ranking(daily), list = popAll ? order : order.slice(0, POP_TOP);
+  const perDay = HL("하루", "1日"), blocks = [];
+  for (let i = 0; i < list.length; i += POP_TOP) blocks.push(list.slice(i, i + POP_TOP));
+  return `${segHTML(HL("순위 기준", "ランキングの基準"), "data-pop-sort", [["total", HL("누적 스트리밍", "累計再生数")], ["day", HL("하루 스트리밍", "1日の再生数")]], daily ? "day" : "total")}
+    ${blocks.map((part, k) => `<ol class="pop-list" start="${k * POP_TOP + 1}" style="--rows: ${Math.ceil(part.length / 2)}">${part.map((s, j) => [s, k * POP_TOP + j]).map(([s, i]) => `<li><a class="pop" href="#/s/${s.t.album.key}/${s.t.no}"><span class="pop-n${i < 3 ? " best" : ""}">${i + 1}</span>${coverHTML(s.t.album)}<span class="pop-t"><span class="pop-jp" lang="ja">${titleHTML(s.t.jp)}</span>${HL(s.t.ko, "") ? `<small>${esc(s.t.ko)}</small>` : ""}</span><span class="pop-c">${daily ? `<b>+${numText(s.d)}</b><small>${HL("누적", "累計")} ${liveHTML(s)}</small>` : `<b>${liveHTML(s)}</b><small>${perDay} +${numText(s.d)}</small>`}</span></a></li>`).join("")}</ol>`).join("")}
+    <div class="pop-more"><button type="button" class="ghost-btn" data-pop-all aria-expanded="${popAll}">${popAll ? HL(`${POP_TOP}곡만 보기`, `${POP_TOP}曲だけ見る`) : HL(`${order.length}곡 전부 보기`, `全${order.length}曲を見る`)}</button></div>
+    <p class="pop-note">${HL(`<a href="https://kworb.net/spotify/artist/4SJ7qRgJYNXB9Yttzs4aSa_songs.html" target="_blank" rel="noopener">kworb.net</a>에 정리된 Spotify 스트리밍 수(${STREAMS.updated} 기준)에, 그 뒤로 흐른 시간만큼 하루 스트리밍 수를 더해서 지금 수를 어림했어요. 실제 수와 조금 다를 수 있어요.`, `<a href="https://kworb.net/spotify/artist/4SJ7qRgJYNXB9Yttzs4aSa_songs.html" target="_blank" rel="noopener">kworb.net</a>がまとめたSpotifyの再生数（${STREAMS.updated}時点）に、その後の時間ぶんの1日の再生数を足して、今の再生数を推定しています。実際の数とは少し違うことがあります。`)}</p>`;
+}
+function drawPop(focus) {
+  document.querySelector(".pop-body").innerHTML = popBodyHTML();
+  document.querySelector(focus).focus({ preventScroll: true });
 }
 
 // 연도별 디스코그래피: 접어 두는 작은 타임라인. 발매일 순서로 늘어놓고 해마다 묶는다. 날짜가 연도뿐인 곡(2013)은 그 해 맨 앞에 온다.
@@ -1888,7 +2058,7 @@ const yearOf = al => al.date.slice(0, 4);
 function timelineHTML() {
   const rels = [...ALBUMS].sort((a, b) => a.date.localeCompare(b.date));
   const years = [...new Set(rels.map(yearOf))];
-  return `<details class="tl"${prefs.tl ? " open" : ""}>
+  return `<details class="tl" data-fold="tl"${prefs.tl ? " open" : ""}>
     <summary>${HL("연도별 디스코그래피", "年別ディスコグラフィー")}<small>${years[0]}~${years[years.length - 1]} · ${HL("발매", "リリース")} ${rels.length}</small></summary>
     <div class="tl-body">${years.map((y, i) => `
       <div class="year${i % 2 ? " alt" : ""}">
@@ -2214,6 +2384,7 @@ function renderSong(t, line) {
       <h1 class="song-title" lang="ja">${titleHTML(t.jp)}${t.read ? `<span class="read">${esc(t.read)}</span>` : ""}</h1>
       ${t.ko || t.en ? `<div class="song-ko">${[t.ko, t.en].filter(Boolean).map(esc).join(" · ")}</div>` : ""}
       ${creditHTML(t)}
+      ${playsHTML(t)}
       ${al.desc ? `<div class="album-desc">${esc(al.desc)}</div>` : ""}
     </header>
     ${videoHTML(t)}
@@ -2263,6 +2434,27 @@ function applyPrefs() {
 }
 
 app.addEventListener("click", e => {
+  const sortBtn = e.target.closest("[data-song-sort]");
+  if (sortBtn) {
+    prefs.songSort = sortBtn.dataset.songSort;
+    savePrefs();
+    if (document.body.dataset.view === "quiz") renderQuizHome(); else renderStudyHome();
+    app.querySelector(`[data-song-sort="${prefs.songSort}"]`).focus({ preventScroll: true });
+    return;
+  }
+  const popBtn = e.target.closest("[data-pop-sort]");
+  if (popBtn) {
+    prefs.popSort = popBtn.dataset.popSort;
+    savePrefs();
+    drawPop(`[data-pop-sort="${prefs.popSort}"]`);
+    return;
+  }
+  if (e.target.closest("[data-pop-all]")) {
+    popAll = !popAll;
+    drawPop("[data-pop-all]");
+    if (!popAll) document.querySelector("[data-pop-all]").scrollIntoView({ block: "nearest" });
+    return;
+  }
   if (document.body.dataset.view === "quiz" && quizClick(e)) return;
   if (document.body.dataset.view === "study" && studyClick(e)) return;
   const modeBtn = e.target.closest("[data-mode]");
@@ -2527,7 +2719,7 @@ addEventListener("appinstalled", () => {
 if ("serviceWorker" in navigator && location.protocol !== "file:" && !window.SINGLE) {
   addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(reg => {
-      const files = new Set(["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "Instagram_icon.png", "brocoplaylist.jpg", "live.jpg", encodeURI(PROFILE_PHOTO), "call/", "call/index.html", "call/poster.jpg", "call/zone.jpg", "call/119956.png", "jlpt.js"]);
+      const files = new Set(["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "Instagram_icon.png", "brocoplaylist.jpg", "live.jpg", encodeURI(PROFILE_PHOTO), "call/", "call/index.html", "call/poster.jpg", "call/zone.jpg", "call/119956.png", "jlpt.js", "streams.js"]);
       for (const al of ALBUMS) {
         files.add(encodeURI(`가사/${al.file}.js`));
         files.add(encodeURI(al.cover || `${al.file}.webp`));
@@ -2538,8 +2730,10 @@ if ("serviceWorker" in navigator && location.protocol !== "file:" && !window.SIN
 }
 
 loadLyrics().then(() => {
+  setStreams(window.STREAMS_DATA);
   addEventListener("hashchange", route);
   route();
+  if (location.hostname.endsWith(".github.io")) refreshStreams();
 });
 </script>
 </body>

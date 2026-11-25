@@ -98,28 +98,41 @@ h1 .jp { display: block; font-weight: 800; font-size: .42em; letter-spacing: .02
 h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .lede { max-width: 62ch; color: var(--muted); margin: 0; }
 
-/* setlist: 접어 두는 칸. 제목 줄을 누르면 곡 목록이 펼쳐지고, 날짜 버튼은 펼쳤을 때만 보인다. 좁은 화면에서는 날짜 버튼이 제목 아래로 내려간다 */
-.setlist { margin-bottom: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
-.sl-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 12px; align-items: end; padding: 18px; cursor: pointer; list-style: none; border-radius: 12px; }
+/* setlist: 접어 두는 칸. 제목 줄은 위 배너와 같은 모양(라이브 사진 + 짙은 초록 그라데이션, 일반·다크 모드 같음)이고, 누르면 곡 목록이 펼쳐진다.
+   날짜 버튼은 펼쳤을 때만 보인다. 좁은 화면에서는 날짜 버튼이 제목 아래로 내려간다 */
+.setlist { container-type: inline-size; margin-bottom: 20px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+.sl-head { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: 1fr auto; column-gap: 12px; align-items: end; min-height: 108px; padding: 18px 16px 16px; cursor: pointer; user-select: none; -webkit-user-select: none; list-style: none; color: #fff; background: rgb(14, 28, 18); }
 .sl-head::-webkit-details-marker { display: none; }
-.setlist[open] .sl-head { padding-bottom: 0; }
-.sl-title { grid-column: 1; font-weight: 800; font-size: 26px; line-height: 1.15; letter-spacing: -.02em; margin: 0; }
-.sl-meta { grid-column: 1; grid-row: 2; font-size: 13px; color: var(--muted); margin-top: 4px; }
+.sl-head::before { --s: max(125cqi, 620px); content: ""; position: absolute; inset: 0; background: var(--end, linear-gradient(transparent, transparent)), linear-gradient(to right, rgba(14, 28, 18, .84) 0%, rgba(14, 28, 18, .62) 24%, rgba(14, 28, 18, .12) 46%, rgba(14, 28, 18, 0) 100%), linear-gradient(to bottom, rgba(14, 28, 18, 0) 0%, rgba(14, 28, 18, .1) 45%, rgba(14, 28, 18, .5) 80%, rgba(14, 28, 18, .86) 100%), #1d3a24 url("../live.jpg") 0 calc(-.02 * var(--s)) / var(--s) auto no-repeat; }
+.sl-head:hover::before { filter: brightness(1.08); }
+.sl-head:focus-visible { outline: none; }
+.sl-head:focus-visible::after { content: ""; position: absolute; inset: 0; border: 2px solid #fff; border-radius: 15px; pointer-events: none; }
+.sl-head > * { position: relative; }
+.sl-title { grid-column: 1; grid-row: 1; font-weight: 800; font-size: 26px; line-height: 1.2; letter-spacing: -.02em; margin: 0; word-break: keep-all; text-shadow: 0 1px 6px rgba(9, 22, 13, .45); }
+.sl-meta { grid-column: 1; grid-row: 2; font-size: 13px; line-height: 1.4; color: #dcefd8; margin-top: 2px; text-shadow: 0 1px 6px rgba(9, 22, 13, .45); }
 .days { grid-column: 2; grid-row: 1 / span 2; display: flex; gap: 6px; cursor: default; }
 .setlist:not([open]) .days { display: none; }
-.sl-head .chev { grid-column: 3; grid-row: 1; align-self: start; width: 9px; height: 9px; margin: 9px 4px 0; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); }
-.sl-head:hover .chev { border-color: var(--leaf); }
-.setlist[open] .sl-head .chev { transform: rotate(-135deg); margin-top: 13px; }
+/* '펼치기 ∨' 버튼 모양. 제목 줄 어디를 눌러도 펼쳐진다 */
+.sl-toggle { grid-column: 3; grid-row: 1 / span 2; display: inline-flex; align-items: center; gap: 9px; padding: 7px 14px; font-size: 13.5px; font-weight: 700; line-height: 19px; white-space: nowrap; color: #101a13; background: #7cc58a; border: 1.5px solid #7cc58a; border-radius: 12px; }
+.sl-head:hover .sl-toggle { filter: brightness(1.08); }
+.setlist[open] .sl-toggle .w-open, .setlist:not([open]) .sl-toggle .w-close { display: none; }
+.sl-toggle .chev { width: 8px; height: 8px; margin-top: -4px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); }
+.setlist[open] .sl-toggle .chev { margin-top: 4px; transform: rotate(-135deg); }
 .sl-body { padding: 0 18px 18px; }
+/* 펼쳤을 때: 사진 아래 끝이 곡 목록 바탕색으로 부드럽게 이어진다 */
+.setlist[open] .sl-head { --end: linear-gradient(to top, var(--surface) 0, color-mix(in srgb, var(--surface) 84%, transparent) 8px, color-mix(in srgb, var(--surface) 52%, transparent) 19px, color-mix(in srgb, var(--surface) 20%, transparent) 30px, transparent 42px); min-height: 138px; padding-bottom: 46px; background: var(--surface); }
+.setlist[open] .sl-list { margin-top: 2px; }
 @media (max-width: 640px) {
-  .sl-head { grid-template-columns: minmax(0, 1fr) auto; }
-  .sl-meta { grid-column: 1 / -1; }
+  .sl-head { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 1fr auto; min-height: 120px; }
+  .sl-head::before { background: var(--end, linear-gradient(transparent, transparent)), linear-gradient(to bottom, rgba(14, 28, 18, 0) 0%, rgba(14, 28, 18, .1) 18%, rgba(14, 28, 18, .42) 36%, rgba(14, 28, 18, .72) 56%, rgba(14, 28, 18, .92) 80%, rgb(14, 28, 18) 100%), #1d3a24 url("../live.jpg") 0 calc(-.03 * var(--s)) / var(--s) auto no-repeat; }
+  .sl-title { font-size: clamp(15px, 5.75cqi, 22px); align-self: end; padding-bottom: 2px; }
+  .sl-meta { grid-column: 1 / -1; margin-top: 4px; }
   .days { grid-column: 1 / -1; grid-row: 3; justify-self: start; margin-top: 12px; }
-  .sl-head .chev { grid-column: 2; }
+  .sl-toggle { grid-column: 2; grid-row: 1; }
 }
-@media (max-width: 340px) { .sl-title { font-size: 23px; } }
-.day { font: inherit; font-weight: 700; font-size: 14px; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; font-variant-numeric: tabular-nums; }
-.day[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.day { font: inherit; font-weight: 700; font-size: 13.5px; line-height: 19px; padding: 7px 14px; border-radius: 12px; border: 1.5px solid rgba(255, 255, 255, .28); background: rgba(14, 28, 18, .55); color: #e6f3e2; cursor: pointer; font-variant-numeric: tabular-nums; }
+.day:hover { border-color: #7cc58a; }
+.day[aria-pressed="true"] { background: #fff; color: #101a13; border-color: #fff; }
 .sl-list { list-style: none; margin: 14px 0 0; padding: 0; columns: 2 300px; column-gap: 32px; }
 .sl-list li { break-inside: avoid; display: grid; grid-template-columns: 2em 1fr auto; gap: 0 8px; align-items: baseline; padding: 7px 0; border-top: 1px dashed var(--line); }
 .sl-no { font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 700; font-size: 13px; }
@@ -138,49 +151,102 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .poster { margin: 0; }
 .poster a { display: block; }
 .poster img { display: block; width: 100%; max-width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); }
-.poster figcaption { font-size: 12px; color: var(--muted); margin-top: 6px; }
-/* 작은 배너(인스타그램)와 큰 배너 2개(가사 노트, Ryoku.님 note). 큰 배너 제목이 같은 높이에 오도록 글자는 위에서부터 놓는다 */
+/* 배너 3개(가사 노트, Ryoku.님 note, 인스타그램): 가사 노트 첫 화면과 같은 모양. 사진이 카드 전체를 채우고 짙은 초록 그라데이션이 맨 아래까지 이어진다.
+   일반·다크 모드 모두 같은 모양이고, 사진 파일이 없으면 초록 바탕에 글자만 남는다 */
 .banners { display: grid; gap: 8px; min-width: 0; }
-.banner { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 12px 14px 12px 12px; color: var(--bg); text-decoration: none; background: var(--leaf); border-radius: 14px; }
-.banner:hover { filter: brightness(1.08); }
-.banner img, .banner svg { display: block; flex: none; width: 56px; height: 56px; padding: 9px; background: #fff; border-radius: 12px; }
-.banner svg { fill: none; stroke: #2f7a3e; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.banner span { display: grid; flex: 1; gap: 2px; min-width: 0; padding-top: 8px; }
-.banner b { font-size: 16px; font-weight: 800; line-height: 1.25; overflow-wrap: anywhere; }
-.banner small { font-size: 12px; line-height: 1.4; word-break: keep-all; }
-.banner::after { content: ""; flex: none; align-self: center; width: 9px; height: 9px; margin-right: 2px; border-top: 2px solid currentColor; border-right: 2px solid currentColor; transform: rotate(45deg); }
-.banner.small { justify-self: start; align-items: center; padding: 10px 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); }
-.banner.small:hover { filter: none; border-color: var(--leaf); }
-.banner.small img { width: 38px; height: 38px; padding: 0; background: none; border-radius: 10px; }
-.banner.small span { gap: 0; padding-top: 0; }
-.banner.small b { font-size: 15px; }
-.banner.small small { font-size: 12px; color: var(--muted); }
-/* 넓은 화면: 포스터 설명은 포스터 바로 아래 줄로 빼고, 인스타와 큰 배너는 소개·포스터 아래 전체 폭에 놓는다 */
+.pban {
+  --fade: linear-gradient(to bottom, rgba(14, 28, 18, 0) 0%, rgba(14, 28, 18, .05) 12%, rgba(14, 28, 18, .2) 22%, rgba(14, 28, 18, .45) 32%, rgba(14, 28, 18, .64) 42%, rgba(14, 28, 18, .79) 54%, rgba(14, 28, 18, .91) 70%, rgba(14, 28, 18, .98) 86%, rgb(14, 28, 18) 100%);
+  position: relative; container-type: inline-size; display: flex; flex-direction: column; min-width: 0; overflow: hidden; background: rgb(14, 28, 18); border: 1px solid var(--line); border-radius: 16px;
+}
+.pban:hover { filter: brightness(1.06); }
+.pban-pic { flex: 1; display: flex; align-items: flex-end; min-height: max(148px, 54cqi); color: #fff; text-decoration: none; }
+/* 사진(::before)과 누르는 자리(::after)는 버튼 칸까지 카드 전체를 덮는다 */
+.pban-pic::before, .pban-pic::after { content: ""; position: absolute; inset: 0; }
+.pban-pic::before { background: var(--fade), #1d3a24 50% 0 / cover no-repeat; }
+.pic-lyrics::before { --s: max(100cqi, 300px); background: var(--fade), #1d3a24 url("../녹황색사회 2026 프로필.jpg") 50% calc(-.09 * var(--s)) / var(--s) auto no-repeat; }
+/* 라이브 사진에서 관객석 쪽을 크게 보여 준다 */
+.pic-note::before { background: var(--fade), linear-gradient(to bottom, rgba(14, 28, 18, 0) 36cqi, rgba(14, 28, 18, .6) 50cqi, rgb(14, 28, 18) 66cqi), #1d3a24 url("../live.jpg") -188cqi -132cqi / 300cqi auto no-repeat; }
+.pic-ig::before { background: var(--fade), linear-gradient(to bottom, rgba(14, 28, 18, 0) 34cqi, rgba(14, 28, 18, .55) 46cqi, rgb(14, 28, 18) 64cqi), #1d3a24 url("../brocoplaylist.jpg") 0 -26cqi / 100cqi auto no-repeat; }
+.pban-pic:focus-visible { outline: none; }
+.pban-pic:focus-visible::after { border: 2px solid #fff; border-radius: 15px; }
+.pban-t { position: relative; flex: 1; min-width: 0; display: grid; gap: 2px; padding: 0 16px 6px; text-shadow: 0 1px 6px rgba(9, 22, 13, .45); }
+.pban-t b { font-size: clamp(13px, 9.4cqi, 18px); font-weight: 800; line-height: 1.3; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.pban-t small { min-height: 2.8em; font-size: 12.5px; line-height: 1.4; color: #dcefd8; word-break: keep-all; }
+.pban-t small:lang(ja) { word-break: normal; word-break: auto-phrase; }
+.pban-go { position: relative; z-index: 1; display: flex; gap: 8px; padding: 6px 16px 16px; pointer-events: none; }
+.pban-go a { display: inline-flex; align-items: center; padding: 7px 13px; font-size: 13.5px; font-weight: 700; line-height: 19px; white-space: nowrap; color: #101a13; text-decoration: none; background: #7cc58a; border: 1.5px solid #7cc58a; border-radius: 12px; pointer-events: auto; }
+.pban-go a:hover { filter: brightness(1.08); }
+/* 그림(歌 아이콘, 문서 모양)은 칸이 넓을 때만 글자 왼쪽에 둔다 */
+.pban-t.has-ic { grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; }
+.pban-t.has-ic:not(:has(img, svg)) { grid-template-columns: minmax(0, 1fr); }
+.pban-t img, .pban-t svg { grid-row: 1 / span 2; align-self: center; display: block; width: 46px; height: 46px; border-radius: 12px; }
+.pban-t svg { padding: 9px; background: #fff; fill: none; stroke: #2f7a3e; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@container (max-width: 270px) {
+  .pban-t.has-ic:not(.ig-t) { grid-template-columns: minmax(0, 1fr); }
+  .pban-t:not(.ig-t) img, .pban-t svg { display: none; }
+}
+/* 인스타그램 로고: 칸이 넓으면 글자 왼쪽에 크게, 좁으면 아이디 앞에 작게 */
+.pban-t.ig-t { column-gap: 11px; }
+.pban-t.ig-t img { align-self: start; width: 42px; height: 42px; padding: 0; background: none; border-radius: 11px; }
+@container (max-width: 215px) {
+  .pban-t.ig-t { column-gap: 6px; }
+  .pban-t.ig-t img { grid-row: 1; align-self: center; width: 18px; height: 18px; border-radius: 5px; }
+  .pban-t.ig-t small { grid-column: 1 / -1; }
+}
+@container (max-width: 150px) {
+  .pban-t.ig-t { column-gap: 4px; }
+  .pban-t.ig-t img { width: 14px; height: 14px; border-radius: 4px; }
+}
+@container (max-width: 190px) {
+  .pban-pic { min-height: 168px; }
+  .pban-t, .pban-go { padding-inline: 12px; }
+}
+/* 좁은 화면(640px 이하): 가사 노트가 위에 넓게, 그 아래 Ryoku.님 note와 인스타그램이 나란히 */
+@media (max-width: 640px) {
+  .head-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .head-text { grid-column: 1 / -1; margin-bottom: 10px; }
+  .banners { display: contents; }
+  .pban.lyrics { grid-column: 1 / -1; grid-row: 2; }
+  .pban.lyrics .pban-pic { min-height: 0; aspect-ratio: 25 / 12; }
+  .pban.lyrics .pban-t b { font-size: clamp(19px, 5.4vw, 23px); }
+  .pban.lyrics .pban-t small { min-height: 0; font-size: 13px; }
+  .pban.ryoku { grid-column: 1; grid-row: 3; }
+  .pban.ig { grid-column: 2; grid-row: 3; }
+  .poster { grid-column: 1 / -1; grid-row: 4; max-width: 240px; margin-top: 10px; }
+}
+/* 중간 화면: 소개·포스터 아래에 배너 세 장이 한 줄로 */
 @media (min-width: 641px) {
   .head-layout { row-gap: 6px; }
-  .head-text { grid-column: 1; grid-row: 1; align-self: end; }
   .poster { display: contents; }
-  .poster a { grid-column: 2; grid-row: 1; }
-  .poster figcaption { grid-column: 2; grid-row: 2; align-self: start; margin-top: 0; }
-  .banner.small { grid-column: 1 / -1; grid-row: 3; margin-top: 8px; }
-  .banners { grid-column: 1 / -1; grid-row: 4; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 2px; }
 }
-/* 더 넓은 화면: 인스타는 제목 오른쪽 빈 공간으로 올라가고, 큰 배너는 그 아래 왼쪽 칸을 채운다.
-   인스타는 제목 줄과 같은 높이에 놓이고, 제목·포스터 윗선이 같으며, 큰 배너 아랫선은 포스터 아랫선과, 인스타 오른쪽 끝은 큰 배너 오른쪽 끝과 맞는다 */
+@media (min-width: 641px) and (max-width: 1039px) {
+  .head-layout { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 8px; }
+  .head-text { grid-column: 1 / span 2; grid-row: 1; align-self: end; padding-right: 20px; }
+  .poster a { grid-column: 3; grid-row: 1; justify-self: end; width: 100%; max-width: 220px; }
+  .banners { display: contents; }
+  .pban { grid-row: 2; margin-top: 8px; }
+  .pban.lyrics { grid-column: 1; }
+  .pban.ryoku { grid-column: 2; }
+  .pban.ig { grid-column: 3; }
+}
+/* 넓은 화면: 인스타그램은 제목 오른쪽 빈 공간에, 가사 노트와 Ryoku.님 note는 그 아래 왼쪽 칸에.
+   제목·인스타·포스터 윗선이 같고, 두 배너 아랫선은 포스터 아랫선과, 인스타 오른쪽 끝은 두 배너 오른쪽 끝과 맞는다 */
 @media (min-width: 1040px) {
-  .head-layout { grid-template-columns: minmax(0, 1fr) auto minmax(0, 220px); }
-  .head-text { align-self: start; }
-  .banner.small { grid-column: 2; grid-row: 1; align-self: start; margin-top: calc(12px * 1.6 + 14px); }
-  html[lang="ja"] .banner.small { margin-top: calc(12px * 1.6 + 14px - 7px); }
-  .poster a { grid-column: 3; grid-row: 1 / span 2; }
-  .poster figcaption { grid-column: 3; grid-row: 3; }
-  .banners { grid-column: 1 / span 2; grid-row: 2; align-self: end; margin-top: 0; }
-}
-
-@media (max-width: 640px) {
-  .head-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
-  .banner.small { margin-bottom: -10px; }
-  .poster { max-width: 240px; }
+  .head-layout { grid-template-columns: minmax(0, 1fr) 236px minmax(0, 220px); grid-template-rows: auto 1fr; row-gap: 8px; align-items: stretch; }
+  .head-text { grid-column: 1; grid-row: 1; align-self: start; }
+  .pban.ig { grid-column: 2; grid-row: 1; }
+  .pban.ig .pban-pic { min-height: 0; }
+  .pban.ig .pban-t small { min-height: 0; }
+  .banners { grid-column: 1 / span 2; grid-row: 2; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; margin-top: 6px; }
+  .banners .pban { flex-direction: row; align-items: stretch; min-height: 77px; }
+  .banners .pban-pic { min-height: 0; }
+  .banners .pban-pic::before { --side: linear-gradient(to right, rgba(14, 28, 18, .82) 0%, rgba(14, 28, 18, .55) 38%, rgba(14, 28, 18, .12) 72%, rgba(14, 28, 18, 0) 100%); --low: linear-gradient(to bottom, rgba(14, 28, 18, 0) 0%, rgba(14, 28, 18, .2) 45%, rgba(14, 28, 18, .62) 78%, rgba(14, 28, 18, .92) 100%); }
+  .banners .pic-lyrics::before { background: var(--side), var(--low), #1d3a24 url("../녹황색사회 2026 프로필.jpg") 0 -9cqi / 100cqi auto no-repeat; }
+  .banners .pic-note::before { background: var(--side), var(--low), #1d3a24 url("../live.jpg") 100% 74% / 150cqi auto no-repeat; }
+  .banners .pban-t { align-content: end; padding: 0 12px 14px 16px; }
+  .banners .pban-t small { min-height: 0; }
+  .banners .pban-go { align-items: flex-end; padding: 0 16px 16px 0; }
+  .poster a { grid-column: 3; grid-row: 1 / span 2; align-self: start; }
 }
 .song { scroll-margin-top: 120px; }
 .song.key { border: 2px solid var(--yolk); }
@@ -300,13 +366,15 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
       <h1><span data-t="h1"><span class="g">녹황색</span><span class="y">사회</span> 콜 가이드</span><span class="jp">リョクシャカ ライブ予習</span></h1>
       <p class="lede" data-t="lede">라이브에서 관객이 다 같이 하는 동작과 콜을 노래별로 모았어요. 곡 이름을 누르면 콜이 펼쳐지고, 다 외운 부분은 오른쪽 체크를 눌러 두면 이 브라우저에 기억돼요.</p>
     </div>
-    <a class="banner small" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener"><img src="../Instagram_icon.png" alt="" onerror="this.remove()"><span><b>@brocoplaylist</b><small data-t="bIg">인스타그램</small></span></a>
+    <div class="pban ig"><a class="pban-pic pic-ig" href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener"><span class="pban-t has-ic ig-t"><img src="../Instagram_icon.png" alt="" onerror="this.remove()"><b>@brocoplaylist</b><small data-t="bIg">제작자의 인스타그램</small></span></a>
+      <div class="pban-go"><a href="https://www.instagram.com/brocoplaylist/" target="_blank" rel="noopener" data-t="bIgGo">프로필 보기</a></div></div>
     <nav class="banners" aria-label="바로 가기">
-      <a class="banner" href="../index.html"><img src="../icon-192.png" alt="" onerror="this.remove()"><span><b data-t="bLyrics">가사 노트</b><small data-t="bLyricsSub">원문·발음·해석 공부 노트</small></span></a>
-      <a class="banner" href="https://note.com/ryoku_528/n/n13c0ff390aef" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 12h7M9 16h7"/></svg><span><b data-t="bNote">Ryoku.님 note</b><small data-t="bNoteSub">dedicated to Ryoku.님</small></span></a>
+      <div class="pban lyrics"><a class="pban-pic pic-lyrics" href="../index.html"><span class="pban-t has-ic"><img src="../icon-192.png" alt="" onerror="this.remove()"><b data-t="bLyrics">가사 노트</b><small data-t="bLyricsSub">원문·발음·해석 공부 노트</small></span></a>
+        <div class="pban-go"><a href="../index.html" data-t="bLyricsGo">가사 보러 가기</a></div></div>
+      <div class="pban ryoku"><a class="pban-pic pic-note" href="https://note.com/ryoku_528/n/n13c0ff390aef" target="_blank" rel="noopener"><span class="pban-t has-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 12h7M9 16h7"/></svg><b data-t="bNote">Ryoku.님 note</b><small data-t="bNoteSub">dedicated to Ryoku.님</small></span></a>
+        <div class="pban-go"><a href="https://note.com/ryoku_528/n/n13c0ff390aef" target="_blank" rel="noopener" data-t="bNoteGo">note 읽기</a></div></div>
     </nav>
     <figure class="poster">      <a href="poster.jpg" target="_blank" rel="noopener"><img src="poster.jpg" alt="녹황색사회 아시아 투어 2025 서울 공연 포스터. 2025년 10월 11일 토, 12일 일 오후 6시, YES24 LIVE HALL" width="850" height="1203"></a>
-      <figcaption data-t="cap">ASIA TOUR 2025 서울 · 누르면 크게 보여요</figcaption>
     </figure>
   </header>
 
@@ -318,7 +386,7 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
         <button type="button" class="day" id="day-1011" data-day="1011" aria-pressed="true" data-t="day1">10.11 토</button>
         <button type="button" class="day" id="day-1012" data-day="1012" aria-pressed="false" data-t="day2">10.12 일</button>
       </span>
-      <span class="chev" aria-hidden="true"></span>
+      <span class="sl-toggle" aria-hidden="true"><span class="w-open" data-t="slOpen">펼치기</span><span class="w-close" data-t="slClose">접기</span><span class="chev"></span></span>
     </summary>
     <div class="sl-body">
       <ol class="sl-list" id="slList"></ol>
@@ -449,14 +517,18 @@ const JA_UI = {
   kicker: "緑黄色社会 · LIVE 予習ノート",
   h1: '<span class="g">緑黄色</span><span class="y">社会</span> コールガイド',
   lede: "ライブでみんなでする動きやコールを曲ごとにまとめました。Ryoku.さんのnoteをもとに韓国のファン向けに作ったガイドの日本語表示です。曲名を押すとコールが開き、覚えた部分は右のチェックを押すとこのブラウザに記録されます。",
-  bIg: "Instagram",
+  bIg: "制作者のInstagram",
   bLyrics: "歌詞ノート",
   bLyricsSub: "韓国語で歌詞を学ぶノート",
   bNote: "Ryoku.さんのnote",
   bNoteSub: "dedicated to Ryoku.さん",
-  cap: "ASIA TOUR 2025 ソウル · 押すと拡大します",
-  slTitle: "2025 韓国公演セットリスト",
+  bIgGo: "プロフィール",
+  bLyricsGo: "歌詞を見る",
+  bNoteGo: "noteを読む",
+  slTitle: "2025 韓国公演<wbr>セットリスト",
   slMeta: "ASIA TOUR 2025 · ソウル YES24 LIVE HALL",
+  slOpen: "開く",
+  slClose: "閉じる",
   day1: "10.11 土",
   day2: "10.12 日",
   slFoot: "両日で違うのは12曲目と14曲目だけです。<b>コールを見る</b>を押すと下のガイドに移動します。",
