@@ -351,6 +351,11 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 /* 곡 화면 제목 아래 작사·작곡. 한 사람(또는 같은 사람들)이 둘 다 했으면 '작사·작곡' 한 칸으로 줄인다 */
 .song-credit { display: flex; flex-wrap: wrap; gap: 2px 14px; margin-top: 6px; font-size: 13px; line-height: 1.5; }
 .song-credit b { margin-right: 6px; font-size: 12px; font-weight: 700; color: var(--muted); }
+.song-tieup { display: flex; align-items: baseline; margin-top: 4px; font-size: 13px; line-height: 1.5; }
+.song-tieup b { flex: none; margin-right: 6px; font-size: 12px; font-weight: 700; color: var(--muted); }
+.song-tieup ul { margin: 0; padding: 0; list-style: none; min-width: 0; }
+.song-tieup li { overflow-wrap: anywhere; }
+.song-tieup .ty { margin-left: 6px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 /* 곡 화면 위 유튜브: 웹 주소로 열면 사이트 안에서 재생. 파일로 직접 열면 유튜브가 막아서(오류 153) 새 탭으로 여는 카드를 보여 준다 */
 .yt-player { margin-top: 14px; aspect-ratio: 16 / 9; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--mask); }
 .yt-player iframe { display: block; width: 100%; height: 100%; border: 0; }
@@ -2295,6 +2300,72 @@ const SONG_NOTES = {
   "レジスダンス": "제목 '레지스단스'는 레지스턴스(レジスタンス, 저항)와 댄스(ダンス)를 합친 말이에요.",
 };
 const SONG_NOTE_BY_TITLE = Object.fromEntries(Object.entries(SONG_NOTES).map(([k, v]) => [norm(k), v]));
+// 타이업: "곡 제목": [[내용, 해]]. 일본어 위키백과 '緑黄色社会' 문서의 タイアップ 표(2026-11-28)를 옮김. 곡 화면의 작사·작곡 줄 아래에 보인다.
+const TIEUPS = {
+  "始まりの歌": [["HBC 『音ドキッ!』 8월 오프닝", 2017], ["스기야마 약품 CM송", 2017], ["MBS 『ミント!』 엔딩", 2020], ["메~테레 『ドデスカ!』 2023년도 테마곡", 2023], ["ABEMA 『今日、好きになりました。ニャチャン編』 주제가", 2024], ["메트라이프생명 기업 광고", 2025]],
+  "リトルシンガー": [["오키타 엔 소설 『きみに届け。はじまりの歌』 작중 시", 2017], ["오키타 엔 소설 『きみに届け。はじまりの歌』 스페셜 콜라보 송", 2018]],
+  "Bitter": [["AbemaTV 드라마 『恋愛ドラマな恋がしたい』 주제가", 2018]],
+  "Re": [["리크루트 『Follow Your Heart & Music』 2018 참가곡", 2018]],
+  "大人ごっこ": [["HTB 『夢チカ18』 3월 엔딩", 2018], ["HBC 『音ドキッ!』 3월 오프닝", 2018]],
+  "あのころ見た光": [["테레비아이치 『a-NN♪』 11월 엔딩", 2018], ["마루호 「ニキビ一緒に治そうProject」 테마송", 2021]],
+  "にちようび": [["일본공학원 CM송", 2019]],
+  "想い人": [["영화 『初恋ロスタイム』 주제가", 2019], ["ABEMA 『今日、好きになりました。ニャチャン編』 삽입곡", 2024]],
+  "Alright!!": [["NHK 『うまいッ!』 테마송", 2019], ["유니클로 히트텍 매장 방송곡", 2019]],
+  "Sabotage": [["TBS 화요드라마 『G線上のあなたと私』 주제가", 2019], ["TBS 화요드라마 『G線上のあなたと私』 7화 엔딩(어쿠스틱 버전)", 2019], ["기타니혼방송 『ちょこミラ』 오프닝", 2021]],
+  "Shout Baby": [["애니 『僕のヒーローアカデミア』(나의 히어로 아카데미아) 4기 2쿨 엔딩", 2020]],
+  "スカーレット": [["삿포로TV 『熱烈!ホットサンド!』 4월 엔딩", 2020]],
+  "幸せ": [["히로시마현 후추초 홍보 애니 『夢中に幸せ、府中町』 주제가", 2020]],
+  "Mela!": [["다리야 「パルティ カラーリングミルク」 CM송", 2020], ["후지TV 『林修のニッポンドリル』 테마송", 2020], ["니혼TV 『スッキリ』 「ひとつになろう！ダンスoneプロジェクト」 테마송", 2020], ["TV도쿄 『JAPAN COUNTDOWN』 9월 오프닝", 2020], ["알리시아 클리닉 브랜드 영상", 2021], ["JRA(일본중앙경마회) 2025년 연간 CM송", 2025], ["JRA(일본중앙경마회) 2026년 연간 CM송", 2026]],
+  "Brand New World": [["혼다카즈(중부 7현) CM송", 2020]],
+  "夏を生きる": [["tvk 『PRIDE OF KANAGAWA 2020 高校野球』 테마송", 2020]],
+  "LADYBUG": [["TV아사히 『サタデーステーション』·『サンデーステーション』 오프닝", 2020]],
+  "結証": [["애니 『半妖の夜叉姫』(반요 야샤히메) 1월 엔딩", 2021]],
+  "Copy": [["FM802 『UPBEAT!』 코너 CM송", 2021], ["도카이TV 『Finder TRIP』 테마곡", 2021]],
+  "merry-go-round": [["WOWOW 『アーバンスポーツ』 테마송", 2021]],
+  "たとえたとえ": [["MBS 제93회 센바츠(봄 고시엔) 공식 테마송", 2021], ["MBS 『MM-TV』 4월 엔딩", 2021], ["삿포로TV 『ハレバレティモンディ』 4·5월 엔딩", 2021], ["후나이 「FUNAI Qdt TV」 CM송", 2021]],
+  "これからのこと、それからのこと": [["시세이도 「SEA BREEZE」 CM송", 2021]],
+  "ずっとずっとずっと": [["아사히 「スーパードライ ザ・クール」 CM송", 2021]],
+  "アーユーレディー": [["영화 『都会のトム&ソーヤ』 주제가", 2021], ["GAORA 『北海道日本ハムファイターズ 春季キャンプLIVE』 테마송", 2023], ["HBC 『あぐり王国北海道NEXT』 오프닝", 2023]],
+  "一歩": [["기타큐슈 시립미술관 「ザ・フィンランドデザイン展」 테마송", 2021]],
+  "LITMUS": [["TV아사히 목요드라마 『緊急取調室』(긴급취조실) 주제가", 2021]],
+  "Landscape": [["스즈키 「ソリオ バンディット」 CM송", 2021]],
+  "恋って": [["ABEMA 『恋のコーチは元恋人』 주제가", 2021]],
+  "キャラクター": [["모리나가 「inゼリー」 CM송", 2022]],
+  "安心してね": [["도카이TV 『Finder TRIP』 테마송", 2022]],
+  "陽はまた昇るから": [["극장판 애니 『クレヨンしんちゃん もののけニンジャ珍風伝』(짱구는 못말려) 주제가", 2022], ["메~테레 『ドデスカ!』 2024년도 테마송", 2024]],
+  "S.T.U.D": [["도카이라디오 『ガッツナイター』 2022년도 테마송", 2022]],
+  "ミチヲユケ": [["니혼TV 수요드라마 『ファーストペンギン!』 주제가", 2022]],
+  "Don!!": [["후지필름 「INSTAX mini Link 2」 CM송", 2022], ["후지필름 「INSTAX “チェキ”」 크리스마스 CM송(크리스마스 버전)", 2022], ["후지필름 「INSTAX SQUARE Link」·「INSTAX Pal」 CM송", 2023]],
+  "ジブンセイフク": [["YKK 「それは、はじまりの音」 CM송", 2023]],
+  "White Rabbit": [["TOHO animation 뮤직 필름 『秘密のはなの庭』 타이업송", 2023], ["도카이TV 『Finder TRIP』 테마송", 2023]],
+  "愛のかたち": [["닛폰햄 「中華名菜」 CM송", 2023]],
+  "Starry Drama": [["도쿄시티경마 2023년도 CM송", 2023]],
+  "サマータイムシンデレラ": [["후지TV 월9 드라마 『真夏のシンデレラ』(한여름의 신데렐라) 주제가", 2023]],
+  "マジックアワー": [["후지TV 월9 드라마 『真夏のシンデレラ』(한여름의 신데렐라) 삽입곡", 2023]],
+  "花になって": [["애니 『薬屋のひとりごと』(약사의 혼잣말) 오프닝", 2023]],
+  "夢と悪魔とファンタジー": [["ZIP-FM 30주년 기념곡", 2023]],
+  "Party!!": [["애니 『ダンジョン飯』(던전밥) 엔딩", 2024]],
+  "Tap Tap Dance": [["유캔 「チャレンジユーキャン2024」 CM송", 2024]],
+  "ナイスアイディア！": [["카고메 「野菜生活100」 CM송", 2024]],
+  "僕らはいきものだから": [["2024년도 NHK 전국학교음악콩쿠르 중학교 부문 과제곡", 2024], ["NHK 『みんなのうた』 8~9월 방송곡", 2024]],
+  "恥ずかしいか青春は": [["ABEMA 『今日、好きになりました。』 주제가(2024년 7월~2025년 3월)", 2024]],
+  "言えない": [["ABEMA 『今日、好きになりました。』 삽입곡(2024년 7~12월)", 2024]],
+  "馬鹿の一つ覚え": [["영화 『六人の嘘つきな大学生』 주제가", 2024]],
+  "つづく": [["도코모 「第24回 ドコモ未来ミュージアム」 CM송", 2025], ["메~테레 『ドデスカ+』 2026년도 테마송", 2026]],
+  "My Answer": [["TV아사히 목요드라마 『緊急取調室』(긴급취조실) 주제가", 2025]],
+  "さもなくば誰がやる": [["영화 『緊急取調室 THE FINAL』(긴급취조실 더 파이널) 주제가", 2025]],
+  "風に乗る": [["극장판 애니 『パリに咲くエトワール』 주제가", 2026]],
+  "étoile": [["극장판 애니 『パリに咲くエトワール』 삽입곡", 2026]],
+  "章": [["니혼TV 수요드라마 『月夜行路 -答えは名作の中に-』 주제가", 2026]],
+  "晴々": [["후지TV 『バレーボールアジア選手権2026』 중계 테마송", 2026]],
+};
+const TIEUP_BY_TITLE = Object.fromEntries(Object.entries(TIEUPS).map(([k, v]) => [norm(k), v]));
+// 곡 화면: 작사·작곡 줄 아래의 타이업 목록. 인스트루멘털 트랙에는 보이지 않는다.
+function tieupHTML(t) {
+  const list = TIEUP_BY_TITLE[norm(t.jp)];
+  if (!list) return "";
+  return `<div class="song-tieup"><b>타이업</b><ul>${list.map(([what, year]) => `<li>${esc(what)}<span class="ty">${year}</span></li>`).join("")}</ul></div>`;
+}
 const WRITERS_BY_TITLE = Object.fromEntries(Object.entries(WRITERS).map(([k, v]) => [norm(k), v]));
 const writerNames = s => /^[HIPSR]+$/.test(s) ? [...s].map(c => WHO[c]).join(", ") : s;
 function creditHTML(t) {
@@ -2385,6 +2456,7 @@ function renderSong(t, line) {
       <h1 class="song-title" lang="ja">${titleHTML(t.jp)}${t.read ? `<span class="read">${esc(t.read)}</span>` : ""}</h1>
       ${t.ko || t.en ? `<div class="song-ko">${[t.ko, t.en].filter(Boolean).map(esc).join(" · ")}</div>` : ""}
       ${creditHTML(t)}
+      ${tieupHTML(t)}
       ${playsHTML(t)}
       ${al.desc ? `<div class="album-desc">${esc(al.desc)}</div>` : ""}
     </header>
