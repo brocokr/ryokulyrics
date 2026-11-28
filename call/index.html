@@ -321,6 +321,19 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .shot { margin: 10px 0 2px; max-width: 220px; }
 .shot img { display: block; width: 100%; max-width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); }
 .shot figcaption { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.shot > a { display: block; }
+/* Ryoku.님 note의 그림: 손 모양(.hand)은 작게, 박수 악보(.score)는 칸 너비만큼. 흰 종이 그림이라 다크 모드에서도 흰 바탕 */
+.shot.hand { max-width: 140px; }
+.shot.score { max-width: 640px; }
+.shot.hand img, .shot.score img { background: #fff; }
+.shot.score img { padding: 4px 2px; }
+.shot figcaption a { color: inherit; }
+.shot .credit { font-size: 11px; }
+/* 휴대폰에서는 악보 글자가 너무 작아지므로 560px로 두고 옆으로 밀어 보게 함 */
+@media (max-width: 600px) {
+  .shot.score > a { overflow-x: auto; border-radius: 10px; }
+  .shot.score img { width: 560px; max-width: none; }
+}
 .got { width: 28px; height: 28px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--surface); cursor: pointer; display: grid; place-items: center; color: transparent; font-size: 15px; font-weight: 800; }
 .got[aria-pressed="true"] { background: var(--leaf); border-color: var(--leaf); color: var(--surface); }
 .move.is-done .what, .move.is-done .call { opacity: .5; }
@@ -413,11 +426,11 @@ const ALBUM = "あたまご";
 const SONGS = [
   { id: "mela", t: "Mela!", ko: "메라!", aka: "멜라", lyric: "정규2집/3", links: [["MV", "https://youtu.be/aRDURmIYBZ4"], ["라이브 영상", "https://youtu.be/Oezmni8SklA"]], m: [
     { when: "인트로 · 라라라 구간", what: "손을 들고 오른쪽부터 와이퍼처럼 좌우로 흔들기", call: "[ラララ ラララ ララララ] / {1} / {2}", ko: "[라라라 라라라 라라라라] / {1} / {2}" },
-    { when: "프리코러스", what: "정해진 리듬으로 박수", note: "원문에 1절 박수 악보 있음. 연습 필수", score: true } ] },
+    { when: "프리코러스", what: "정해진 리듬으로 박수", note: "박수 칠 자리를 음표로 적은 1절 악보예요. 느낌으로 봐 주세요. 연습 필수", score: true, img: "score-mela.png", w: 1233, h: 377, shot: "score", alt: "Mela! 1절 프리코러스의 박수 리듬 악보. 4분의 4박자이고, 가사 「ラララ ラララ 手を取ってくれないか ラララ ラララ ギブとテイクさ ラララ ラララ 君が僕のヒーローだったように」 위에 박수 칠 자리를 음표로 적었어요." } ] },
   { id: "bitter", t: "Bitter", ko: "비터", links: [["MV", "https://youtu.be/9p3Q0IKFt4I"]], m: [
-    { when: "후렴 · 「トゥールッ トゥ トゥールッ」부터", what: "정해진 손 모양으로 좌우로 붕붕 흔들기", note: "손 모양은 원문 그림 참고", score: true } ] },
+    { when: "후렴 · 「トゥールッ トゥ トゥールッ」부터", what: "정해진 손 모양으로 좌우로 붕붕 흔들기", note: "손 모양은 아래 그림처럼 엄지와 새끼손가락만 펴요 🤙", score: true, img: "hand-bitter.png", w: 491, h: 482, shot: "hand", alt: "엄지와 새끼손가락을 펴고 나머지 세 손가락은 접은 손 그림" } ] },
   { id: "alright", t: "Alright!!", ko: "올라잇!!", m: [
-    { when: "후렴 · 정해진 타이밍", what: "엄지 척 👍 → 손 흔들기 👋 를 번갈아", note: "동작 그림은 원문 참고", score: true } ] },
+    { when: "후렴 · 정해진 타이밍", what: "엄지 척 👍 → 손 흔들기 👋 를 번갈아", note: "엄지 척 손 모양은 아래 그림처럼", score: true, img: "hand-alright.png", w: 404, h: 522, shot: "hand", alt: "엄지를 위로 세운 손 그림" } ] },
   { id: "hiwamata", t: "陽はまた昇るから", ko: "해는 다시 떠오르니까", en: "hi wa mata noboru kara", lyric: "정규4집/7", m: [
     { when: "후렴 끝 · 「陽はまた昇るから」가 반복될 때 1번째와 3번째", what: "昇\"る\"から의 「る」 음에 맞춰 검지를 위로 👆", call: "{1:る}", ko: "{1:루}", note: "2번째 반복에서는 하지 않아요" } ] },
   { id: "pinkblue", t: "ピンクブルー", ko: "핑크블루", en: "pink blue", lyric: "정규4집/1", m: [
@@ -444,11 +457,11 @@ const SONGS = [
     { when: "곡 내내", what: "탬버린을 든 보컬 나가야 하루코의 박자에 맞춰 박수" },
     { when: "인트로", what: "라라라 멜로디를 세 번 다 같이", call: "[ラーラ ララッラー] / {7} / {8}", ko: "[라-라 라랏라-] / {7} / {8}" } ] },
   { id: "scarlet", t: "スカーレット", ko: "스칼렛", en: "scarlet", m: [
-    { when: "2절 벌스", what: "정해진 리듬으로 박수", note: "음악 해 본 사람도 어려운 구간. 원문 악보로 연습 필수", score: true } ] },
+    { when: "2절 벌스", what: "정해진 리듬으로 박수", note: "음악 해 본 사람도 어려운 구간. 아래 악보로 연습 필수(느낌으로 봐 주세요)", score: true, img: "score-scarlet.png", w: 1231, h: 176, shot: "score", alt: "スカーレット 2절 벌스의 박수 리듬 악보. 4분의 4박자 네 마디이고, 가사 「愛のメロドラマ あのテレビスターのようにヘラヘラしてられたら」 위에 박수 칠 자리를 음표로 적었어요." } ] },
   { id: "landscape", t: "Landscape", ko: "랜드스케이프", m: [
-    { when: "2절 벌스", what: "정해진 리듬으로 박수", note: "원문 악보 참고", score: true } ] },
+    { when: "2절 벌스", what: "정해진 리듬으로 박수", note: "아래 악보 참고", score: true, img: "score-landscape.png", w: 983, h: 173, shot: "score", alt: "Landscape 2절 벌스의 박수 리듬 악보. 4분의 4박자이고 셋잇단음표가 섞여 있으며, 가사 「あれこれ貰ってきた 受け取って溢してきた」 위에 박수 칠 자리를 음표로 적었어요." } ] },
   { id: "hazukashii", t: "恥ずかしいか青春は", ko: "부끄러운가 청춘은", en: "hazukashii ka seishun wa", lyric: "정규5집/2", m: [
-    { when: "프리코러스", what: "박수 짝- 짝- 짝 짝 짝 ×4", call: "{6} / {7} / {8} / {9}", ko: "{6} / {7} / {8} / {9}", score: true },
+    { when: "프리코러스", what: "박수 짝- 짝- 짝 짝 짝 ×4", call: "{6} / {7} / {8} / {9}", ko: "{6} / {7} / {8} / {9}", note: "아래는 1절 악보예요", score: true, img: "score-hazukashii.png", w: 912, h: 301, shot: "score", alt: "恥ずかしいか青春は 1절 프리코러스의 박수 리듬 악보. 4분의 4박자 여덟 마디이고, 가사 「繊細されど大胆だ うるさいこれが切り札だ 泣き虫されど熱血だ うるさいこれが持ち味だ」 위에 박수 칠 자리를 음표로 적었어요." },
     { when: "브릿지 끝", what: "브릿지 마지막 한 줄을 다 같이 부르기", call: "{40} / {41} / [{42}] / {43} / {44}", ko: "{40} / {41} / [{42}] / {43} / {44}" } ] },
   { id: "illusion", t: "illusion", ko: "일루전", al: 4, m: [
     { when: "인트로", what: "엇박에 맞춰 핑거스냅", note: "박수 대신 손가락 튕기기." } ] },
@@ -538,9 +551,9 @@ const JA_UI = {
 // 번역이 없는 콜은 한국어로 보이니 곡이나 콜을 추가하면 여기도 추가. call을 적으면 일본어 화면에서 그 문구를 씀
 const JA_MOVES = {
   "mela:0": { when: "イントロ（ラララの部分）", what: "手を上げて、右からワイパーのように左右に振る" },
-  "mela:1": { when: "Bメロ", what: "決まったリズムで手拍子", note: "1番の楽譜は元記事にあります。練習必須" },
-  "bitter:0": { when: "サビの「トゥールッ トゥ トゥールッ」から", what: "決まった手の形で左右にブンブン振る", note: "手の形は元記事の画像を参照" },
-  "alright:0": { when: "サビの決まったタイミング", what: "👍 → 👋 を交互に", note: "動きは元記事を参照" },
+  "mela:1": { when: "Bメロ", what: "決まったリズムで手拍子", note: "叩くタイミングを楽譜にしたもの（1番）。ニュアンスで見てください。練習必須", alt: "Mela! 1番Bメロの手拍子のリズム譜。4分の4拍子で、歌詞「ラララ ラララ 手を取ってくれないか ラララ ラララ ギブとテイクさ ラララ ラララ 君が僕のヒーローだったように」の上に叩くタイミングを音符で示しています。" },
+  "bitter:0": { when: "サビの「トゥールッ トゥ トゥールッ」から", what: "決まった手の形で左右にブンブン振る", note: "手の形は下の画像のとおり、親指と小指だけを伸ばします 🤙", alt: "親指と小指を伸ばし、残りの3本の指を曲げた手の絵" },
+  "alright:0": { when: "サビの決まったタイミング", what: "👍 → 👋 を交互に", note: "👍の手の形は下の画像のとおり", alt: "親指を立てた手の絵" },
   "hiwamata:0": { when: "サビ終わりの「陽はまた昇るから」（1回目と3回目）", what: "「る」の音で人差し指を上に 👆", note: "2回目はやりません" },
   "pinkblue:0": { when: "2番Aメロ「世紀末」の「つ」", what: "ピース ✌️" },
   "pinkblue:1": { when: "1番Aメロ2回、2番Aメロ1回", what: "ボーカルの「あーあ」のあとに続けて言う" },
@@ -557,9 +570,9 @@ const JA_MOVES = {
   "player1:2": { when: "Aメロ終わり", what: "最後の言葉をみんなで" },
   "koitte:0": { when: "曲全体", what: "タンバリンを持った長屋晴子さんのリズムに合わせて手拍子" },
   "koitte:1": { when: "イントロ", what: "ラララのメロディを3回みんなで" },
-  "scarlet:0": { when: "2番Aメロ", what: "決まったリズムで手拍子", note: "音楽経験者でも難しい部分。元記事の楽譜で練習必須" },
-  "landscape:0": { when: "2番Aメロ", what: "決まったリズムで手拍子", note: "元記事を参照" },
-  "hazukashii:0": { when: "Bメロ", what: "手拍子 パンー パンー パン パン パン ×4" },
+  "scarlet:0": { when: "2番Aメロ", what: "決まったリズムで手拍子", note: "音楽経験者でも難しい部分。下の楽譜で練習必須（ニュアンスで見てください）", alt: "スカーレット 2番Aメロの手拍子のリズム譜。4分の4拍子4小節で、歌詞「愛のメロドラマ あのテレビスターのようにヘラヘラしてられたら」の上に叩くタイミングを音符で示しています。" },
+  "landscape:0": { when: "2番Aメロ", what: "決まったリズムで手拍子", note: "下の楽譜を参照", alt: "Landscape 2番Aメロの手拍子のリズム譜。4分の4拍子で3連符を含み、歌詞「あれこれ貰ってきた 受け取って溢してきた」の上に叩くタイミングを音符で示しています。" },
+  "hazukashii:0": { when: "Bメロ", what: "手拍子 パンー パンー パン パン パン ×4", note: "下の楽譜は1番", alt: "恥ずかしいか青春は 1番Bメロの手拍子のリズム譜。4分の4拍子8小節で、歌詞「繊細されど大胆だ うるさいこれが切り札だ 泣き虫されど熱血だ うるさいこれが持ち味だ」の上に叩くタイミングを音符で示しています。" },
   "hazukashii:1": { when: "Cメロ終わり", what: "Cメロの最後の1行をみんなで歌う" },
   "illusion:0": { when: "イントロ", what: "裏拍でフィンガースナップ", note: "手拍子の代わりに指を鳴らします" },
   "alice:0": { when: "サビ終わり", what: "3回、順番に叫ぶ" },
@@ -743,7 +756,7 @@ function render() {  const q = fold(state.q.trim());
           <div class="what">${esc(m.what)}</div>
           ${m.call ? `<div class="call" lang="ja">${callHtml(m.call, m.ko)}</div>` : ""}
           ${m.note ? `<div class="note">${esc(m.note)}</div>` : ""}
-          ${m.img ? `<figure class="shot"><img src="${m.img}" alt="${esc(m.alt || "")}" width="486" height="486" loading="lazy">${m.cap ? `<figcaption>${esc(m.cap)}</figcaption>` : ""}</figure>` : ""}
+          ${m.img ? `<figure class="shot${m.shot ? ` ${m.shot}` : ""}"><a href="${m.img}" target="_blank" rel="noopener"><img src="${m.img}" alt="${esc(m.alt || "")}" width="${m.w || 486}" height="${m.h || 486}" loading="lazy"></a>${m.cap || m.shot ? `<figcaption>${m.cap ? esc(m.cap) : ""}${m.shot ? `<span class="credit">${L("출처", "出典")}: <a href="${NOTE}" target="_blank" rel="noopener">Ryoku.${L("님", "さん")}</a></span>` : ""}</figcaption>` : ""}</figure>` : ""}
         </div>
         <button type="button" class="got" id="got-${m.key.replace(":", "-")}" data-key="${m.key}" aria-pressed="${!!done[m.key]}" aria-label="${L("외웠어요", "覚えた")}">✓</button>
       </li>`).join("")}</ul></div></details>`;
@@ -885,7 +898,7 @@ if (matchMedia("(display-mode: standalone)").matches || navigator.standalone ===
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   addEventListener("load", () => {
     navigator.serviceWorker.register("../sw.js", { scope: "../" }).then(() => navigator.serviceWorker.ready).then(reg => {
-      reg.active.postMessage({ type: "save-all", files: ["call/", "call/index.html", "call/poster.jpg", "call/zone.jpg", "./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "Instagram_icon.png", ...LYRIC_FILES.map(f => encodeURI(`가사/${f}.js`))] });
+      reg.active.postMessage({ type: "save-all", files: ["call/", "call/index.html", "call/poster.jpg", "call/zone.jpg", ...["score-mela", "score-scarlet", "score-landscape", "score-hazukashii", "hand-bitter", "hand-alright"].map(f => `call/${f}.png`),"./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "Instagram_icon.png", ...LYRIC_FILES.map(f => encodeURI(`가사/${f}.js`))] });
     }).catch(() => {});
   });
 }

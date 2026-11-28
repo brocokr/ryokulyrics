@@ -983,9 +983,9 @@ function playsHTML(t) {
   return `<div class="song-plays" title="Spotify 스트리밍 수(${STREAMS.updated} 기준)에 그 뒤로 흐른 시간만큼 하루 스트리밍 수를 더해 어림한 수예요."><span><i class="live-dot"></i>스트리밍 <b>${liveHTML(s)}</b>회</span><span>인기 ${ranking().indexOf(s) + 1}위</span>${s.d ? `<span>하루 +${numText(s.d)}</span>` : ""}<span>Spotify · 실시간 어림</span></div>`;
 }
 
-// 공부·퀴즈의 곡 목록: 앨범순(앨범 묶음별)이나 인기순(한 묶음). list는 곡 카드의 자료, trackOf는 그 곡, card(x, 순위·스트리밍 줄)는 카드 HTML
-const bySong = () => STREAMS && prefs.songSort === "pop";
-const songSortHTML = () => (STREAMS ? `<div class="song-sort"><span class="qs-label">곡 순서</span>${segHTML("곡 순서", "data-song-sort", [["album", "앨범순"], ["pop", "인기순"]], bySong() ? "pop" : "album")}</div>` : "");
+// 공부·퀴즈의 곡 목록: 인기순(한 묶음, 기본)이나 앨범순(앨범 묶음별). 스트리밍 자료가 없으면 앨범순. list는 곡 카드의 자료, trackOf는 그 곡, card(x, 순위·스트리밍 줄)는 카드 HTML
+const bySong = () => STREAMS && prefs.songOrder !== "album";
+const songSortHTML = () => (STREAMS ? `<div class="song-sort"><span class="qs-label">곡 순서</span>${segHTML("곡 순서", "data-song-sort", [["pop", "인기순"], ["album", "앨범순"]], bySong() ? "pop" : "album")}</div>` : "");
 function songListHTML(list, trackOf, card) {
   if (!bySong()) return GROUPS.map(g => {
     const part = list.filter(x => trackOf(x).album.group === g.id);
@@ -1169,8 +1169,9 @@ const store = {
   get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
   set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
 };
-const prefs = Object.assign({ mode: "all", pr: true, hg: true, furi: true, studyOpen: false, tl: false, pop: false, popSort: "total", songSort: "album" }, store.get("ryokushaka-lyrics:prefs", {}));
+const prefs = Object.assign({ mode: "all", pr: true, hg: true, furi: true, studyOpen: false, tl: false, pop: false, popSort: "total", songOrder: "pop" }, store.get("ryokushaka-lyrics:prefs", {}));
 if (!["all", "ko", "jp"].includes(prefs.mode)) prefs.mode = "all";
+delete prefs.songSort; // 예전 곡 순서 설정(기본이 앨범순이었음). 이제 기본은 인기순이고 songOrder에 저장한다.
 const savePrefs = () => store.set("ryokushaka-lyrics:prefs", prefs);
 
 /* ---------- 화면 ---------- */
@@ -2436,10 +2437,10 @@ function applyPrefs() {
 app.addEventListener("click", e => {
   const sortBtn = e.target.closest("[data-song-sort]");
   if (sortBtn) {
-    prefs.songSort = sortBtn.dataset.songSort;
+    prefs.songOrder = sortBtn.dataset.songSort;
     savePrefs();
     if (document.body.dataset.view === "quiz") renderQuizHome(); else renderStudyHome();
-    app.querySelector(`[data-song-sort="${prefs.songSort}"]`).focus({ preventScroll: true });
+    app.querySelector(`[data-song-sort="${prefs.songOrder}"]`).focus({ preventScroll: true });
     return;
   }
   const popBtn = e.target.closest("[data-pop-sort]");
