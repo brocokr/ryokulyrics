@@ -304,6 +304,13 @@ h1 .g { color: var(--leaf); } h1 .y { color: var(--yolk); }
 .live-dot { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--leaf); animation: live 1.6s ease-in-out infinite; }
 @keyframes live { 50% { opacity: .25; } }
 @media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+/* 다이얼처럼 굴러 올라가는 수: 자리마다 투명한 숫자가 자리를 잡고, 그 위에 0~9 띠를 겹쳐 칸 밖은 잘라 낸다(clip-path는 글자 줄 맞춤을 바꾸지 않음) */
+.odo { display: inline-block; white-space: nowrap; font-variant-numeric: tabular-nums; line-height: 1.25; }
+.odo-d { position: relative; display: inline-block; clip-path: inset(0); }
+.odo-p { color: transparent; }
+.odo-s { position: absolute; top: 0; left: 0; right: 0; text-align: center; transition: transform .45s cubic-bezier(.2, .75, .25, 1); }
+.odo-s::before { content: "0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9"; white-space: pre; }
+@media (prefers-reduced-motion: reduce) { .odo-s { transition: none; } }
 @media (max-width: 860px) { .pop-list { grid-auto-flow: row; grid-auto-columns: auto; grid-template-rows: none; } .pop-list + .pop-list { margin-top: 0; } }
 @media (max-width: 480px) {
   .pop { grid-template-columns: 1.7em 42px minmax(0, 1fr); }
@@ -964,15 +971,44 @@ function setStreams(data) {
 const streamNow = s => Math.floor(s.n + s.d * Math.max(0, Date.now() - STREAMS.base) / 864e5);
 const streamOf = t => (STREAMS && STREAMS.by[norm(t.jp)]) || null;
 const numText = n => n.toLocaleString("ko");
-// 저절로 올라가는 수. 열쇠가 "*"이면 모든 곡의 합계
-const liveHTML = s => `<span data-live="${s === STREAMS.all ? "*" : esc(s.key)}">${numText(streamNow(s))}</span>`;
+/* 저절로 올라가는 수(다이얼처럼 굴러 올라감). 열쇠가 "*"이면 모든 곡의 합계.
+   숫자 한 자리마다 투명한 숫자(.odo-p, 너비와 글자 줄을 잡고 화면 읽기·복사용)와 0~9가 두 번 세로로 쌓인 띠(.odo-s, CSS ::before)가 있고,
+   수가 바뀌면 띠를 위로 옮겨 새 숫자가 아래에서 올라오게 한다. 9 → 0처럼 넘어갈 때는 두 번째 0~9 쪽으로 굴린 뒤, 다음에 바뀔 때 같은 숫자인 앞쪽 자리로 몰래 옮긴다. */
+const ODO_STILL = matchMedia("(prefers-reduced-motion: reduce)");
+const odoHTML = text => [...text].map(ch => /\d/.test(ch) ? `<span class="odo-d"><span class="odo-p">${ch}</span><span class="odo-s" aria-hidden="true" style="transform:translateY(${-ch * 5}%)"></span></span>` : `<span class="odo-c">${ch}</span>`).join("");
+const liveHTML = s => { const text = numText(streamNow(s)); return `<span class="odo" data-live="${s === STREAMS.all ? "*" : esc(s.key)}">${odoHTML(text)}</span>`; };
+function setOdo(el, text) {
+  const old = el.textContent;
+  if (old === text) return;
+  const num = x => Number(x.replace(/\D/g, ""));
+  // 자리 수가 바뀌었거나, 새 자료로 수가 줄었거나, 움직임 줄이기를 켠 기기면 굴리지 않고 새로 그린다
+  if (old.length !== text.length || num(text) < num(old) || ODO_STILL.matches || !el.querySelector(".odo-d")) { el.innerHTML = odoHTML(text); return; }
+  const cells = el.querySelectorAll(".odo-d");
+  let k = 0;
+  for (const ch of text) {
+    if (!/\d/.test(ch)) continue;
+    const cell = cells[k++], p = cell.firstElementChild, strip = cell.lastElementChild;
+    if (p.textContent === ch) continue;
+    let at = Number(strip.dataset.at ?? p.textContent);
+    if (at >= 10) {
+      at -= 10;
+      strip.style.transition = "none";
+      strip.style.transform = `translateY(${-at * 5}%)`;
+      void strip.offsetHeight;
+      strip.style.transition = "";
+    }
+    const to = Number(ch) > at ? Number(ch) : Number(ch) + 10;
+    strip.dataset.at = to;
+    strip.style.transform = `translateY(${-to * 5}%)`;
+    p.textContent = ch;
+  }
+}
 const ranking = daily => [...STREAMS.list].sort((a, b) => (daily ? b.d - a.d : streamNow(b) - streamNow(a)) || b.n - a.n);
 setInterval(() => {
   if (!STREAMS || document.hidden) return;
   for (const el of document.querySelectorAll("[data-live]")) {
     const s = el.dataset.live === "*" ? STREAMS.all : STREAMS.by[el.dataset.live];
-    const text = s && numText(streamNow(s));
-    if (text && el.textContent !== text) el.textContent = text;
+    if (s) setOdo(el, numText(streamNow(s)));
   }
 }, 500);
 // 깃허브 작업이 streams.js를 새로 썼어도 사이트에는 늦게 올라올 수 있어서, 저장소의 파일을 한 번 더 확인한다.
